@@ -1,4 +1,6 @@
-# Transporte Sanitário — núcleo de domínio
+# SIGEPAS
+
+**Sistema de Gestão de Transportes de Pacientes e Servidores**
 
 Reconstrução, em arquitetura de servidor, de um sistema de **agendamento de transporte
 sanitário** hoje em produção no setor de transportes de uma secretaria municipal de saúde.
