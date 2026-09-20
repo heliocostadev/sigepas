@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  verificar:
+    name: tipos, lint e testes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Checagem de tipos
+        run: npm run typecheck
+
+      - name: Análise estática
+        run: npm run lint
+
+      - name: Testes com cobertura
+        run: npm run test:cov
