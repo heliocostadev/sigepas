@@ -1,7 +1,7 @@
 {
-  "name": "transporte-sanitario",
+  "name": "sigepas",
   "version": "0.1.0",
-  "description": "Núcleo de domínio do sistema de agendamento de transporte sanitário",
+  "description": "SIGEPAS — Sistema de Gestão de Transportes de Pacientes e Servidores: núcleo de domínio",
   "type": "module",
   "license": "MIT",
   "engines": {
