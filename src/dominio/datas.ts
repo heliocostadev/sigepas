@@ -48,20 +48,25 @@ export function interpretarData(valor: string | null | undefined): DataISO | nul
     return montar(Number(partes[0]), mes, Number(partes[2]));
   }
 
+  // Nos formatos numéricos, o texto inteiro precisa casar com o padrão. Dividir pelo
+  // separador e usar só as três primeiras partes deixava passar "2026-09-12-99" e
+  // "12/09/2026/lixo" como datas válidas (issue 5). Depois da data, só é aceita uma hora.
+  const [parteData = '', ...resto] = texto.split(/\s+/);
+  if (resto.length > 1 || (resto.length === 1 && !HORA_COLADA.test(resto[0] ?? ''))) return null;
+
   // "2026-09-12"
-  if (texto.includes('-')) {
-    const [ano, mes, dia] = texto.split(' ')[0]?.split('-') ?? [];
-    return montar(Number(dia), Number(mes), Number(ano));
-  }
+  const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(parteData);
+  if (iso) return montar(Number(iso[3]), Number(iso[2]), Number(iso[1]));
 
   // "12/9/2026" (com ou sem hora depois)
-  if (texto.includes('/')) {
-    const [dia, mes, ano] = texto.split(' ')[0]?.split('/') ?? [];
-    return montar(Number(dia), Number(mes), Number(ano));
-  }
+  const br = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(parteData);
+  if (br) return montar(Number(br[1]), Number(br[2]), Number(br[3]));
 
   return null;
 }
+
+/** Hora que pode vir colada depois da data: "14:30" ou "14:30:00". */
+const HORA_COLADA = /^\d{1,2}:\d{2}(:\d{2})?$/;
 
 /** Hora no formato usado internamente: `HH:MM`, 24 horas. */
 export type Hora = string;
@@ -71,23 +76,25 @@ export type Hora = string;
  *
  * Vazio vira `00:00` — é o que o sistema em produção faz hoje: a viagem existe mesmo sem
  * hora definida, e some da lista se for descartada. Ver a pergunta aberta no PR.
+ *
+ * Formatos aceitos: "9", "09", "930", "1000", "9:30", "10h" e "10h30". Qualquer texto a mais,
+ * como em "10h30h" ou "10:30:59", devolve `null` (issue 5).
  */
 export function interpretarHora(valor: string | null | undefined): Hora | null {
   const texto = (valor ?? '').toString().trim();
   if (!texto) return '00:00';
 
-  const comDoisPontos = texto.replace(/[hH]/g, ':');
-
-  if (comDoisPontos.includes(':')) {
-    const [h, m] = comDoisPontos.split(':');
-    return validarHora(Number(h), Number(m || 0));
+  const separada = /^(\d{1,2})[:hH](\d{2})?$/.exec(texto);
+  if (separada) {
+    // "9:" não é hora; "10h" é.
+    if (separada[2] === undefined && texto.includes(':')) return null;
+    return validarHora(Number(separada[1]), Number(separada[2] ?? 0));
   }
 
-  if (/^\d+$/.test(comDoisPontos)) {
-    const d = comDoisPontos;
-    if (d.length <= 2) return validarHora(Number(d), 0);
-    if (d.length === 3) return validarHora(Number(d.slice(0, 1)), Number(d.slice(1)));
-    if (d.length === 4) return validarHora(Number(d.slice(0, 2)), Number(d.slice(2)));
+  if (/^\d+$/.test(texto)) {
+    if (texto.length <= 2) return validarHora(Number(texto), 0);
+    if (texto.length === 3) return validarHora(Number(texto.slice(0, 1)), Number(texto.slice(1)));
+    if (texto.length === 4) return validarHora(Number(texto.slice(0, 2)), Number(texto.slice(2)));
   }
 
   return null;
