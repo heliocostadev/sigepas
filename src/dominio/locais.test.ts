@@ -7,6 +7,7 @@ import {
   semelhanca,
   sugerir,
 } from './locais.js';
+import { normalizarTexto } from './texto.js';
 
 const HOSPITAL = { cidade: 'FLORIANOPOLIS', local: 'HOSPITAL REGIONAL' };
 
@@ -94,13 +95,55 @@ describe('sugerir — os limites', () => {
     expect(sugerir(HOSPITAL, new DicionarioDeLocais())).toBeNull();
   });
 
-  it('entre dois candidatos, vence o mais parecido', () => {
+  it('entre dois candidatos da mesma cidade, vence o mais parecido', () => {
     dicionario.registrar({
-      origem: { cidade: 'F', local: 'HOSPITAL REGIONAL SUL' },
-      padrao: { cidade: 'F', local: 'HOSPITAL REGIONAL SUL' },
+      origem: { cidade: 'FLORIANOPOLIS', local: 'HOSPITAL REGIONAL SUL' },
+      padrao: { cidade: 'FLORIANOPOLIS', local: 'HOSPITAL REGIONAL SUL' },
     });
-    const s = sugerir({ cidade: 'F', local: 'HOSPITAL REGIONA' }, dicionario);
+    const s = sugerir({ cidade: 'FLORIANOPOLIS', local: 'HOSPITAL REGIONA' }, dicionario);
     expect(s?.destino).toEqual(HOSPITAL);
+  });
+});
+
+describe('sugerir — a cidade não pode mudar (issue 7)', () => {
+  it('o exemplo da issue: Hospital Regional de Lages não recebe o de Joinville como sugestão', () => {
+    const joinville = { cidade: 'Joinville', local: 'Hospital Regional' };
+    const soJoinville = new DicionarioDeLocais([{ origem: joinville, padrao: joinville }]);
+    const resultado = padronizar({ cidade: 'Lages', local: 'Hospital Regional' }, soJoinville);
+    expect(resultado.tipo).toBe('pendente');
+    expect(resultado.tipo === 'pendente' ? resultado.sugestao : 'não pendente').toBeNull();
+  });
+
+  it('local parecido em outra cidade não é sugerido', () => {
+    expect(sugerir({ cidade: 'CURITIBA', local: 'HOSPITAL REGIONALL' }, dicionario)).toBeNull();
+  });
+
+  it('local com o mesmo nome em outra cidade não é sugerido, mesmo com 100% de semelhança', () => {
+    expect(sugerir({ cidade: 'JOINVILLE', local: 'HOSPITAL REGIONAL' }, dicionario)).toBeNull();
+  });
+
+  it('com o mesmo nome em duas cidades, a sugestão fica na cidade da linha', () => {
+    const joinville = { cidade: 'JOINVILLE', local: 'HOSPITAL REGIONAL' };
+    dicionario.registrar({ origem: joinville, padrao: joinville });
+    const s = sugerir({ cidade: 'Joinville', local: 'HOSPITAL REGIONALL' }, dicionario);
+    expect(s?.destino).toEqual(joinville);
+  });
+
+  it('a cidade é comparada sem acento e sem diferença de caixa', () => {
+    const s = sugerir({ cidade: 'Florianópolis', local: 'HOSPITAL REGIONALL' }, dicionario);
+    expect(s?.destino).toEqual(HOSPITAL);
+  });
+
+  it('havendo sugestão, a cidade sugerida é sempre a da linha', () => {
+    const entradas = [
+      { cidade: 'FLORIANOPOLIS', local: 'HOSPITAL REGIONALL' },
+      { cidade: 'SAO JOSE', local: 'CLINICA DOS OLHO' },
+      { cidade: 'CURITIBA', local: 'HOSPITAL REGIONAL' },
+    ];
+    for (const entrada of entradas) {
+      const s = sugerir(entrada, dicionario);
+      if (s) expect(normalizarTexto(s.destino.cidade)).toBe(normalizarTexto(entrada.cidade));
+    }
   });
 });
 

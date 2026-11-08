@@ -116,12 +116,24 @@ export function padronizar(destino: Destino, dicionario: DicionarioDeLocais): Re
   return { tipo: 'pendente', destino, sugestao: sugerir(destino, dicionario) };
 }
 
-/** O destino oficial mais parecido, se passar do limiar. */
+/**
+ * O destino oficial mais parecido, na mesma cidade, se passar do limiar.
+ *
+ * Só são candidatos os destinos da mesma cidade normalizada (issue 7). Antes a comparação
+ * olhava apenas o nome do local: "CURITIBA / HOSPITAL REGIONALL" recebia como sugestão o
+ * hospital de Florianópolis, e dois locais de mesmo nome em cidades diferentes chegavam a
+ * 100% de semelhança. Aceitar uma sugestão dessas troca a cidade do destino do paciente.
+ *
+ * Consequência aceita: se a própria cidade vier escrita errado, não há sugestão. A viagem
+ * entra pendente do mesmo jeito (RN-IMP-07), e a pessoa decide.
+ */
 export function sugerir(destino: Destino, dicionario: DicionarioDeLocais): Sugestao | null {
   if (normalizarTexto(destino.local).length < TAMANHO_MINIMO_PARA_COMPARAR) return null;
 
+  const cidade = normalizarTexto(destino.cidade);
   let melhor: Sugestao | null = null;
   for (const candidato of dicionario.destinosPadrao()) {
+    if (normalizarTexto(candidato.cidade) !== cidade) continue;
     const nota = semelhanca(destino.local, candidato.local);
     if (nota >= LIMIAR_SEMELHANCA && (melhor === null || nota > melhor.semelhanca)) {
       melhor = { destino: candidato, semelhanca: nota };
