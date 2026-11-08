@@ -50,6 +50,17 @@ describe('interpretarStatus', () => {
     },
   );
 
+  // issue 9: o complemento depois da palavra pode dizer que o cancelamento não aconteceu
+  it.each([
+    'Cancelamento negado',
+    'Cancelamento recusado',
+    'CANCELAMENTO PENDENTE',
+    'Cancelamento em análise',
+    'Cancelamento pelo posto negado',
+  ])('"%s" é desconhecido, porque o pedido pode continuar valendo', (texto) => {
+    expect(interpretarStatus(texto)).toBe(StatusPedido.Desconhecido);
+  });
+
   it('vazio é desconhecido, não ativo — a diferença importa para o relatório', () => {
     expect(interpretarStatus('')).toBe(StatusPedido.Desconhecido);
     expect(interpretarStatus(null)).toBe(StatusPedido.Desconhecido);
