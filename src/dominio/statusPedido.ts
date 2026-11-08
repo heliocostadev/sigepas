@@ -33,20 +33,45 @@ export function acharColunaStatus(cabecalho: readonly string[]): number {
   return cabecalho.findIndex((coluna) => normalizarTexto(coluna).includes('STATUS'));
 }
 
+/** Textos reconhecidos como pedido ativo, já normalizados. */
+const VALORES_ATIVOS: ReadonlySet<string> = new Set([
+  'ATIVO',
+  'ATIVA',
+  'AGENDADO',
+  'AGENDADA',
+  'EM ABERTO',
+]);
+
+/** Palavras que indicam cancelamento: "CANCELADO", "CANCELADA", "CANCELAMENTO". */
+const PALAVRA_CANCELAMENTO = /^CANCELA(DO|DA|MENTO)S?$/;
+
+/** Palavras que negam o que vem depois: "NÃO CANCELADO" não é cancelamento. */
+const NEGACOES: ReadonlySet<string> = new Set(['NAO', 'SEM']);
+
 /**
  * Traduz o texto livre do posto para um status conhecido.
  *
  * O texto varia conforme quem preenche: "Cancelado", "CANCELADO PELO POSTO",
- * "cancelada pelo solicitante". Por isso o teste é por conteúdo, não por igualdade.
+ * "cancelada pelo solicitante", "Cancelamento". Por isso o cancelamento é reconhecido pela
+ * palavra, e não pela frase inteira.
+ *
+ * Tudo o que não for reconhecido com segurança vira `Desconhecido` (issue 6). Antes, qualquer
+ * texto sem "CANCELA" virava ativo, e assim "SUSPENSO" ou um erro de digitação como
+ * "CANCELDO" entravam como pedido ativo sem ninguém perceber. No sentido oposto,
+ * "NÃO CANCELADO" contém "CANCELA" e virava cancelamento. Um valor desconhecido fica
+ * visível para revisão, em vez de alterar a operação em silêncio.
  */
 export function interpretarStatus(texto: string | null | undefined): StatusPedido {
   const valor = normalizarTexto(texto);
-
   if (!valor) return StatusPedido.Desconhecido;
-  // "CANCELA" e não "CANCELAD": o posto também escreve "Cancelamento", que o prefixo
-  // mais longo deixava passar como pedido ATIVO — o pior erro possível aqui.
-  if (valor.includes('CANCELA')) return StatusPedido.CanceladoPeloPosto;
-  return StatusPedido.Ativo;
+  if (VALORES_ATIVOS.has(valor)) return StatusPedido.Ativo;
+
+  const palavras = valor.split(' ');
+  const posicao = palavras.findIndex((palavra) => PALAVRA_CANCELAMENTO.test(palavra));
+  if (posicao === -1) return StatusPedido.Desconhecido;
+
+  const negado = palavras.slice(0, posicao).some((palavra) => NEGACOES.has(palavra));
+  return negado ? StatusPedido.Desconhecido : StatusPedido.CanceladoPeloPosto;
 }
 
 /** Atalho de leitura para as telas: este pedido foi cancelado pelo posto? */

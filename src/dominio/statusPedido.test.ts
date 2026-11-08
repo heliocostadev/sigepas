@@ -38,9 +38,17 @@ describe('interpretarStatus', () => {
     },
   );
 
-  it.each(['Ativo', 'Agendado', 'Em aberto'])('"%s" é pedido ativo', (texto) => {
+  it.each(['Ativo', 'Agendado', 'Em aberto', '  ATIVO ', 'em  aberto'])('"%s" é pedido ativo', (texto) => {
     expect(interpretarStatus(texto)).toBe(StatusPedido.Ativo);
   });
+
+  // issue 6: o que não é reconhecido com segurança fica visível para revisão
+  it.each(['SUSPENSO', 'CANCELDO', 'NÃO CANCELADO', 'nao cancelada', 'Sem cancelamento', 'Reagendar'])(
+    '"%s" é desconhecido, nem ativo nem cancelado',
+    (texto) => {
+      expect(interpretarStatus(texto)).toBe(StatusPedido.Desconhecido);
+    },
+  );
 
   it('vazio é desconhecido, não ativo — a diferença importa para o relatório', () => {
     expect(interpretarStatus('')).toBe(StatusPedido.Desconhecido);
