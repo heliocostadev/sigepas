@@ -74,9 +74,16 @@ describe('interpretarHora', () => {
     expect(interpretarHora(entrada)).toBe(esperado);
   });
 
-  it('vazio vira meia-noite (comportamento do sistema em produção)', () => {
-    expect(interpretarHora('')).toBe('00:00');
-    expect(interpretarHora(null)).toBe('00:00');
+  it('vazio devolve null e não se confunde com meia-noite (issue 8)', () => {
+    expect(interpretarHora('')).toBeNull();
+    expect(interpretarHora('   ')).toBeNull();
+    expect(interpretarHora(null)).toBeNull();
+    expect(interpretarHora(undefined)).toBeNull();
+  });
+
+  it('meia-noite informada continua sendo meia-noite', () => {
+    expect(interpretarHora('00:00')).toBe('00:00');
+    expect(interpretarHora('0')).toBe('00:00');
   });
 
   it.each([

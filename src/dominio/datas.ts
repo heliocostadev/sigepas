@@ -74,15 +74,16 @@ export type Hora = string;
 /**
  * Normaliza a hora digitada pelo posto para `HH:MM`.
  *
- * Vazio vira `00:00` — é o que o sistema em produção faz hoje: a viagem existe mesmo sem
- * hora definida, e some da lista se for descartada. Ver a pergunta aberta no PR.
+ * Vazio devolve `null`, o mesmo valor de "não reconhecido" (issue 8). Antes vazio virava
+ * `00:00`, e uma viagem sem horário ficava igual a uma viagem marcada para a meia-noite.
+ * Se a tela precisar de um horário padrão, essa decisão fica com quem chama o parser.
  *
  * Formatos aceitos: "9", "09", "930", "1000", "9:30", "10h" e "10h30". Qualquer texto a mais,
  * como em "10h30h" ou "10:30:59", devolve `null` (issue 5).
  */
 export function interpretarHora(valor: string | null | undefined): Hora | null {
   const texto = (valor ?? '').toString().trim();
-  if (!texto) return '00:00';
+  if (!texto) return null;
 
   const separada = /^(\d{1,2})[:hH](\d{2})?$/.exec(texto);
   if (separada) {
