@@ -10,6 +10,8 @@
  * de quem importa. Este módulo existe para que essa decisão seja tomada uma vez só.
  */
 
+import { normalizarTexto } from './texto.js';
+
 export const StatusPedido = {
   Ativo: 'ATIVO',
   CanceladoPeloPosto: 'CANCELADO_PELO_POSTO',
@@ -28,15 +30,7 @@ export type StatusPedido = (typeof StatusPedido)[keyof typeof StatusPedido];
  * Devolve -1 quando não encontra.
  */
 export function acharColunaStatus(cabecalho: readonly string[]): number {
-  return cabecalho.findIndex((coluna) =>
-    (coluna ?? '')
-      .toString()
-      .trim()
-      .normalize('NFD')
-      .replace(/[̀-ͯ]/g, '')
-      .toUpperCase()
-      .includes('STATUS'),
-  );
+  return cabecalho.findIndex((coluna) => normalizarTexto(coluna).includes('STATUS'));
 }
 
 /**
@@ -46,12 +40,7 @@ export function acharColunaStatus(cabecalho: readonly string[]): number {
  * "cancelada pelo solicitante". Por isso o teste é por conteúdo, não por igualdade.
  */
 export function interpretarStatus(texto: string | null | undefined): StatusPedido {
-  const valor = (texto ?? '')
-    .toString()
-    .trim()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toUpperCase();
+  const valor = normalizarTexto(texto);
 
   if (!valor) return StatusPedido.Desconhecido;
   // "CANCELA" e não "CANCELAD": o posto também escreve "Cancelamento", que o prefixo
