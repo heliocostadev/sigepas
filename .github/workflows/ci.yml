@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main, dev]
 
+permissions:
+  contents: read
+
 jobs:
   verificar:
     name: tipos, lint e testes
@@ -28,3 +31,66 @@ jobs:
 
       - name: Testes com cobertura
         run: npm run test:cov
+
+      - name: Guardar o relatório de cobertura
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura
+          path: coverage/
+          retention-days: 7
+
+  mensagens-de-commit:
+    name: padrão das mensagens de commit
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # A referência final é o último commit da branch do PR, e não o HEAD: no PR, o HEAD é o commit de merge
+      # que o GitHub cria para o teste ("Merge <sha> into <sha>"), que não faz parte do histórico do autor.
+      - name: Conferir tipo(escopo) em cada commit do PR
+        run: node scripts/conferir-mensagens-de-commit.mjs "origin/${{ github.base_ref }}" "${{ github.event.pull_request.head.sha }}"
+
+  sonarcloud:
+    name: SonarCloud
+    needs: verificar
+    # Fica desligado até a conta no SonarCloud existir. Para ligar: criar o segredo SONAR_TOKEN e a variável
+    # SONAR_HABILITADO=true em Settings > Secrets and variables > Actions.
+    if: vars.SONAR_HABILITADO == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: cobertura
+          path: coverage/
+
+      - name: Análise e portão de qualidade
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: -Dsonar.qualitygate.wait=true
+
+  ci-aprovado:
+    # Verificação única usada na proteção das branches (ideia do Cauê Fernandes, github.com/CaueFer/alagou):
+    # só passa se nenhuma etapa falhou. Etapa pulada (Sonar desligado, mensagens fora de PR) não reprova.
+    name: CI aprovado
+    if: always()
+    needs: [verificar, mensagens-de-commit, sonarcloud]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Conferir o resultado de cada etapa
+        env:
+          RESULTADOS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTADOS"
+          if echo "$RESULTADOS" | grep -E '"result": "(failure|cancelled)"'; then
+            echo "Alguma etapa falhou ou foi cancelada."
+            exit 1
+          fi
