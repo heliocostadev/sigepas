@@ -78,11 +78,35 @@ uma revisão. Detalhes em [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Documentação
 
-A pasta [`docs/`](docs/) descreve o sistema que está em produção — o que cada tela faz, quais
-são as regras de negócio numeradas e, principalmente, **o que não deve ser reproduzido aqui**.
-É de lá que sai cada linha de código deste repositório.
+O sistema que está em produção foi documentado tela por tela: o que cada tela faz, quais são as
+regras de negócio numeradas e, principalmente, **o que não deve ser reproduzido aqui**. Essa
+documentação fica fora deste repositório; o que cada fluxo usa dela é trazido para o `spec.md`
+do fluxo, com a origem de cada requisito. A pasta [`docs/`](docs/README.md) descreve o sistema
+deste repositório.
 
-- [`docs/abas/01_IMPORTACAO.md`](docs/abas/01_IMPORTACAO.md) — entrada das solicitações do dia.
+- [`docs/README.md`](docs/README.md): índice da documentação, por assunto.
+- [`specs/001-importacao-fila/spec.md`](specs/001-importacao-fila/spec.md): entrada das solicitações do dia.
+
+## Trabalho com IA
+
+O projeto é construído com apoio do Claude Code, com regras escritas no [`CLAUDE.md`](CLAUDE.md): spec antes do
+código, teste antes da implementação e quem escreve não confere. Os subagentes ficam em `.claude/agents/` e as skills
+em `.claude/skills/`.
+
+## Créditos
+
+Material de terceiros usado no repositório, com a licença de cada um:
+
+- **Skills do Claude Code:** a lista completa, com autor, origem, versão e licença, está em
+  [`.claude/skills/README.md`](.claude/skills/README.md). Inclui trabalho de Jesse Vincent (Superpowers, MIT),
+  Cloudflare (security-audit, MIT), Peter Yang (no-ai-slop, MIT), Microsoft (playwright-cli, Apache-2.0), GHDaru
+  (Maestro, MIT), forrestchang (karpathy-guidelines, MIT), Cherif Toujeni (c4-model, MIT), Jakub Krehel (better-*,
+  MIT) e Paul Bakaus (impeccable, Apache-2.0).
+- **Método de trabalho:** adaptado do [Maestro](https://github.com/GHDaru/maestro) (GHDaru, MIT).
+- **Modelos de especificação:** traduzidos e adaptados do [Spec Kit](https://github.com/github/spec-kit) (GitHub, MIT).
+- **Ideias de colegas do curso**, citadas onde foram usadas: organização da pasta `docs/` e piso de cobertura no CI
+  (Lucas Klemke), matriz requisito → teste e modelo de ameaça (Leonardo), foco da revisão por risco (Vinícius
+  Zanatta), verificação única do CI (Cauê Fernandes).
 
 ## Licença
 
