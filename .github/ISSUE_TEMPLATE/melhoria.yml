@@ -1,0 +1,50 @@
+name: Melhoria ou pedido do setor
+description: Uma funcionalidade nova ou uma mudança pedida pelo setor de transportes, pelo professor ou por um colega.
+title: "Melhoria: "
+labels: ["melhoria"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Este repositório é público: **não cole dado real de paciente**, nem em print. Use dados inventados.
+  - type: dropdown
+    id: origem
+    attributes:
+      label: De onde veio o pedido
+      options:
+        - Setor de Transportes (gestão ou operação)
+        - Professor (orientação ou playbook)
+        - Colega (peer review)
+        - Encontrado no desenvolvimento
+    validations:
+      required: true
+  - type: textarea
+    id: historia
+    attributes:
+      label: História de usuário
+      placeholder: "Como operador do setor, quero ... para ..."
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceite
+      description: Cada critério deve poder virar um teste.
+      placeholder: |
+        - Dado ..., quando ..., então ...
+    validations:
+      required: true
+  - type: dropdown
+    id: fluxo
+    attributes:
+      label: Fluxo afetado
+      options:
+        - "1. Do arquivo à fila"
+        - "2. Do pedido ao carro escalado"
+        - "3. Remoção interna"
+        - Nenhum dos três (infraestrutura, documentação, qualidade)
+  - type: textarea
+    id: dados-pessoais
+    attributes:
+      label: Toca em dado pessoal, login, permissão, configuração ou deploy?
+      description: Se sim, o revisor de segurança precisa ver o PR.

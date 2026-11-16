@@ -1,0 +1,46 @@
+name: Defeito
+description: Algo que o SIGEPAS faz de errado ou deixa de fazer.
+title: "Defeito: "
+labels: ["defeito"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar. Este repositório é público: **não cole dado real de paciente** (nome, matrícula,
+        telefone, endereço, data de nascimento), nem em print. Use dados inventados.
+  - type: textarea
+    id: o-que-acontece
+    attributes:
+      label: O que acontece
+      description: O comportamento que você viu.
+      placeholder: "Ex.: a hora vazia aparece como 00:00 na fila do dia."
+    validations:
+      required: true
+  - type: textarea
+    id: o-que-deveria-acontecer
+    attributes:
+      label: O que deveria acontecer
+      placeholder: "Ex.: o pedido deveria aparecer como \"sem hora\"."
+    validations:
+      required: true
+  - type: textarea
+    id: como-reproduzir
+    attributes:
+      label: Como reproduzir
+      description: A entrada exata (linha do CSV, valor do campo, função chamada) e os passos.
+      placeholder: |
+        1. Chamar interpretarHora('')
+        2. Ver que devolve '00:00'
+    validations:
+      required: true
+  - type: input
+    id: onde
+    attributes:
+      label: Onde está no código ou na tela
+      placeholder: "Ex.: src/dominio/datas.ts, função interpretarHora"
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Como saber que foi corrigido
+      description: Critérios que um teste consegue verificar.
+      placeholder: "Ex.: interpretarHora('') devolve null; a fila mostra \"sem hora\"."
