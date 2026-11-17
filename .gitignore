@@ -27,3 +27,6 @@ crash.log
 # Configuração pessoal do Claude Code (a do projeto, .claude/settings.json, é versionada)
 .claude/settings.local.json
 .claude/worktrees/
+
+# Cliente do Prisma, gerado a partir de backend/prisma/schema.prisma pelo comando prisma generate
+backend/src/gerado/

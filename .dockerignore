@@ -1,0 +1,14 @@
+# O que não entra no contexto do docker build. O contexto é a raiz, por causa dos workspaces do npm.
+**/node_modules
+**/coverage
+**/dist
+**/.env
+**/.env.*
+**/.npmrc
+backend/src/gerado
+.git
+.github
+.claude
+.playwright-cli
+docs
+specs

@@ -29,3 +29,15 @@
 
 Nenhum dado real de paciente entra em código, teste, captura, log ou mensagem. Achado de segurança não é publicado antes
 da correção.
+
+## Ressalvas registradas no esqueleto (17/11/2026)
+
+Pontos de risco baixo apontados pelo `revisor-de-seguranca`, com o momento em que cada um é resolvido.
+
+| Ponto | Situação | Quando resolver |
+|---|---|---|
+| Imagens Docker e GitHub Actions sem fixação por digest ou por SHA | O Dependabot cobre as imagens e as ações | Antes do release |
+| `X-Forwarded-Proto $scheme` no Nginx informa `http` se o HTTPS terminar fora do contêiner `web` | Ainda não há login nem cookie | No deploy, junto com o HTTPS |
+| JSON malformado é recusado pelo leitor do corpo antes do log, da métrica e do limite de requisições | O custo de cada pedido tem teto (100 KB no Express e 1 MB no Nginx) | No fluxo 1, antes da rota de envio do arquivo, com teste |
+| Dado pessoal no caminho da URL vai para os logs | Nenhuma rota tem dado pessoal no caminho | Regra do fluxo 1: o caminho leva só identificador interno |
+| Exceção do Prisma pode trazer os valores dos argumentos na mensagem | Ainda não há rota que use o banco | No fluxo 1: um filtro global de exceção grava só a classe e o código do erro |
