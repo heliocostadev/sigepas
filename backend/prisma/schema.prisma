@@ -1,0 +1,12 @@
+// Esquema do banco do SIGEPAS. As tabelas entram com o fluxo 1, a partir da spec aprovada
+// (specs/001-importacao-fila/spec.md). Toda mudança aqui vira uma migração versionada.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/gerado/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
