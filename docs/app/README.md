@@ -1,22 +1,75 @@
 # Rodar o projeto na máquina
 
-## Hoje (núcleo de domínio)
+## O que instalar antes
 
-O projeto requer Node 20 ou superior.
+- Node 24 ou superior.
+- Docker Desktop, com o WSL 2 no Windows.
 
-```bash
-npm install
-npm run verificar      # tipos, lint e testes
-npm run test:cov       # cobertura, com o relatório em coverage/
-```
+## Passos
 
-## Depois do esqueleto
+1. Instale as dependências na raiz do repositório:
 
-Esta página passa a ter, no mesmo PR do esqueleto:
+   ```bash
+   npm install
+   ```
 
-- Os passos exatos para subir API, front-end e banco com Docker Compose.
-- A lista de variáveis de ambiente, onde cada uma é lida no código e onde fica guardada em produção.
-- Como gerar dados fictícios no formato do OLOSTECH para testar e demonstrar.
-- A estrutura de pastas de `backend/` e `frontend/`.
+2. Rode os portões, que são os mesmos do CI:
 
-Esses itens respondem às perguntas 4, 5 e 6 do guia da prova de autoria.
+   ```bash
+   npm run verificar
+   ```
+
+3. Suba o ambiente completo:
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+4. Abra os endereços:
+
+   | O quê | Endereço |
+   |---|---|
+   | Telas | http://localhost:8080 |
+   | API, saúde | http://localhost:3000/saude |
+   | Métricas da API (porta interna) | http://localhost:9464/metrics |
+   | Prometheus | http://localhost:9090 |
+   | Grafana | http://localhost:3001 (usuário `admin`, senha local `grafana_local`) |
+
+5. Para rodar também o teste com banco real, suba só o banco e informe o endereço dele:
+
+   ```bash
+   docker compose up -d banco
+   ```
+
+   ```powershell
+   $env:DATABASE_URL_DE_TESTE = 'postgresql://sigepas:sigepas_local@localhost:5432/sigepas'; npm run test --workspace backend
+   ```
+
+As senhas acima valem só na máquina local, com dados fictícios.
+
+## Variáveis de ambiente da API
+
+A API lê as variáveis uma vez, ao iniciar, em `backend/src/configuracao/variaveis-de-ambiente.ts`. Se faltar uma
+variável obrigatória, a API não sobe e a mensagem diz qual variável corrigir.
+
+| Variável | Obrigatória | Padrão | Para quê |
+|---|---|---|---|
+| `DATABASE_URL` | Sim | | Endereço do PostgreSQL |
+| `PORTA` | Não | `3000` | Porta da API |
+| `ORIGENS_PERMITIDAS` | Não | nenhuma | Endereços das telas que podem chamar a API, separados por vírgula |
+| `PORTA_DAS_METRICAS` | Não | `9464` | Porta interna das métricas. Deve ser diferente de `PORTA` |
+| `LIMITE_DE_REQUISICOES_POR_MINUTO` | Não | `100` | Limite por cliente, pelo IP que o Nginx informa |
+| `NIVEL_DE_LOG` | Não | `info` | Nível do log: `fatal`, `error`, `warn`, `info`, `debug`, `trace` ou `silent` |
+
+Em produção, os valores ficam em variáveis guardadas fora do repositório, na máquina da AWS. Nenhum arquivo `.env`
+entra no git.
+
+## Estrutura de pastas
+
+| Pasta | O que tem |
+|---|---|
+| `src/dominio/` | Núcleo de domínio: regras de negócio em TypeScript puro |
+| `backend/` | API em NestJS, com Prisma, testes e `Dockerfile` |
+| `frontend/` | Telas em React com Vite, com testes, `Dockerfile` e configuração do Nginx |
+| `observabilidade/` | Configuração do Prometheus e do Grafana |
+| `docker-compose.yml` | Banco, API, telas, Prometheus e Grafana |

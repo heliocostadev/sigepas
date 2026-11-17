@@ -26,9 +26,19 @@ O Dependabot (`.github/dependabot.yml`) abre PR semanal para a `dev` com atualiz
   segurança do código" (CodeQL).
 - **Rótulos:** crie no repositório os rótulos `defeito` e `melhoria`, usados pelos modelos de issue.
 
-## Observabilidade (entra com o esqueleto)
+## Observabilidade
 
-- Logs estruturados em JSON, sem dado pessoal (nome, telefone e matrícula mascarados).
-- Endpoint `/metrics` no formato do Prometheus, `/saude` para o monitor de disponibilidade.
-- Prometheus e Grafana no Docker Compose, com um painel dos três fluxos (importações, carros montados, erros).
-- Monitor externo de disponibilidade com alerta, para saber antes do professor que o sistema caiu.
+- A API grava logs estruturados em JSON (`nestjs-pino`). Cada linha traz só o identificador, o método, o caminho sem
+  a query string e o código de resposta. Nome, telefone, matrícula, cabeçalhos e endereço IP não entram no log (LGPD).
+  A regra fica em `backend/src/registro/formatadores-de-log.ts`, com testes.
+- A API publica as métricas no formato do Prometheus numa porta interna (9464), que não sai para a internet. A rota
+  `/saude` serve ao monitor de disponibilidade e responde 503 quando o banco não responde.
+- O contador `sigepas_requisicoes_http_total` registra cada requisição por método, rota e código de resposta.
+- O Prometheus e o Grafana sobem no Docker Compose. O Grafana já vem ligado ao Prometheus.
+- Falta o painel do Grafana com os três fluxos (importações, carros montados, erros), que entra com o fluxo 1.
+- Falta o monitor externo de disponibilidade com alerta, que entra com o deploy.
+- O log de erro do Nginx registra só os erros críticos, para não gravar IP e query string. Por isso, uma falha de
+  conexão com a API aparece só como código 502 no log de acesso. Para investigar um 502, confira primeiro o
+  `docker compose logs api` e a rota `/saude`.
+- O log de acesso do Nginx grava o caminho depois da regravação interna (`$uri`). Um endereço que não existe nas
+  telas aparece como `/index.html`.

@@ -93,3 +93,81 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 - Depois da prova de conceito (R-0007), o Hélio decidiu: Vitest nos dois lados, com o plugin SWC no NestJS. O
   back-end também terá um teste de guarda que lê os metadados do construtor.
 - Prova: ADR [0005](adr/0005-testes-com-vitest.md), agora aceita. A entrada R-0002 registrava o Vitest como pendente.
+
+## R-0009 · 16/11/2026 · Esqueleto do sistema montado
+
+- Branch `feat/esqueleto-do-sistema`, saída da `dev` depois do merge do PR 10.
+- Back-end em NestJS, com `/saude`, `/metrics`, logs em JSON, `helmet`, CORS fechado e limite de requisições.
+  Front-end em React com Vite. Docker Compose com PostgreSQL, API, telas, Prometheus e Grafana.
+- TDD: os seis arquivos de teste do back-end foram escritos antes do código e falharam porque os módulos não
+  existiam. Depois do código, um teste falhou por um motivo real: no Express 5, a rota inexistente recebia a etiqueta
+  `{/*splat}`. O middleware de métricas foi corrigido.
+- Resultado: `npm run verificar` passou com 7 testes do domínio, 19 do back-end e 3 do front-end. A cobertura do
+  back-end ficou em 96,8%. Os 2 testes do banco passaram com o PostgreSQL real no Docker.
+- O ambiente completo foi testado na máquina do Hélio. A rota `/saude` respondeu 200 com o banco disponível. O Nginx
+  devolveu 404 em `/api/metrics`. O Prometheus leu a API (situação "up"), e o Grafana respondeu.
+- Prova: ADR [0013](adr/0013-estrutura-e-versoes-do-esqueleto.md), proposta e aguardando a aprovação do Hélio.
+
+## R-0010 · 17/11/2026 · Correções do esqueleto depois das conferências
+
+- O `revisor-de-seguranca` não achou risco alto e apontou 3 riscos médios. O `verificador` reprovou a primeira versão
+  pelos mesmos pontos e por outros menores. A entrada R-0009 dizia que o Nginx devolvia 404 em `/api/metrics`. Isso
+  valia só para o endereço exato: `/api/metrics/` e `/api/METRICS` passavam.
+- TDD: os testes das correções foram escritos antes do código. Na primeira execução, 9 testes falharam e 2 arquivos de
+  teste não encontraram o código, que ainda não existia.
+- Correções:
+  - As métricas saíram da porta pública e foram para uma porta interna (9464).
+  - A API passou a confiar em um salto de proxy, e o Nginx envia só o IP real do cliente.
+  - Os logs da API e do Nginx passaram a gravar só uma lista de campos permitidos, sem query string, sem cabeçalhos e
+    sem IP.
+  - O validador passou a conferir `NIVEL_DE_LOG` e `PORTA_DAS_METRICAS` e a recusar `1e3` e `0x10`.
+  - As telas ganharam cabeçalhos de segurança, e o Nginx passou a rodar sem permissão de administrador.
+  - Entraram o `.dockerignore`, a imagem da API sem dependências opcionais, os caminhos da cobertura para o Sonar e o
+    Dependabot das imagens Docker.
+- Prova no ambiente local, em 17/11/2026:
+  - `npm run verificar` passou, com 42 testes do back-end e 1 pulado, e cobertura de 97,5%.
+  - Todas as variações de `/metrics` responderam 404 pela porta pública.
+  - Um pedido com nome e telefone fictícios na query string não deixou nenhum desses dados no log da API nem no do
+    Nginx.
+  - O contador do limite continuou o mesmo entre um pedido direto à API e um pedido pelo Nginx (96, 95, 94). Isso
+    mostra que a API conta o cliente real atrás do Nginx.
+
+## R-0011 · 17/11/2026 · Segunda conferência do esqueleto e correções
+
+- A segunda conferência do `verificador` provou a maior parte das correções da R-0010. Ela também mostrou três
+  afirmações da R-0010 que não eram verdade:
+  - A imagem da API ainda levava a linha de comando do Prisma e o TypeScript. O `--omit=peer` não tinha efeito,
+    porque o lockfile marca esses pacotes como "devOptional".
+  - O log de erro do Nginx ainda gravava o IP e a query string. Só o log de acesso tinha sido trocado.
+  - Os cabeçalhos de segurança do Nginx se somavam aos do helmet nas respostas da API, com valores em conflito.
+- TDD: os testes novos foram escritos antes do código. Dois falharam pelo motivo certo: o limite com 400 algarismos
+  virava "Infinity" sem erro, e o log ainda ignorava `/metrics`. Os testes do método POST e do erro 500 no servidor de
+  métricas passaram logo de cara, porque o código já se comportava assim. Eles ficaram como proteção contra regressão.
+- Correções:
+  - A imagem da API passou a usar `--omit=dev --omit=optional`. A pasta `node_modules` caiu de 387,7 MB
+    para 114,8 MB, e o único programa que ficou foi o `pino`.
+  - O log de erro do Nginx passou a registrar só os erros críticos.
+  - Os cabeçalhos de segurança do Nginx passaram a valer só para as telas.
+  - O validador passou a recusar números grandes demais (`Number.isSafeInteger`).
+  - O Sonar passou a deixar de fora da cobertura os arquivos que só iniciam a aplicação.
+  - O Dependabot passou a cobrir as imagens do `docker-compose.yml`.
+  - O CI ganhou a conferência automática do Nginx: a sintaxe, o 404 de `/api/metrics` e os cabeçalhos das telas.
+- Prova no ambiente local, em 17/11/2026:
+  - `npm run verificar` passou, com 46 testes do back-end e 1 pulado, e cobertura de 98,75%.
+  - Cada cabeçalho de segurança aparece uma vez só em `/api/saude`.
+  - Um corpo de 2 MB com nome fictício na query string recebeu 413. O log do Nginx ficou sem o nome e sem o IP.
+  - A conferência do Nginx do CI passou na imagem local.
+
+## R-0012 · 17/11/2026 · Terceira conferência e segunda revisão de segurança
+
+- O `verificador` aprovou com ressalvas. O `revisor-de-seguranca` confirmou que os três riscos médios estão corrigidos
+  e não achou risco alto nem médio.
+- Os dois apontaram um defeito no `backend/Dockerfile`: o comando de instalação tinha um `\n` literal no lugar da
+  quebra de linha. O build funcionava por acaso. A linha foi corrigida e a imagem foi reconstruída.
+- Ajustes: o `--omit=peer` saiu do `Dockerfile`, porque não tinha efeito. O `.dockerignore` passou a deixar de fora o
+  `.npmrc`. O log de acesso do Nginx ganhou o código e o tempo de resposta da API. As versões de desenvolvimento da
+  raiz ficaram exatas.
+- As ressalvas de risco baixo ficaram registradas em `docs/seguranca/README.md`, com o momento de resolver cada uma.
+  A condição do proxy de borda para o limite de requisições ficou em `docs/deploy/README.md`.
+- Prova: `npm run verificar` passou, e `npm audit` não achou falha conhecida. O log do Nginx gravou
+  `"GET /api/saude HTTP/1.1" 200 38 0.004 upstream=200 0.004`, sem IP e sem query string.
