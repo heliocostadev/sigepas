@@ -53,7 +53,8 @@ jobs:
           node-version: 24
           cache: npm
 
-      - run: npm ci
+      # --ignore-scripts: mesmo motivo do ci.yml.
+      - run: npm ci --ignore-scripts
 
       - name: Auditoria das dependências de produção
         run: npm audit --omit=dev --audit-level=moderate

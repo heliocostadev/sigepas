@@ -6,7 +6,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY backend/package.json backend/package.json
 COPY frontend/package.json frontend/package.json
-RUN npm ci --workspace backend --include-workspace-root=false
+# --ignore-scripts: nenhum pacote roda script próprio durante a instalação (regra docker:S6505 do SonarQube Cloud).
+RUN npm ci --workspace backend --include-workspace-root=false --ignore-scripts
 COPY backend backend
 RUN npm run prisma:gerar --workspace backend && npm run build --workspace backend
 
@@ -19,7 +20,7 @@ COPY frontend/package.json frontend/package.json
 # Só as dependências de produção. O lockfile marca a linha de comando do Prisma e o TypeScript como "devOptional"
 # (de desenvolvimento e opcionais ao mesmo tempo). O npm só deixa esses pacotes de fora quando as duas categorias
 # são omitidas, por isso o comando usa --omit=dev e --omit=optional.
-RUN npm ci --workspace backend --include-workspace-root=false --omit=dev --omit=optional \
+RUN npm ci --workspace backend --include-workspace-root=false --omit=dev --omit=optional --ignore-scripts \
     && npm cache clean --force
 COPY --from=construcao /app/backend/dist backend/dist
 # A aplicação não roda como administrador do contêiner.

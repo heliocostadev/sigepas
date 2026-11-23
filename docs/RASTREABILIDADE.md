@@ -171,3 +171,19 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
   A condição do proxy de borda para o limite de requisições ficou em `docs/deploy/README.md`.
 - Prova: `npm run verificar` passou, e `npm audit` não achou falha conhecida. O log do Nginx gravou
   `"GET /api/saude HTTP/1.1" 200 38 0.004 upstream=200 0.004`, sem IP e sem query string.
+
+## R-0013 · 23/11/2026 · Instalação sem scripts dos pacotes, SonarQube Cloud e proteção da `dev`
+
+- O SonarQube Cloud foi ligado pelo Hélio no plano gratuito, com o projeto `heliocostadev_sigepas`. A análise
+  automática rodou uma vez na `main` e apontou uma vulnerabilidade: `npm ci` sem `--ignore-scripts` (regra S6505).
+  Sem essa opção, um pacote pode rodar um script próprio durante a instalação, o que é um caminho conhecido de ataque
+  pela cadeia de dependências.
+- Decisão: as cinco instalações (`ci.yml`, `seguranca.yml` e três linhas dos `Dockerfile`) passam a usar
+  `--ignore-scripts`. Só quatro pacotes têm script de instalação: `prisma`, `@prisma/engines`, `@swc/core` e
+  `fsevents`. O Prisma funciona sem o script, o SWC recebe o binário pelas dependências opcionais, e o `fsevents` só
+  serve ao macOS.
+- A `dev` passou a exigir a verificação "CI aprovado" para o merge, também para o administrador. Push forçado e
+  exclusão da branch ficaram bloqueados.
+- Prova: numa cópia separada da `dev`, `npm ci --ignore-scripts` seguido de `prisma generate`, tipos, lint, testes das
+  três camadas e build passou. O back-end teve 46 testes e 1 pulado, com 98,75% de cobertura. A proteção foi conferida
+  pela API do GitHub. As imagens Docker são conferidas pelo job `imagens-docker` deste PR.

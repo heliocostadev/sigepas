@@ -6,7 +6,7 @@
 |---|---|---|
 | `ci.yml` | Tipos, lint e testes com cobertura | Erro de tipo, regra do ESLint, teste falhando ou cobertura abaixo do piso |
 | `ci.yml` | Padrão das mensagens de commit (só em PR) | Commit fora de `tipo(escopo): descrição` (`scripts/conferir-mensagens-de-commit.mjs`) |
-| `ci.yml` | SonarCloud (desligado até a conta existir) | Portão de qualidade do SonarCloud reprovado |
+| `ci.yml` | SonarQube Cloud, novo nome do SonarCloud (ligado em 23/11/2026, plano gratuito) | Portão de qualidade "Sonar way" reprovado |
 | `ci.yml` | **CI aprovado** | Qualquer etapa acima falhou. Esta etapa junta o `ci.yml` numa verificação só para a proteção da `main` e da `dev`. A ideia é do Cauê Fernandes, repositório [alagou](https://github.com/CaueFer/alagou). As verificações de segurança, abaixo, são marcadas à parte |
 | `seguranca.yml` | gitleaks | Segredo no histórico |
 | `seguranca.yml` | Revisão de dependências (só em PR) | Dependência nova com falha conhecida moderada ou maior, ou licença GPL ou AGPL |
@@ -15,15 +15,27 @@
 
 O Dependabot (`.github/dependabot.yml`) abre PR semanal para a `dev` com atualizações do npm e das GitHub Actions.
 
+Toda instalação de dependências usa `npm ci --ignore-scripts`, no CI e nos `Dockerfile`. Assim, nenhum pacote roda
+script próprio durante a instalação (regra S6505 do SonarQube Cloud). O Prisma e o SWC funcionam sem esses scripts.
+
+## Proteção das branches
+
+- **`dev`, desde 23/11/2026:** o merge exige a verificação "CI aprovado", e a regra vale também para o
+  administrador. Push forçado e exclusão da branch estão bloqueados. A branch não precisa estar atualizada com a `dev`
+  para o merge.
+
+## SonarQube Cloud
+
+A chave do projeto é `heliocostadev_sigepas`, e a da organização é `heliocostadev`, as mesmas do
+`sonar-project.properties`. O segredo `SONAR_TOKEN` e a variável `SONAR_HABILITADO=true` ficam no repositório. A
+análise automática do SonarQube Cloud fica desligada, porque a análise é feita pelo CI, junto com a cobertura.
+
 ## Para ligar o que ainda está desligado
 
-- **SonarCloud:** entre no SonarCloud com a conta do GitHub. Importe `heliocostadev/sigepas`. Confira a chave do
-  projeto e a organização em `sonar-project.properties`. Crie no repositório o segredo `SONAR_TOKEN` e a variável
-  `SONAR_HABILITADO=true`.
 - **Wiki:** crie a primeira página pelo site. Crie também a variável `WIKI_HABILITADA=true`.
-- **Proteção das branches:** na `main` e na `dev`, marque como obrigatória a verificação "CI aprovado". Marque também
-  as verificações de segurança, que ficam em workflows separados: "segredos no histórico (gitleaks)" e "análise de
-  segurança do código" (CodeQL).
+- **Proteção da `main`:** marque como obrigatória a verificação "CI aprovado". Na `main` e na `dev`, avalie marcar
+  também as verificações de segurança, que ficam em workflows separados: "segredos no histórico (gitleaks)" e
+  "análise de segurança do código" (CodeQL).
 - **Rótulos:** crie no repositório os rótulos `defeito` e `melhoria`, usados pelos modelos de issue.
 
 ## Observabilidade
