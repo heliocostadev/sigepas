@@ -187,3 +187,18 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 - Prova: numa cópia separada da `dev`, `npm ci --ignore-scripts` seguido de `prisma generate`, tipos, lint, testes das
   três camadas e build passou. O back-end teve 46 testes e 1 pulado, com 98,75% de cobertura. A proteção foi conferida
   pela API do GitHub. As imagens Docker são conferidas pelo job `imagens-docker` deste PR.
+
+## R-0014 · 23/11/2026 · Versão corrigida da `effect` por `overrides`
+
+- No PR 12, o `npm audit` reprovou por uma falha publicada em 19/11/2026: ReDoS de severidade alta na biblioteca
+  `effect` até a versão 3.22.0 (GHSA-7589-6fvf-x4pw, corrigido na 3.22.1). A `effect` entra pela linha de comando do
+  Prisma (`prisma` → `@prisma/config` → `effect` 3.20.0). Todas as versões 7.x do Prisma fixam a 3.20.0.
+- Decisão: o `package.json` da raiz ganhou `"overrides": { "effect": "3.22.5" }`, a versão mais recente da linha 3.22.
+  No `package-lock.json`, só a entrada da `effect` mudou. Regerar o lockfile inteiro mudaria 25 versões sem relação com
+  a falha, inclusive o `@types/node`.
+- O `npm ls` marca a `effect` como "invalid". O mesmo acontece num lockfile gerado do zero pelo próprio npm, então é
+  uma limitação do `npm ls` com `overrides` em workspaces. O `npm ci` instala a 3.22.5 sem erro.
+- O `overrides` sai quando uma versão do Prisma trouxer a `effect` corrigida. A ressalva está em
+  `docs/seguranca/README.md`.
+- Prova: `npm ci --ignore-scripts`, `npm audit --omit=dev` e `npm audit` completo sem falha, `prisma generate` e
+  `prisma validate` com a `effect` nova, `npm run verificar` (7, 46 com 1 pulado e 3 testes) e build das duas camadas.
