@@ -202,3 +202,16 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
   `docs/seguranca/README.md`.
 - Prova: `npm ci --ignore-scripts`, `npm audit --omit=dev` e `npm audit` completo sem falha, `prisma generate` e
   `prisma validate` com a `effect` nova, `npm run verificar` (7, 46 com 1 pulado e 3 testes) e build das duas camadas.
+
+## R-0015 · 23/11/2026 · SonarQube Cloud só em PR e na `main`
+
+- Depois do merge do PR 12, o CI de push na `dev` falhou no job do SonarQube Cloud: "Failed to get Quality Gate
+  status - Organization is not allowed to access data from non main branches". O plano gratuito analisa só a branch
+  principal (`main`) e os PRs.
+- Decisão: o job roda em todo PR e no push para a `main`, e não roda no push para a `dev`. A proteção da `dev` exige
+  "CI aprovado" no PR, e o portão do SonarQube Cloud faz parte dele. Assim, todo código da `dev` passou pelo portão
+  antes do merge.
+- Consequência: o painel do SonarQube Cloud mostra a `main`, que só muda no release. A análise de cada PR fica no
+  próprio PR e no SonarQube Cloud.
+- Prova: o PR 12 teve a análise do SonarQube Cloud aprovada como PR nos três commits. A falha da `dev` está no CI do
+  commit `5bdf705`.
