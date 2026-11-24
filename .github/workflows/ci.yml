@@ -13,13 +13,14 @@ jobs:
   verificar:
     name: tipos, lint e testes
     runs-on: ubuntu-latest
-    # PostgreSQL de verdade para os testes de integração do back-end. A senha só existe dentro desta execução.
+    # PostgreSQL de verdade para os testes de integração do back-end. O banco só existe durante esta execução e aceita
+    # conexão sem senha (trust): assim, nenhuma senha fica escrita no código (regra S6698 do SonarQube Cloud).
     services:
       banco:
         image: postgres:16-alpine
         env:
           POSTGRES_USER: sigepas
-          POSTGRES_PASSWORD: sigepas_ci
+          POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_DB: sigepas_teste
         ports:
           - 5432:5432
@@ -29,7 +30,7 @@ jobs:
           --health-timeout 3s
           --health-retries 10
     env:
-      DATABASE_URL_DE_TESTE: postgresql://sigepas:sigepas_ci@localhost:5432/sigepas_teste
+      DATABASE_URL_DE_TESTE: postgresql://sigepas@localhost:5432/sigepas_teste
     steps:
       - uses: actions/checkout@v4
 
@@ -182,7 +183,7 @@ jobs:
           sed -i 's#^SF:#SF:frontend/#' frontend/coverage/lcov.info
 
       - name: Análise e portão de qualidade
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@2f77a1ec69fb1d595b06f35ab27e97605bdef703 # v5.3.2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:

@@ -1,8 +1,9 @@
 # Ambiente completo do SIGEPAS na máquina de desenvolvimento.
 #   Só o banco, para rodar os testes:  docker compose up -d banco
 #   Tudo, para ver o sistema rodando:  docker compose up -d --build
-# As senhas abaixo valem só na máquina local, com dados fictícios. Em produção, os valores vêm de variáveis de
-# ambiente guardadas fora do repositório (ver docs/deploy/README.md).
+# O banco local aceita conexão sem senha (trust), porque só a própria máquina o alcança e ele só tem dados fictícios.
+# Assim, nenhuma senha fica escrita no código (regra S6698 do SonarQube Cloud). Em produção, as senhas são geradas
+# na própria máquina da AWS (ver docs/deploy/README.md).
 # Todas as portas são ligadas a 127.0.0.1: só a própria máquina acessa, e ninguém da rede local consegue se conectar.
 name: sigepas
 
@@ -11,7 +12,7 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: sigepas
-      POSTGRES_PASSWORD: ${SENHA_DO_BANCO_LOCAL:-sigepas_local}
+      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_DB: sigepas
     ports:
       - '127.0.0.1:5432:5432'
@@ -28,7 +29,7 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     environment:
-      DATABASE_URL: postgresql://sigepas:${SENHA_DO_BANCO_LOCAL:-sigepas_local}@banco:5432/sigepas
+      DATABASE_URL: postgresql://sigepas@banco:5432/sigepas
       ORIGENS_PERMITIDAS: http://localhost:8080
       PORTA_DAS_METRICAS: '9464'
     depends_on:
