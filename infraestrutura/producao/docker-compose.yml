@@ -1,0 +1,114 @@
+# Ambiente de produção do SIGEPAS, na máquina EC2. O workflow de deploy baixa este arquivo na versão do commit e o
+# script atualizar-sistema.sh o executa. As senhas ficam em /opt/sigepas/.env, geradas na própria máquina.
+#
+# Diferenças em relação ao docker-compose.yml da raiz:
+# - as imagens vêm prontas do GitHub Container Registry, com a tag do commit (VERSAO);
+# - o Caddy fica na frente, com o HTTPS do Let's Encrypt, e é o único serviço aberto para a internet;
+# - o Prometheus e o Grafana só respondem dentro da máquina (127.0.0.1), pelo túnel do Systems Manager;
+# - cada serviço tem limite de memória, porque a máquina tem 2 GB.
+name: sigepas
+
+services:
+  banco:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sigepas
+      POSTGRES_PASSWORD: ${SENHA_DO_BANCO:?a senha do banco fica em /opt/sigepas/.env}
+      POSTGRES_DB: sigepas
+    volumes:
+      - dados-do-banco:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U sigepas -d sigepas']
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    mem_limit: 384m
+    networks: [interna]
+
+  api:
+    image: ghcr.io/heliocostadev/sigepas-api:${VERSAO:?a versão é o SHA do commit}
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://sigepas:${SENHA_DO_BANCO}@banco:5432/sigepas
+      ORIGENS_PERMITIDAS: https://${DOMINIO:?o domínio fica em /opt/sigepas/.env}
+      PORTA_DAS_METRICAS: '9464'
+    depends_on:
+      banco:
+        condition: service_healthy
+    mem_limit: 384m
+    networks: [interna]
+
+  web:
+    image: ghcr.io/heliocostadev/sigepas-web:${VERSAO}
+    restart: unless-stopped
+    depends_on:
+      - api
+    mem_limit: 64m
+    networks: [interna]
+
+  # O Caddy recebe o HTTPS, pede e renova o certificado do Let's Encrypt sozinho e repassa tudo para o Nginx (web).
+  # O IP fixo dele na rede interna é o único em que o Nginx confia para saber o IP real do cliente (nginx.conf).
+  caddy:
+    image: caddy:2.11.8-alpine
+    restart: unless-stopped
+    environment:
+      DOMINIO: ${DOMINIO}
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - certificados-do-caddy:/data
+      - configuracao-do-caddy:/config
+    depends_on:
+      - web
+    mem_limit: 128m
+    networks:
+      interna:
+        ipv4_address: 172.30.0.10
+
+  prometheus:
+    image: prom/prometheus:v3.7.3
+    restart: unless-stopped
+    volumes:
+      - ../../observabilidade/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - dados-do-prometheus:/prometheus
+    depends_on:
+      - api
+    ports:
+      - '127.0.0.1:9090:9090'
+    mem_limit: 256m
+    networks: [interna]
+
+  grafana:
+    image: grafana/grafana:12.3.0
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${SENHA_DO_GRAFANA:?a senha do Grafana fica em /opt/sigepas/.env}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_ANALYTICS_REPORTING_ENABLED: 'false'
+    volumes:
+      - ../../observabilidade/grafana/provisionamento:/etc/grafana/provisioning:ro
+      - dados-do-grafana:/var/lib/grafana
+    depends_on:
+      - prometheus
+    ports:
+      - '127.0.0.1:3001:3000'
+    mem_limit: 256m
+    networks: [interna]
+
+networks:
+  interna:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+          # O Docker distribui endereços só da metade de cima. O .10 fica livre para o Caddy.
+          ip_range: 172.30.0.128/25
+
+volumes:
+  dados-do-banco:
+  certificados-do-caddy:
+  configuracao-do-caddy:
+  dados-do-prometheus:
+  dados-do-grafana:

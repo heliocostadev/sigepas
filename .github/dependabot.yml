@@ -34,9 +34,19 @@ updates:
     commit-message:
       prefix: chore
 
-  # Imagens do docker-compose.yml (PostgreSQL, Prometheus e Grafana).
+  # Imagens dos Compose de desenvolvimento e de produção (PostgreSQL, Caddy, Prometheus e Grafana).
   - package-ecosystem: docker-compose
-    directory: /
+    directories: [/, /infraestrutura/producao]
+    target-branch: dev
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: chore
+
+  # Plugin da AWS do Terraform.
+  - package-ecosystem: terraform
+    directory: /infraestrutura/terraform
     target-branch: dev
     schedule:
       interval: weekly
