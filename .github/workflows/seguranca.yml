@@ -1,0 +1,60 @@
+name: Segurança
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+  schedule:
+    # Toda segunda-feira às 6h (horário de Brasília), para pegar falha nova em dependência que não mudou.
+    - cron: '0 9 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  segredos:
+    name: segredos no histórico (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  dependencias-novas:
+    name: dependências novas do PR
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Barrar dependência com falha conhecida ou licença incompatível
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          deny-licenses: AGPL-3.0-only, AGPL-3.0-or-later, GPL-3.0-only, GPL-3.0-or-later
+          comment-summary-in-pr: on-failure
+
+  auditoria-npm:
+    name: falhas conhecidas nas dependências (npm audit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      # --ignore-scripts: mesmo motivo do ci.yml.
+      - run: npm ci --ignore-scripts
+
+      - name: Auditoria das dependências de produção
+        run: npm audit --omit=dev --audit-level=moderate

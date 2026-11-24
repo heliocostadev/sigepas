@@ -5,5 +5,29 @@ dist/
 .DS_Store
 .env
 .env.*
+!.env.example
 .vscode/
 .idea/
+
+# Playwright e playwright-cli: capturas, rastreamentos e perfis de navegador com login (guardam cookies de sessão)
+.playwright-cli/
+test-results/
+playwright-report/
+blob-report/
+playwright/.auth/
+
+# Terraform: estado e variáveis podem conter segredo
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+crash.log
+
+# Configuração pessoal do Claude Code (a do projeto, .claude/settings.json, é versionada)
+.claude/settings.local.json
+.claude/worktrees/
+
+# Cliente do Prisma, gerado a partir de backend/prisma/schema.prisma pelo comando prisma generate
+backend/src/gerado/

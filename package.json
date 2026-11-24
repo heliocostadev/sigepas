@@ -5,25 +5,30 @@
   "type": "module",
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src",
-    "verificar": "npm run typecheck && npm run lint && npm run test"
+    "lint": "eslint src backend/src frontend/src",
+    "verificar": "npm run typecheck && npm run lint && npm run test && npm run verificar --workspaces",
+    "test:cov:todos": "npm run test:cov && npm run test:cov --workspaces"
   },
   "devDependencies": {
-    "@eslint/js": "^9.11.0",
-    "@vitest/coverage-v8": "^2.1.1",
-    "eslint": "^9.11.0",
-    "typescript": "^5.6.2",
-    "typescript-eslint": "^8.6.0",
-    "vitest": "^2.1.1"
+    "@eslint/js": "9.39.5",
+    "@vitest/coverage-v8": "5.1.0",
+    "eslint": "9.39.5",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.73.0",
+    "vitest": "5.1.0"
   },
-  "allowScripts": {
-    "esbuild@0.21.5": true
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "overrides": {
+    "effect": "3.22.5"
   }
 }

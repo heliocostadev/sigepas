@@ -5,6 +5,7 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    ignores: ['coverage/**', 'node_modules/**'],
+    // Código gerado pelo Prisma e saídas de build não são escritos à mão, por isso não passam pelo lint.
+    ignores: ['coverage/**', 'node_modules/**', '**/dist/**', 'backend/src/gerado/**', 'backend/coverage/**', 'frontend/coverage/**'],
   },
 );

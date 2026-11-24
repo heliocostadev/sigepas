@@ -1,0 +1,62 @@
+#!/bin/bash
+# Preparação da máquina do SIGEPAS. Roda uma vez, como root, no primeiro boot (user_data da EC2).
+# Este arquivo é um modelo do Terraform: as variáveis entre $${ } são preenchidas pelo maquina.tf.
+set -euo pipefail
+
+# Pasta do sistema e senhas, primeiro, para que uma falha mais adiante não deixe a máquina sem elas. As senhas são
+# geradas aqui, na própria máquina, e nunca passam pelo Terraform, pelo GitHub nem pela conversa. Só o root as lê.
+install -d -m 700 /opt/sigepas
+if [ ! -f /opt/sigepas/.env ]; then
+  umask 077
+  {
+    echo "SENHA_DO_BANCO=$(openssl rand -hex 24)"
+    echo "SENHA_DO_GRAFANA=$(openssl rand -hex 24)"
+  } > /opt/sigepas/.env
+  umask 022
+fi
+
+# A máquina não tem IP público próprio. A internet só funciona depois que o Terraform associa o IP fixo, alguns
+# segundos depois do boot. Espera até 10 minutos.
+for tentativa in $(seq 1 60); do
+  if curl --proto '=https' -fsS -o /dev/null https://github.com; then
+    break
+  fi
+  echo "Esperando a internet (tentativa $tentativa)."
+  sleep 10
+done
+
+# Memória de troca de 2 GB. A t3.small tem 2 GB de memória, e a troca evita que um pico derrube o banco.
+if [ ! -f /swapfile ]; then
+  dd if=/dev/zero of=/swapfile bs=1M count=2048
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  echo '/swapfile none swap sw 0 0' >> /etc/fstab
+fi
+
+# Docker, do repositório oficial do Amazon Linux. O log de cada contêiner gira em 3 arquivos de 10 MB: o disco não
+# enche, e nenhum log fica guardado sem prazo (LGPD).
+install -d -m 755 /etc/docker
+cat > /etc/docker/daemon.json << 'CONFIGURACAO'
+{
+  "log-driver": "json-file",
+  "log-opts": { "max-size": "10m", "max-file": "3" }
+}
+CONFIGURACAO
+dnf install -y docker util-linux
+systemctl enable --now docker
+
+# Docker Compose numa versão fixa. O download só é aceito se o checksum bater com o publicado pelo projeto.
+install -d -m 755 /usr/local/lib/docker/cli-plugins
+curl --proto '=https' -fsSL -o /usr/local/lib/docker/cli-plugins/docker-compose \
+  "https://github.com/docker/compose/releases/download/${versao_do_docker_compose}/docker-compose-linux-x86_64"
+echo "${checksum_do_docker_compose}  /usr/local/lib/docker/cli-plugins/docker-compose" | sha256sum -c -
+chmod 755 /usr/local/lib/docker/cli-plugins/docker-compose
+
+# Atualizações de segurança do sistema, aplicadas sozinhas todos os dias. O Amazon Linux 2023 trava os pacotes na
+# versão da imagem. O releasever igual a latest faz o dnf olhar a versão mais recente do repositório.
+install -d -m 755 /etc/dnf/vars
+echo latest > /etc/dnf/vars/releasever
+dnf install -y dnf-automatic
+sed -i 's/^upgrade_type = .*/upgrade_type = security/; s/^apply_updates = .*/apply_updates = yes/' /etc/dnf/automatic.conf
+systemctl enable --now dnf-automatic.timer

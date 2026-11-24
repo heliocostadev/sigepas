@@ -31,10 +31,12 @@ verificou: "conferi os três formatos de data contra a RN-IMP-04 e bate".
 
 ## Convenções
 
-- Mensagem de commit: `tipo(escopo): o que mudou` — `feat`, `fix`, `docs`, `test`, `chore`.
+- Mensagem de commit: `tipo(escopo): o que mudou` — `feat`, `fix`, `docs`, `test`, `chore`. A lista completa,
+  conferida no CI, está em [`docs/git/README.md`](docs/git/README.md).
 - Código e comentários em português. O domínio é português; traduzir só atrapalharia.
 - Comentário explica **por quê**, não o quê. O código já diz o quê.
-- Regra de negócio referencia o código dela (`RN-IMP-04`), que vive em [`docs/`](docs/).
+- Regra de negócio referencia o código dela (`RN-IMP-04`), que aparece no `spec.md` do fluxo, em
+  [`specs/`](specs/README.md).
 
 ## Dados
 

@@ -1,0 +1,73 @@
+# Ambiente completo do SIGEPAS na máquina de desenvolvimento.
+#   Só o banco, para rodar os testes:  docker compose up -d banco
+#   Tudo, para ver o sistema rodando:  docker compose up -d --build
+# O banco local aceita conexão sem senha (trust), porque só a própria máquina o alcança e ele só tem dados fictícios.
+# Assim, nenhuma senha fica escrita no código (regra S6698 do SonarQube Cloud). Em produção, as senhas são geradas
+# na própria máquina da AWS (ver docs/deploy/README.md).
+# Todas as portas são ligadas a 127.0.0.1: só a própria máquina acessa, e ninguém da rede local consegue se conectar.
+name: sigepas
+
+services:
+  banco:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sigepas
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: sigepas
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - dados-do-banco:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U sigepas -d sigepas']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://sigepas@banco:5432/sigepas
+      ORIGENS_PERMITIDAS: http://localhost:8080
+      PORTA_DAS_METRICAS: '9464'
+    depends_on:
+      banco:
+        condition: service_healthy
+    ports:
+      - '127.0.0.1:3000:3000'
+      - '127.0.0.1:9464:9464'
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      - api
+    ports:
+      - '127.0.0.1:8080:8080'
+
+  prometheus:
+    image: prom/prometheus:v3.7.3
+    volumes:
+      - ./observabilidade/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - api
+    ports:
+      - '127.0.0.1:9090:9090'
+
+  grafana:
+    image: grafana/grafana:12.3.0
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${SENHA_DO_GRAFANA_LOCAL:-grafana_local}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+    volumes:
+      - ./observabilidade/grafana/provisionamento:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    ports:
+      - '127.0.0.1:3001:3000'
+
+volumes:
+  dados-do-banco:

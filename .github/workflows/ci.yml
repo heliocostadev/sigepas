@@ -6,25 +6,203 @@ on:
   pull_request:
     branches: [main, dev]
 
+permissions:
+  contents: read
+
 jobs:
   verificar:
     name: tipos, lint e testes
     runs-on: ubuntu-latest
+    # PostgreSQL de verdade para os testes de integração do back-end. O banco só existe durante esta execução e aceita
+    # conexão sem senha (trust): assim, nenhuma senha fica escrita no código (regra S6698 do SonarQube Cloud).
+    services:
+      banco:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: sigepas
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_DB: sigepas_teste
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sigepas -d sigepas_teste"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL_DE_TESTE: postgresql://sigepas@localhost:5432/sigepas_teste
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
-      - run: npm ci
+      # --ignore-scripts: nenhum pacote roda script próprio durante a instalação. Fecha um caminho conhecido de ataque
+      # pela cadeia de dependências (regra githubactions:S6505 do SonarQube Cloud). O Prisma não depende do script.
+      - run: npm ci --ignore-scripts
+
+      - name: Cliente do Prisma
+        run: npm run prisma:gerar --workspace backend
 
       - name: Checagem de tipos
-        run: npm run typecheck
+        run: npm run typecheck && npm run typecheck --workspaces
 
       - name: Análise estática
         run: npm run lint
 
-      - name: Testes com cobertura
+      # Cada camada tem o próprio piso de cobertura, e o teste reprova abaixo dele: 75% no domínio e no back-end,
+      # 25% no front-end (linha Web Apps).
+      - name: Testes do núcleo de domínio, com cobertura
         run: npm run test:cov
+
+      - name: Testes do back-end, com cobertura e banco real
+        run: npm run test:cov --workspace backend
+
+      - name: Testes do front-end, com cobertura
+        run: npm run test:cov --workspace frontend
+
+      - name: Build do back-end e do front-end
+        run: npm run build --workspaces
+
+      - name: Guardar os relatórios de cobertura
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura
+          path: |
+            coverage/
+            backend/coverage/
+            frontend/coverage/
+          retention-days: 7
+
+  imagens-docker:
+    name: imagens Docker da API e das telas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir a imagem da API
+        run: docker build -f backend/Dockerfile -t sigepas-api:teste .
+
+      - name: Construir a imagem das telas
+        run: docker build -f frontend/Dockerfile -t sigepas-web:teste .
+
+      # Confere o Nginx de verdade: a sintaxe, o bloqueio das métricas e os cabeçalhos de segurança das telas.
+      # O nome "api" aponta para a própria máquina só para o Nginx conseguir iniciar sem a API.
+      - name: Conferir a configuração do Nginx
+        run: |
+          docker run --rm --add-host api:127.0.0.1 sigepas-web:teste nginx -t
+          docker run -d --name web-teste --add-host api:127.0.0.1 -p 8080:8080 sigepas-web:teste
+          sleep 2
+          for endereco in /api/metrics /api/metrics/ /api/METRICS /api/Metrics/; do
+            codigo=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:8080$endereco")
+            echo "$endereco -> $codigo"
+            test "$codigo" = "404"
+          done
+          cabecalhos=$(curl -s -I http://127.0.0.1:8080/)
+          echo "$cabecalhos"
+          echo "$cabecalhos" | grep -qi '^content-security-policy:.*frame-ancestors'
+          echo "$cabecalhos" | grep -qi '^x-content-type-options: nosniff'
+          docker rm -f web-teste
+
+  infraestrutura:
+    name: Terraform, scripts e Compose de produção
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: 1.17.2
+
+      # Confere o formato e a validade do Terraform sem acessar a AWS (-backend=false e sem credenciais).
+      - name: Formato e validade do Terraform
+        working-directory: infraestrutura/terraform
+        run: |
+          terraform fmt -check -recursive
+          terraform init -backend=false -input=false
+          terraform validate
+
+      # O shellcheck aponta erros comuns de bash. O modelo do Terraform é conferido depois de trocar as variáveis.
+      - name: Scripts da máquina
+        run: |
+          shellcheck infraestrutura/producao/atualizar-sistema.sh
+          sed 's/\${versao_do_docker_compose}/v0.0.0/; s/\${checksum_do_docker_compose}/0/' \
+            infraestrutura/terraform/preparar-maquina.sh.tftpl > /tmp/preparar-maquina.sh
+          shellcheck /tmp/preparar-maquina.sh
+
+      # Valores fictícios, só para o Compose conferir a sintaxe e as variáveis obrigatórias.
+      - name: Compose de produção
+        env:
+          SENHA_DO_BANCO: ficticia
+          SENHA_DO_GRAFANA: ficticia
+          VERSAO: '0000000000000000000000000000000000000000'
+          DOMINIO: exemplo.duckdns.org
+        run: docker compose -f infraestrutura/producao/docker-compose.yml config --quiet
+
+  mensagens-de-commit:
+    name: padrão das mensagens de commit
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # A referência final é o último commit da branch do PR, e não o HEAD: no PR, o HEAD é o commit de merge
+      # que o GitHub cria para o teste ("Merge <sha> into <sha>"), que não faz parte do histórico do autor.
+      - name: Conferir tipo(escopo) em cada commit do PR
+        run: node scripts/conferir-mensagens-de-commit.mjs "origin/${{ github.base_ref }}" "${{ github.event.pull_request.head.sha }}"
+
+  sonarcloud:
+    name: SonarCloud
+    needs: verificar
+    # Liga com o segredo SONAR_TOKEN e a variável SONAR_HABILITADO=true (Settings > Secrets and variables > Actions).
+    # O plano gratuito do SonarQube Cloud só analisa a main e os PRs: no push para a dev, a análise falha com "not
+    # allowed to access data from non main branches". Como toda mudança chega à dev por PR, a análise do PR cobre a dev.
+    if: vars.SONAR_HABILITADO == 'true' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # O artefato guarda os caminhos a partir da raiz do repositório (coverage/, backend/coverage/,
+      # frontend/coverage/). Por isso o download vai para a raiz.
+      - uses: actions/download-artifact@v4
+        with:
+          name: cobertura
+          path: .
+
+      # O Vitest de cada workspace grava no lcov o caminho a partir do próprio workspace (src/...). O Sonar lê a partir
+      # da raiz, então o prefixo do workspace entra aqui.
+      - name: Ajustar os caminhos da cobertura dos workspaces
+        run: |
+          sed -i 's#^SF:#SF:backend/#' backend/coverage/lcov.info
+          sed -i 's#^SF:#SF:frontend/#' frontend/coverage/lcov.info
+
+      - name: Análise e portão de qualidade
+        uses: SonarSource/sonarqube-scan-action@2f77a1ec69fb1d595b06f35ab27e97605bdef703 # v5.3.2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: -Dsonar.qualitygate.wait=true
+
+  ci-aprovado:
+    # Verificação única usada na proteção das branches (ideia do Cauê Fernandes, github.com/CaueFer/alagou):
+    # só passa se nenhuma etapa falhou. Etapa pulada (Sonar desligado, mensagens fora de PR) não reprova.
+    name: CI aprovado
+    if: always()
+    needs: [verificar, imagens-docker, infraestrutura, mensagens-de-commit, sonarcloud]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Conferir o resultado de cada etapa
+        env:
+          RESULTADOS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTADOS"
+          if echo "$RESULTADOS" | grep -E '"result": "(failure|cancelled)"'; then
+            echo "Alguma etapa falhou ou foi cancelada."
+            exit 1
+          fi
