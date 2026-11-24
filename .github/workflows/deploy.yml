@@ -1,0 +1,124 @@
+name: Deploy
+
+# Publica o SIGEPAS na AWS a cada merge na main (ADR 0006). Também pode ser disparado pela aba Actions, sempre na main.
+# Não há SSH: a máquina recebe a ordem pelo AWS Systems Manager.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Um deploy por vez. Um deploy novo espera o anterior terminar, em vez de cancelar no meio.
+concurrency:
+  group: deploy-producao
+  cancel-in-progress: false
+
+# As actions ficam fixas pelo SHA do commit, e não pela tag: estes jobs recebem o token do GitHub Container Registry e
+# o login da AWS. Uma tag trocada por um atacante não chega aqui. O Dependabot atualiza os SHAs.
+jobs:
+  imagens:
+    name: imagens no GitHub Container Registry
+    # Fica desligado até a infraestrutura existir (variável DEPLOY_HABILITADO, docs/deploy/README.md). Só a main publica.
+    if: vars.DEPLOY_HABILITADO == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # A tag é o SHA completo do commit: cada versão no ar corresponde a um commit. O rótulo source liga a imagem ao
+      # repositório no GitHub.
+      - name: Construir e publicar as imagens
+        env:
+          VERSAO: ${{ github.sha }}
+          REPOSITORIO: ${{ github.repository }}
+        run: |
+          for camada in api web; do
+            if [ "$camada" = api ]; then pasta=backend; else pasta=frontend; fi
+            imagem="ghcr.io/heliocostadev/sigepas-$camada:$VERSAO"
+            docker build -f "$pasta/Dockerfile" --label "org.opencontainers.image.source=https://github.com/$REPOSITORIO" \
+              --label "org.opencontainers.image.revision=$VERSAO" -t "$imagem" .
+            docker push "$imagem"
+          done
+
+  publicar:
+    name: atualizar a máquina na AWS
+    needs: imagens
+    runs-on: ubuntu-latest
+    # O ambiente producao é o único que o papel da AWS aceita (infraestrutura/terraform/github.tf). No GitHub, ele só
+    # libera a main.
+    environment:
+      name: producao
+      url: https://${{ vars.DOMINIO }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Login na AWS por OIDC, sem chave guardada
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_PAPEL_DE_DEPLOY }}
+          aws-region: us-east-2
+
+      # O domínio é conferido aqui, antes de entrar no comando que a máquina executa como root. O @sh do jq põe cada
+      # valor entre aspas de shell, então nenhum caractere vira comando.
+      - name: Mandar a máquina atualizar
+        env:
+          VERSAO: ${{ github.sha }}
+          DOMINIO: ${{ vars.DOMINIO }}
+          ID_DA_MAQUINA: ${{ vars.AWS_ID_DA_MAQUINA }}
+          REPOSITORIO: ${{ github.repository }}
+        run: |
+          if ! [[ "$DOMINIO" =~ ^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$ ]]; then
+            echo "A variável DOMINIO tem caracteres não permitidos." >&2
+            exit 1
+          fi
+          script="https://raw.githubusercontent.com/$REPOSITORIO/$VERSAO/infraestrutura/producao/atualizar-sistema.sh"
+          comandos=$(jq -cn --arg script "$script" --arg versao "$VERSAO" --arg dominio "$DOMINIO" \
+            '{commands: [
+              "install -d -m 700 /opt/sigepas",
+              "curl -fsSL \($script|@sh) -o /opt/sigepas/atualizar-sistema.sh.novo",
+              "mv /opt/sigepas/atualizar-sistema.sh.novo /opt/sigepas/atualizar-sistema.sh",
+              "bash /opt/sigepas/atualizar-sistema.sh \($versao|@sh) \($dominio|@sh)"
+            ]}')
+          id_do_comando=$(aws ssm send-command --instance-ids "$ID_DA_MAQUINA" --document-name AWS-RunShellScript \
+            --comment "Deploy do SIGEPAS ${VERSAO:0:7}" --parameters "$comandos" \
+            --query Command.CommandId --output text)
+          echo "Comando do Systems Manager: $id_do_comando"
+
+          # Espera até 10 minutos. O primeiro deploy baixa seis imagens, e o script ainda espera a API responder.
+          situacao=Pending
+          for tentativa in $(seq 1 60); do
+            sleep 10
+            situacao=$(aws ssm get-command-invocation --command-id "$id_do_comando" --instance-id "$ID_DA_MAQUINA" \
+              --query Status --output text 2>/dev/null || echo Pending)
+            case "$situacao" in
+              Pending|InProgress|Delayed|Cancelling) echo "Tentativa $tentativa: $situacao" ;;
+              *) break ;;
+            esac
+          done
+          aws ssm get-command-invocation --command-id "$id_do_comando" --instance-id "$ID_DA_MAQUINA" \
+            --query '[StandardOutputContent, StandardErrorContent]' --output text
+          echo "Situação final: $situacao"
+          test "$situacao" = "Success"
+
+      - name: Conferir o sistema no ar pelo HTTPS
+        env:
+          DOMINIO: ${{ vars.DOMINIO }}
+        run: |
+          for tentativa in $(seq 1 12); do
+            if curl -fsS "https://$DOMINIO/api/saude"; then echo; exit 0; fi
+            echo "Tentativa $tentativa sem resposta."
+            sleep 10
+          done
+          echo "O endereço https://$DOMINIO/api/saude não respondeu." >&2
+          exit 1
