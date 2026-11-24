@@ -2,9 +2,9 @@
 
 As decisões estão na [ADR 0006](../adr/0006-hospedagem-na-aws-com-terraform.md) (AWS, Terraform, Systems Manager e
 OIDC) e na [ADR 0014](../adr/0014-regiao-maquina-e-https-do-deploy.md) (região `us-east-2`, máquina `t3.small` e
-HTTPS pelo Caddy). **Situação em 24/11/2026: o Terraform está escrito e o `terraform plan` passou, com 12 recursos a
-criar. Nada foi criado na AWS ainda.** O `revisor-de-seguranca` revisou o Terraform, o Compose e o workflow antes do
-primeiro `apply`. O `terraform apply` só roda com o ok do Hélio.
+HTTPS pelo Caddy). **Situação em 24/11/2026: os 12 recursos foram criados na AWS com `terraform apply`, com o ok
+do Hélio. O deploy ainda está desligado.** O `revisor-de-seguranca` revisou o Terraform, o Compose e o workflow antes
+do primeiro `apply`. O `terraform apply` só roda com o ok do Hélio.
 
 ## Como funciona
 
@@ -120,8 +120,11 @@ aws login --profile sigepas --region us-east-2
   do Session Manager.
 - **Trocar o domínio:** mude a variável `DOMINIO` no GitHub e aponte o DNS do domínio novo para o `ip_publico`.
   Depois, rode o workflow `Deploy`. O Caddy pede o certificado novo sozinho.
-- **Desligar tudo depois do Demo Day:** na pasta do Terraform, rode `terraform destroy`. O volume do banco é apagado
-  junto com a máquina.
+- **Desligar tudo:** só com a decisão do Hélio. Perto do Demo Day, a IA avisa com o custo acumulado, e ele decide se
+  mantém ou desliga. Para desligar, rode `terraform destroy` na pasta do Terraform. O volume do banco é apagado junto
+  com a máquina.
+- **Cópia do estado do Terraform:** depois de cada `apply` ou `destroy`, copie o `terraform.tfstate` para a pasta
+  `ESTADO_DO_TERRAFORM` do Hélio, fora do repositório. Sem esse arquivo, o Terraform não reconhece os recursos.
 
 ## O que ainda falta
 
