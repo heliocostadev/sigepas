@@ -122,9 +122,10 @@ jobs:
   sonarcloud:
     name: SonarCloud
     needs: verificar
-    # Fica desligado até a conta no SonarCloud existir. Para ligar: criar o segredo SONAR_TOKEN e a variável
-    # SONAR_HABILITADO=true em Settings > Secrets and variables > Actions.
-    if: vars.SONAR_HABILITADO == 'true'
+    # Liga com o segredo SONAR_TOKEN e a variável SONAR_HABILITADO=true (Settings > Secrets and variables > Actions).
+    # O plano gratuito do SonarQube Cloud só analisa a main e os PRs: no push para a dev, a análise falha com "not
+    # allowed to access data from non main branches". Como toda mudança chega à dev por PR, a análise do PR cobre a dev.
+    if: vars.SONAR_HABILITADO == 'true' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

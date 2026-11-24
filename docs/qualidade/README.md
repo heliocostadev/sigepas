@@ -30,6 +30,11 @@ A chave do projeto é `heliocostadev_sigepas`, e a da organização é `heliocos
 `sonar-project.properties`. O segredo `SONAR_TOKEN` e a variável `SONAR_HABILITADO=true` ficam no repositório. A
 análise automática do SonarQube Cloud fica desligada, porque a análise é feita pelo CI, junto com a cobertura.
 
+O plano gratuito só analisa a `main` e os PRs. Por isso, o job roda em todo PR e no push para a `main`, e não roda no
+push para a `dev`. Toda mudança chega à `dev` por PR, e a proteção da `dev` exige o CI verde no PR. Assim, todo código
+da `dev` passou pelo portão de qualidade antes do merge. O painel do SonarQube Cloud mostra a `main`, que só muda no
+release.
+
 ## Para ligar o que ainda está desligado
 
 - **Wiki:** crie a primeira página pelo site. Crie também a variável `WIKI_HABILITADA=true`.
