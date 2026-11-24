@@ -6,7 +6,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY backend/package.json backend/package.json
 COPY frontend/package.json frontend/package.json
-RUN npm ci --workspace frontend --include-workspace-root=false
+# --ignore-scripts: nenhum pacote roda script próprio durante a instalação (regra docker:S6505 do SonarQube Cloud).
+RUN npm ci --workspace frontend --include-workspace-root=false --ignore-scripts
 COPY frontend frontend
 RUN npm run build --workspace frontend
 

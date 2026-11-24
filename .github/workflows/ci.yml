@@ -38,7 +38,9 @@ jobs:
           node-version: 24
           cache: npm
 
-      - run: npm ci
+      # --ignore-scripts: nenhum pacote roda script próprio durante a instalação. Fecha um caminho conhecido de ataque
+      # pela cadeia de dependências (regra githubactions:S6505 do SonarQube Cloud). O Prisma não depende do script.
+      - run: npm ci --ignore-scripts
 
       - name: Cliente do Prisma
         run: npm run prisma:gerar --workspace backend

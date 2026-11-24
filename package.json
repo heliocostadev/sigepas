@@ -27,5 +27,8 @@
   "workspaces": [
     "backend",
     "frontend"
-  ]
+  ],
+  "overrides": {
+    "effect": "3.22.5"
+  }
 }
