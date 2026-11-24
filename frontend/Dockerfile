@@ -12,7 +12,7 @@ COPY frontend frontend
 RUN npm run build --workspace frontend
 
 # Imagem oficial do Nginx que roda sem permissão de administrador.
-FROM nginxinc/nginx-unprivileged:1.29-alpine AS execucao
+FROM nginxinc/nginx-unprivileged:1.31-alpine AS execucao
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=construcao /app/frontend/dist /usr/share/nginx/html
 EXPOSE 8080
