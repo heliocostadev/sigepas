@@ -215,3 +215,28 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
   próprio PR e no SonarQube Cloud.
 - Prova: o PR 12 teve a análise do SonarQube Cloud aprovada como PR nos três commits. A falha da `dev` está no CI do
   commit `5bdf705`.
+
+## R-0016 · 24/11/2026 · Infraestrutura do deploy em Terraform
+
+- O Hélio escolheu a máquina `t3.small` e o subdomínio gratuito `sigepas.duckdns.org`, até o domínio próprio ficar
+  pronto. A organização da conta da AWS só libera `us-east-2`. As decisões estão na ADR 0014, proposta.
+- Entrou o Terraform em `infraestrutura/terraform/`. Ele cria o grupo de segurança só com 80 e 443 e a EC2 `t3.small`
+  com IMDSv2 e disco criptografado. Cria também o IP fixo e o papel da máquina só com o Systems Manager. O OIDC do
+  GitHub aceita só o ambiente `producao` do repositório, e o papel só manda comando a esta máquina.
+- Entraram o Compose de produção e o Caddyfile em `infraestrutura/producao/`, com o Caddy na frente para o HTTPS.
+- Entrou o script `atualizar-sistema.sh`. Ele confere o SHA e o domínio antes de usá-los e roda uma atualização por
+  vez.
+- Entrou o workflow `deploy.yml`, desligado até a variável `DEPLOY_HABILITADO` existir.
+- O Nginx ganhou o `set_real_ip_from` do IP fixo do Caddy e passou a repassar o protocolo original do cliente.
+- O CI ganhou o job "Terraform, scripts e Compose de produção". O Dependabot passou a cobrir o Terraform e o Compose
+  de produção.
+- O `verificador` reprovou a primeira versão por três pontos: a espera do deploy, a volta de versão e a escrita. O
+  `revisor-de-seguranca` não achou risco que impeça o `apply`. Ele apontou três bloqueios para o primeiro deploy: o
+  formato do `sub` do OIDC, a `main` sem proteção e o ambiente `producao` inexistente. O primeiro foi corrigido no
+  código. Os outros dois ficaram como passos do Hélio no `docs/deploy/README.md`.
+- No workflow, entraram aspas seguras no comando do Systems Manager, actions fixas por SHA e espera de até 10
+  minutos. Na máquina, entraram a rotação de logs do Docker e as senhas geradas no início do boot. No Compose, o Caddy
+  ganhou uma faixa de IP só dele, e o HSTS deixou de sair duplicado.
+- Prova: `terraform validate` passou. O `terraform plan` com o login temporário do Hélio mostrou 12 recursos a criar,
+  nenhum a mudar e nenhum a apagar. Nada foi criado na AWS. O plugin da AWS ficou fixo na 6.73.0, com os códigos de
+  conferência do Windows e do Linux no `.terraform.lock.hcl`.

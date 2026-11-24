@@ -1,47 +1,132 @@
 # Deploy
 
-A decisão está na [ADR 0006](../adr/0006-hospedagem-na-aws-com-terraform.md). **Situação em 17/11/2026: a conta na
-AWS existe desde 16/11, no plano gratuito, com orçamento de gasto zero. O Terraform ainda não foi escrito, e nada foi
-criado na AWS.** O Terraform é escrito depois do merge do esqueleto. Ele só é aplicado com o ok do Hélio.
+As decisões estão na [ADR 0006](../adr/0006-hospedagem-na-aws-com-terraform.md) (AWS, Terraform, Systems Manager e
+OIDC) e na [ADR 0014](../adr/0014-regiao-maquina-e-https-do-deploy.md) (região `us-east-2`, máquina `t3.small` e
+HTTPS pelo Caddy). **Situação em 24/11/2026: o Terraform está escrito e o `terraform plan` passou, com 12 recursos a
+criar. Nada foi criado na AWS ainda.** O `revisor-de-seguranca` revisou o Terraform, o Compose e o workflow antes do
+primeiro `apply`. O `terraform apply` só roda com o ok do Hélio.
+
+## Como funciona
+
+```text
+internet ──HTTPS──> Caddy (80 e 443) ──> Nginx "web" (8080) ──/api/──> API (3000) ──> PostgreSQL (5432)
+                                                                          └─ métricas (9464) <── Prometheus <── Grafana
+```
+
+1. **A infraestrutura está em Terraform**, em [`infraestrutura/terraform/`](../../infraestrutura/terraform/). Ele cria
+   o grupo de segurança, só com as portas 80 e 443. Ele cria também a máquina EC2 com Amazon Linux 2023 e o IP fixo.
+   Por fim, cria o papel da máquina para o Systems Manager e o acesso do GitHub Actions por OIDC.
+2. **No primeiro boot**, o script `preparar-maquina.sh.tftpl` gera as senhas em `/opt/sigepas/.env`. Depois, ele
+   instala o Docker, com rotação de logs, e o Docker Compose, numa versão conferida pelo checksum. Ele também cria
+   2 GB de memória de troca e liga as atualizações de segurança automáticas.
+3. **A cada merge na `main`**, o workflow [`deploy.yml`](../../.github/workflows/deploy.yml) gera as imagens. Ele as
+   publica no GitHub Container Registry, com o SHA do commit como tag. Depois, faz login na AWS por OIDC e manda a
+   máquina rodar o [`atualizar-sistema.sh`](../../infraestrutura/producao/atualizar-sistema.sh) pelo Systems Manager.
+4. **O script na máquina** baixa a configuração do mesmo commit e atualiza os contêineres. Ele só termina com sucesso
+   quando a API responde em `/saude`. Por fim, o workflow confere `https://<domínio>/api/saude`.
 
 ## O que roda na máquina
 
-O `docker-compose.yml` da máquina de desenvolvimento serve de base para a produção. Na produção, só a porta das telas
-fica publicada. A API, as métricas, o banco, o Prometheus e o Grafana não publicam porta nenhuma, e nenhuma senha tem
-valor padrão.
-
 | Serviço | Porta | Quem acessa |
 |---|---|---|
-| `web` (Nginx sem root) | 8080 | A internet, pelo HTTPS. Repassa `/api/` para a API |
+| `caddy` | 80 e 443 | A internet. Pede e renova o certificado do Let's Encrypt e repassa para o `web` |
+| `web` (Nginx sem root) | 8080 | Só o Caddy, pela rede interna. Repassa `/api/` para a API |
 | `api` | 3000 | Só o Nginx, pela rede interna |
-| `api`, métricas | 9464 | Só o Prometheus, pela rede interna. O Nginx não repassa esta porta |
+| `api`, métricas | 9464 | Só o Prometheus, pela rede interna |
 | `banco` | 5432 | Só a API, pela rede interna |
-| `prometheus` e `grafana` | 9090 e 3000 | Só pela rede interna ou por túnel. Nenhum dos dois fica público |
+| `prometheus` e `grafana` | 9090 e 3001 | Só a própria máquina (127.0.0.1), pelo túnel do Systems Manager |
 
-**Condição para o limite de requisições:** nenhum outro proxy fica na frente do contêiner `web`. Se o HTTPS terminar
-num proxy à frente dele, esse proxy deve sobrescrever o `X-Forwarded-For`. Nesse caso, a API passa a confiar em dois
-saltos (`trust proxy` igual a 2). Sem isso, todos os clientes voltam a dividir o mesmo limite.
+**IP do cliente e limite de requisições:** o Caddy informa o IP do cliente no `X-Forwarded-For`. O Nginx só aceita
+esse cabeçalho quando ele vem do IP fixo do Caddy (`172.30.0.10`, regra `set_real_ip_from`). Depois, o Nginx repassa
+o IP à API, que confia em um salto (`trust proxy` igual a 1). Se outro proxy for posto na frente do Caddy, essa
+cadeia precisa ser revista.
 
-As variáveis ficam fora do repositório, na máquina da AWS. Os nomes
-estão em [`docs/app/README.md`](../app/README.md).
+## Antes de ligar o deploy
 
-## Como vai funcionar
+Estas regras do GitHub impedem que outra branch ou um push direto publique na produção. Elas vêm da revisão de
+segurança de 24/11/2026.
 
-1. **A infraestrutura é escrita em Terraform** e fica no repositório. O Terraform cria a rede, uma máquina EC2
-   pequena com Linux e Docker e o IP elástico. Também cria as permissões do Systems Manager e o acesso do GitHub
-   Actions por OIDC (login federado, sem chave guardada).
-2. **A cada merge na `main`**, o GitHub Actions gera as imagens Docker. Ele publica as imagens no GitHub Container
-   Registry com a tag do commit. Depois, manda a máquina atualizar pelo **AWS Systems Manager (Run Command)**. Não há
-   SSH no deploy, o que atende à proibição de deploy manual por SSH.
-3. O site usa **HTTPS** com certificado Let's Encrypt.
-4. **Voltar uma versão:** reimplante a imagem com a tag do commit anterior.
-5. A **cópia de segurança** do PostgreSQL vai para o S3 todos os dias, com teste de restauração.
-6. O **alerta de orçamento** fica ligado na AWS desde o primeiro acesso.
+1. **Ambiente `producao`:** em Settings > Environments, crie o ambiente `producao`. Em "Deployment branches", libere
+   só a `main`. Crie o ambiente antes de ligar o deploy. Sem isso, o GitHub cria o ambiente sozinho, sem regra.
+2. **Proteção da `main`:** crie uma regra que exige PR e a verificação "CI aprovado". A regra também bloqueia push
+   forçado e exclusão da branch.
+3. **Nenhum workflow com `pull_request_target`** pode usar o ambiente `producao`.
 
-## O que o Hélio precisa fazer antes
+## Primeira publicação, passo a passo
 
-- A conta na AWS e o alerta de orçamento já existem (16/11/2026).
-- Quando o Terraform estiver escrito, o `revisor-de-seguranca` faz a revisão dele. O Terraform só é aplicado com o
-  ok do Hélio (`terraform apply` pede confirmação no `.claude/settings.json`).
+Na máquina do Hélio, faça o login do AWS CLI:
 
-Esta página ganha os passos exatos de deploy e de volta de versão no mesmo PR em que o deploy existir.
+```bash
+aws login --profile sigepas --region us-east-2
+```
+
+1. Entre na pasta do Terraform:
+   ```bash
+   cd infraestrutura/terraform
+   ```
+2. Prepare a pasta:
+   ```bash
+   terraform init
+   ```
+3. Gere e confira o plano:
+   ```bash
+   terraform plan -out=plano.tfplan
+   ```
+4. Com o ok do Hélio, aplique o plano:
+   ```bash
+   terraform apply plano.tfplan
+   ```
+5. Anote as três saídas: `ip_publico`, `id_da_maquina` e `papel_de_deploy`.
+6. No DuckDNS, coloque o `ip_publico` no campo "current ip" do subdomínio.
+7. Espere 5 minutos. A preparação do primeiro boot precisa terminar antes do primeiro deploy.
+8. No GitHub, em Settings > Secrets and variables > Actions, aba "Variables", crie estas variáveis:
+
+   | Variável | Valor |
+   |---|---|
+   | `DOMINIO` | O domínio, por exemplo `sigepas.duckdns.org` |
+   | `AWS_ID_DA_MAQUINA` | A saída `id_da_maquina` |
+   | `AWS_PAPEL_DE_DEPLOY` | A saída `papel_de_deploy` |
+   | `DEPLOY_HABILITADO` | `true` |
+
+9. Faça o merge da `dev` na `main` por um PR. O workflow `Deploy` roda sozinho.
+10. Na primeira execução, a máquina não consegue baixar as imagens, porque o GitHub as cria como privadas. Em
+    github.com/heliocostadev?tab=packages, abra `sigepas-api` e `sigepas-web`. Em "Package settings", troque a
+    visibilidade para "Public". As imagens não têm segredo.
+11. Na aba Actions, abra a execução do `Deploy` que falhou e clique em "Re-run all jobs".
+
+## Operação
+
+- **Voltar uma versão:** na aba Actions, abra a execução do `Deploy` da versão anterior e clique em "Re-run all
+  jobs". O GitHub repete o deploy com o commit daquela execução. O GitHub só aceita repetir uma execução até 30 dias
+  depois dela. Para uma volta definitiva, faça um `git revert` por PR.
+- **Comandos do Systems Manager na máquina do Hélio:** eles exigem o plugin do Session Manager instalado.
+  ```bash
+  winget install Amazon.SessionManagerPlugin
+  ```
+- **Ver os contêineres sem SSH:** abra uma sessão pelo Systems Manager.
+  ```bash
+  aws ssm start-session --profile sigepas --region us-east-2 --target <id_da_maquina>
+  ```
+  Na sessão, rode o comando do Compose:
+  ```bash
+  sudo docker compose -f /opt/sigepas/infraestrutura/producao/docker-compose.yml --env-file /opt/sigepas/.env ps
+  ```
+- **Abrir o Grafana:** crie um túnel até a porta 3001 da máquina e acesse `http://localhost:3001`. O usuário é
+  `admin`. A senha está em `/opt/sigepas/.env` (`SENHA_DO_GRAFANA`), legível só pelo root.
+  ```bash
+  aws ssm start-session --profile sigepas --region us-east-2 --target <id_da_maquina> --document-name AWS-StartPortForwardingSession --parameters portNumber=3001,localPortNumber=3001
+  ```
+- **Não leia segredo pelo Run Command.** A saída do Run Command fica guardada na AWS. Para ler o `.env`, use a sessão
+  do Session Manager.
+- **Trocar o domínio:** mude a variável `DOMINIO` no GitHub e aponte o DNS do domínio novo para o `ip_publico`.
+  Depois, rode o workflow `Deploy`. O Caddy pede o certificado novo sozinho.
+- **Desligar tudo depois do Demo Day:** na pasta do Terraform, rode `terraform destroy`. O volume do banco é apagado
+  junto com a máquina.
+
+## O que ainda falta
+
+- **Cópia de segurança do banco** para o S3, com teste de restauração (ADR 0006). Entra antes do release.
+- **Estado do Terraform num bucket S3.** Hoje, o arquivo `terraform.tfstate` fica só na máquina do Hélio, fora do
+  git. Se ele se perder, o Terraform não reconhece mais os recursos.
+- **Monitor externo de disponibilidade**, com alerta quando `/api/saude` parar de responder.
+- **Documento próprio do Systems Manager**, que aceite só um SHA da `main`, no lugar do `AWS-RunShellScript`.
