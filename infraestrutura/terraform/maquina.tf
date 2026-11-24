@@ -37,6 +37,10 @@ resource "aws_instance" "sigepas" {
   vpc_security_group_ids = [aws_security_group.sigepas_web.id]
   iam_instance_profile   = aws_iam_instance_profile.maquina.name
 
+  # Sem IP público temporário. O único endereço público da máquina é o IP fixo (aws_eip.sigepas), associado logo
+  # depois da criação. O script do primeiro boot espera esse IP antes de baixar pacotes.
+  associate_public_ip_address = false
+
   # A preparação roda uma vez, no primeiro boot: Docker, Docker Compose, memória de troca e as senhas geradas na
   # própria máquina. Nenhuma senha passa pelo Terraform nem fica no estado dele.
   user_data = templatefile("${path.module}/preparar-maquina.sh.tftpl", {

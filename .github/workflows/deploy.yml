@@ -86,7 +86,7 @@ jobs:
           comandos=$(jq -cn --arg script "$script" --arg versao "$VERSAO" --arg dominio "$DOMINIO" \
             '{commands: [
               "install -d -m 700 /opt/sigepas",
-              "curl -fsSL \($script|@sh) -o /opt/sigepas/atualizar-sistema.sh.novo",
+              "curl --proto =https -fsSL \($script|@sh) -o /opt/sigepas/atualizar-sistema.sh.novo",
               "mv /opt/sigepas/atualizar-sistema.sh.novo /opt/sigepas/atualizar-sistema.sh",
               "bash /opt/sigepas/atualizar-sistema.sh \($versao|@sh) \($dominio|@sh)"
             ]}')
@@ -116,7 +116,7 @@ jobs:
           DOMINIO: ${{ vars.DOMINIO }}
         run: |
           for tentativa in $(seq 1 12); do
-            if curl -fsS "https://$DOMINIO/api/saude"; then echo; exit 0; fi
+            if curl --proto '=https' -fsS "https://$DOMINIO/api/saude"; then echo; exit 0; fi
             echo "Tentativa $tentativa sem resposta."
             sleep 10
           done

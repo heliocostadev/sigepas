@@ -37,7 +37,8 @@ for arquivo in \
   observabilidade/prometheus.yml \
   observabilidade/grafana/provisionamento/fontes-de-dados/prometheus.yml; do
   install -d -m 755 "$(dirname "$arquivo")"
-  curl -fsSL "$ORIGEM/$arquivo" -o "$arquivo"
+  # --proto =https: o download não aceita ser redirecionado para um endereço sem HTTPS.
+  curl --proto '=https' -fsSL "$ORIGEM/$arquivo" -o "$arquivo"
 done
 
 # A versão e o domínio entram no .env sem tocar nas senhas.
