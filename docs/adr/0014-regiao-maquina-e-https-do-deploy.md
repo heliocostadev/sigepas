@@ -1,6 +1,6 @@
 # 0014. Deploy em us-east-2, numa t3.small, com HTTPS pelo Caddy
 
-- **Situação:** proposta em 24/11/2026. Aguarda a aprovação do Hélio.
+- **Situação:** aceita em 24/11/2026, por decisão do Hélio.
 - **Redação:** IA, em 24/11/2026, durante a escrita do Terraform.
 - **Fontes:** decisões do Hélio na conversa de 24/11/2026 e consulta à conta da AWS no mesmo dia. Ele escolheu a
   máquina `t3.small`, o subdomínio gratuito no começo e o domínio próprio depois. Também a ADR 0006.
@@ -59,4 +59,5 @@ O sistema roda seis contêineres: banco, API, Nginx, Caddy, Prometheus e Grafana
 - Antes do primeiro deploy, o Hélio cria no GitHub o ambiente `producao`, só para a `main`, e a proteção da `main`.
   Ele cria também as variáveis `DEPLOY_HABILITADO`, `DOMINIO`, `AWS_ID_DA_MAQUINA` e `AWS_PAPEL_DE_DEPLOY`. Depois do
   primeiro deploy, ele torna públicas as duas imagens do GitHub Container Registry, para a máquina baixá-las sem senha.
-- Depois do Demo Day, `terraform destroy` remove todos os recursos e para o gasto.
+- O desligamento não é automático. Perto do Demo Day e quando o crédito ficar baixo, a IA avisa o Hélio com o
+  custo acumulado. Ele decide se mantém o sistema no ar ou se roda `terraform destroy` (pedido dele em 24/11/2026).

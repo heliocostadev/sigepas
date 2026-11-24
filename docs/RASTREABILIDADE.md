@@ -240,3 +240,16 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 - Prova: `terraform validate` passou. O `terraform plan` com o login temporário do Hélio mostrou 12 recursos a criar,
   nenhum a mudar e nenhum a apagar. Nada foi criado na AWS. O plugin da AWS ficou fixo na 6.73.0, com os códigos de
   conferência do Windows e do Linux no `.terraform.lock.hcl`.
+
+## R-0017 · 24/11/2026 · Infraestrutura criada na AWS
+
+- O Hélio aprovou a ADR 0014 e autorizou o `terraform apply`. O PR 14 entrou na `dev` antes, com as 12 verificações
+  verdes, inclusive o SonarQube Cloud.
+- Antes do `apply`, foram criadas duas regras no GitHub. O ambiente `producao` aceita só a `main`. A `main` exige PR e
+  a verificação "CI aprovado", também para o administrador, e bloqueia push forçado e exclusão.
+- O `terraform apply` criou os 12 recursos em `us-east-2`, sem erro. A máquina ficou com o IP fixo e com o IMDSv2
+  obrigatório.
+- O estado do Terraform tem cópia fora do repositório, na pasta do Hélio. A cópia não tem senha: as únicas ocorrências
+  de "password" e "senha" são campos vazios e o texto do script de preparação.
+- O desligamento não é automático. O Hélio decide se mantém ou desliga, depois de um aviso perto do Demo Day.
+- O deploy continua desligado até o IP entrar no DuckDNS e as variáveis do repositório existirem.
