@@ -42,10 +42,18 @@
    ```
 
    ```powershell
-   $env:DATABASE_URL_DE_TESTE = 'postgresql://sigepas:sigepas_local@localhost:5432/sigepas'; npm run test --workspace backend
+   $env:DATABASE_URL_DE_TESTE = 'postgresql://sigepas@localhost:5432/sigepas'; npm run test --workspace backend
    ```
 
-As senhas acima valem só na máquina local, com dados fictícios.
+A senha do Grafana vale só na máquina local, com dados fictícios. O banco local aceita conexão sem senha, porque só a
+própria máquina o alcança.
+
+Se o banco local foi criado antes de 24/11/2026, ele ainda pede a senha antiga. Para recriar o banco, apague o volume
+com os dados fictícios e suba de novo:
+
+```bash
+docker compose down -v
+```
 
 ## Variáveis de ambiente da API
 

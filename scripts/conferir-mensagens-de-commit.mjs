@@ -19,7 +19,10 @@ if (!base) {
   process.exit(1);
 }
 
-const saida = execFileSync('git', ['log', '--format=%h%x09%s', `${base}..${fim}`], { encoding: 'utf8' });
+// No Linux (CI), o git é chamado pelo caminho completo, e não pelo PATH, que outro programa poderia alterar (regra
+// S4036). No Windows, o Git for Windows fica em pastas diferentes em cada máquina.
+const PROGRAMA_GIT = process.platform === 'win32' ? 'git.exe' : '/usr/bin/git';
+const saida = execFileSync(PROGRAMA_GIT, ['log', '--format=%h%x09%s', `${base}..${fim}`], { encoding: 'utf8' });
 const commits = saida.split('\n').filter(Boolean).map((linha) => {
   const [hash, ...titulo] = linha.split('\t');
   return { hash, titulo: titulo.join('\t') };

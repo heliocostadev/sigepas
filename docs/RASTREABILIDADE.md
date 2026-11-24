@@ -253,3 +253,16 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
   de "password" e "senha" são campos vazios e o texto do script de preparação.
 - O desligamento não é automático. O Hélio decide se mantém ou desliga, depois de um aviso perto do Demo Day.
 - O deploy continua desligado até o IP entrar no DuckDNS e as variáveis do repositório existirem.
+
+## R-0018 · 24/11/2026 · Portão do SonarQube Cloud na primeira publicação
+
+- No PR de publicação da `dev` para a `main`, todo o código contou como novo para o SonarQube Cloud. O portão reprovou
+  com cobertura de 76,9% (mínimo de 80%) e nota E de segurança. Os sete problemas vinham de código anterior ao Sonar.
+- Correções: o banco do CI e o banco local passaram a aceitar conexão sem senha, porque são descartáveis e só a
+  própria máquina os alcança. Assim, nenhuma senha fica escrita no código (regra S6698). A produção continua com
+  senha gerada na própria máquina.
+- Também foram corrigidos: duas actions fixadas por SHA (S7637), duas expressões regulares sem volta atrás (S8786) e
+  o git chamado pelo caminho completo no CI (S4036). Os scripts de apoio saíram da conta de cobertura, porque não
+  fazem parte do sistema entregue.
+- Prova: a conferência de escrita deu o mesmo resultado antes e depois da troca das expressões regulares, nos 181
+  arquivos Markdown. O script de mensagens aprovou os 43 commits da publicação. `npm run verificar` passou.

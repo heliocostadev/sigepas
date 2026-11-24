@@ -17,7 +17,7 @@ const VERBOS_PROIBIDOS =
   /\b(deveria|poderia|faria|seria|teria|precisaria|iria|haveria|ficaria|conseguiria|daria|estaria)m?\b/i;
 const ENCHIMENTO = /\b(basicamente|de certa forma|na verdade|literalmente|simplesmente)\b/i;
 // Abreviações comuns (art., ex., p., nº) não encerram a frase.
-const FIM_DE_FRASE = /(?<!\b(?:art|ex|p|pág|nº|inc|Sr|Sra|Dr)\.)(?<=[.!?])\s+(?=["“(*_]?[A-ZÁÉÍÓÚÂÊÔÃÕÇ0-9])/u;
+const FIM_DE_FRASE = /(?<!\b(?:art|ex|p|pág|nº|inc|Sr|Sra|Dr)\.)(?<=[.!?])\s(?=["“(*_]?[A-ZÁÉÍÓÚÂÊÔÃÕÇ0-9])/u;
 // Em specs e ADRs, as listas numeradas são cenários e consequências (descrição), não procedimentos.
 const PASTAS_SO_DE_DESCRICAO = /(^|[\\/])(specs|adr)[\\/]/;
 
@@ -70,7 +70,7 @@ function separarEmUnidades(conteudo) {
       }
       return;
     }
-    const inicioDeItem = linha.match(/^\s*(\d+\.|[-*])\s+/);
+    const inicioDeItem = linha.match(/^[ \t]*(\d+\.|[-*])[ \t]/);
     if (/^#/.test(linha) || inicioDeItem || !atual) {
       fechar();
       atual = { linha: numero, texto: linha.trim(), procedimento: Boolean(inicioDeItem && /\d+\./.test(inicioDeItem[1])) };
