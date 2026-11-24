@@ -82,7 +82,7 @@ services:
     networks: [interna]
 
   grafana:
-    image: grafana/grafana:12.3.0
+    image: grafana/grafana:13.3.1
     restart: unless-stopped
     environment:
       GF_SECURITY_ADMIN_PASSWORD: ${SENHA_DO_GRAFANA:?a senha do Grafana fica em /opt/sigepas/.env}
