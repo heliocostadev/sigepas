@@ -1,0 +1,17 @@
+# Caddy na frente do SIGEPAS: recebe o HTTPS, pede e renova o certificado do Let's Encrypt e repassa para o Nginx.
+# O domínio vem da variável DOMINIO, gravada em /opt/sigepas/.env pelo atualizar-sistema.sh.
+{
+	# Sem painel de administração aberto.
+	admin off
+}
+
+{$DOMINIO} {
+	encode zstd gzip
+
+	# O navegador passa a usar só HTTPS neste domínio durante um ano. O sinal > substitui o valor que a API já envia,
+	# para o cabeçalho não sair duplicado.
+	header >Strict-Transport-Security "max-age=31536000"
+
+	# O Caddy não grava log de acesso (padrão dele): o IP do cliente é dado pessoal pela LGPD.
+	reverse_proxy web:8080
+}
