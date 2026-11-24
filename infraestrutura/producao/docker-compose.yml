@@ -50,7 +50,7 @@ services:
   # O Caddy recebe o HTTPS, pede e renova o certificado do Let's Encrypt sozinho e repassa tudo para o Nginx (web).
   # O IP fixo dele na rede interna é o único em que o Nginx confia para saber o IP real do cliente (nginx.conf).
   caddy:
-    image: caddy:2.11.8-alpine
+    image: caddy:2.11.9-alpine
     restart: unless-stopped
     environment:
       DOMINIO: ${DOMINIO}
