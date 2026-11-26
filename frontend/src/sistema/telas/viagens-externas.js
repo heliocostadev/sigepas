@@ -3634,7 +3634,7 @@
       +   '<div><label for="dmNovoTrecho">Trecho</label>'
       +     '<select id="dmNovoTrecho">'
       +       dmNovoOpcoes(['Completo (Ida e Volta)', 'Ida', 'Volta'],
-      +                    p ? p.trecho : 'Completo (Ida e Volta)')
+                           p ? p.trecho : 'Completo (Ida e Volta)')
       +     '</select></div>'
       +   '<div class="col3"><label for="dmNovoObs">Restrição / observação</label>'
       +     '<input type="text" id="dmNovoObs" autocomplete="off" value="' + v('observacao') + '"'
