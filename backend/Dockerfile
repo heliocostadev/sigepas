@@ -1,7 +1,7 @@
 # Imagem da API. Rode a partir da raiz do repositório: docker build -f backend/Dockerfile .
 # O contexto é a raiz porque o projeto usa workspaces do npm, com um package-lock.json só.
 
-FROM node:24-alpine AS construcao
+FROM node:26-alpine AS construcao
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY backend/package.json backend/package.json
@@ -18,7 +18,7 @@ WORKDIR /app/backend
 USER node
 CMD ["/app/node_modules/.bin/prisma", "migrate", "deploy"]
 
-FROM node:24-alpine AS execucao
+FROM node:26-alpine AS execucao
 ENV NODE_ENV=production
 WORKDIR /app
 COPY package.json package-lock.json ./
