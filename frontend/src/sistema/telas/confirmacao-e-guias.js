@@ -696,7 +696,7 @@ const estadoGuia = {
           </div>
 
           <div style="display:flex;justify-content:flex-end;margin-top:4px;">
-            <button class="gd-btn ok" style="flex:none;padding:7px 14px;font-size:12px;" onclick="registrarConfirmacaoPanel('${escGuia(p.statusConfirmacao || 'Pendente')}')">
+            <button class="gd-btn ok" style="flex:none;padding:7px 14px;font-size:12px;" onclick="registrarConfirmacaoPanel()">
               <i class="ti ti-device-floppy"></i> Salvar anotações
             </button>
           </div>
@@ -907,9 +907,12 @@ const estadoGuia = {
       });
   }
 
+  // Sem status (botão Salvar anotações): mantém o status ATUAL do passageiro. Antes o botão levava o status de quando
+  // a aba foi desenhada, e salvar as anotações depois de Confirmou desfazia a confirmação.
   function registrarConfirmacaoPanel(status) {
     const c = _confAtual();
     if (!c || !c.p) return;
+    if (status === undefined) status = c.p.statusConfirmacao || 'Pendente';
     const quem = getQuemAtendeuPanel();
     const obs = (document.getElementById('gdObs') ? document.getElementById('gdObs').value : (c.p.observacao || ''));
     guiaGravarStatusContato(c, status, quem, obs, 'Resultado registrado: ' + statusConfTexto(status) + '.');
