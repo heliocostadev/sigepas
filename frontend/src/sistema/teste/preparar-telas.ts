@@ -51,6 +51,11 @@ export function chamadasA(rota: string): unknown[][] {
   return estado.chamadas.filter((c) => c.rota === rota).map((c) => c.argumentos);
 }
 
+// Esquece as chamadas já feitas, mas mantém as respostas que o teste combinou.
+export function esquecerChamadas(): void {
+  estado.chamadas = [];
+}
+
 export function limparChamadas(): void {
   estado.chamadas = [];
   estado.falhas = {};

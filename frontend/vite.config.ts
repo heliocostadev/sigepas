@@ -8,8 +8,8 @@ export default defineConfig({
     // Duas páginas: a tela de entrada (React) e as telas trazidas do SIGEPAS em Apps Script (ADR 0016).
     rollupOptions: {
       input: {
-        entrada: resolve(__dirname, 'index.html'),
-        sistema: resolve(__dirname, 'sistema/index.html'),
+        entrada: resolve(import.meta.dirname, 'index.html'),
+        sistema: resolve(import.meta.dirname, 'sistema/index.html'),
       },
     },
   },
