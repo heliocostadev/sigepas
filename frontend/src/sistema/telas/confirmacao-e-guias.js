@@ -1331,14 +1331,10 @@ const estadoGuia = {
     return h + '</div>';
   }
 
-  // A mesma lib e o mesmo endereço da Escala para Enviar; carrega só no primeiro clique.
+  // A biblioteca html2canvas vem do próprio SIGEPAS (iniciar-sistema.js), e não mais de um site de fora: a política de
+  // segurança da página só aceita script do próprio endereço.
   function guiaCarregarHtml2Canvas(cb) {
-    if (window.html2canvas) { cb(true); return; }
-    const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-    s.onload = function () { cb(!!window.html2canvas); };
-    s.onerror = function () { cb(false); };
-    document.head.appendChild(s);
+    cb(!!window.html2canvas);
   }
 
   function guiaPalcoImagem() {

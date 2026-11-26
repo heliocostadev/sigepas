@@ -188,12 +188,10 @@
       });
   }
 
+  // A biblioteca html2canvas vem do próprio SIGEPAS (iniciar-sistema.js): a política de segurança da página só aceita
+  // script do próprio endereço.
   function envCarregarHtml2Canvas(callback) {
-    if (window.html2canvas) { callback(); return; }
-    var script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-    script.onload = callback;
-    document.head.appendChild(script);
+    callback();
   }
 
   function envBaixarPNG(evento) {
