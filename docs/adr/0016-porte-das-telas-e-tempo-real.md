@@ -21,9 +21,10 @@ cópia de aba, trava de script, cache de 6 horas) não valem aqui.
 2. **Servidor:** cada função do `codigo.gs` usada pelas telas virou um método de serviço do NestJS, com rota própria em
    `/api/`. A resposta tem o mesmo formato que a tela já esperava. Uma trava do PostgreSQL por dia
    (`pg_advisory_xact_lock`) substitui o LockService.
-3. **Telas:** o HTML, o CSS e o JavaScript das telas ficam em `frontend/public/sistema/`, com a aparência de antes. Cada
-   `google.script.run` virou `chamarServidor(...)`, que faz um `fetch` para a rota da API (`servidor.js`). O React fica
-   com a tela de entrada.
+3. **Telas:** o HTML das telas fica em `frontend/sistema/index.html`, o CSS em `frontend/public/sistema/telas/` e o
+   JavaScript em `frontend/src/sistema/`, como módulos que o Vite empacota numa segunda página. A aparência é a de antes.
+   Cada `google.script.run` virou `chamarServidor(...)`, que faz um `fetch` para a rota da API (`servidor.js`). Cada
+   módulo põe no `window` as funções que o HTML chama, como no Apps Script. O React fica com a tela de entrada.
 4. **Tempo real:** cada gravação manda um evento por Server-Sent Events (`/api/eventos`). As telas abertas recarregam só
    o dia ou o cadastro que mudou. A aba que gravou não recarrega.
 
@@ -38,9 +39,9 @@ cópia de aba, trava de script, cache de 6 horas) não valem aqui.
 - As telas usam `onclick` e `style` escritos no HTML. Por isso, a política de segurança de conteúdo de `/sistema/`
   aceita `'unsafe-inline'`. O resto da política continua fechado (nada de fora do próprio endereço). Converter os
   `onclick` para `addEventListener` é melhoria registrada.
-- O JavaScript de `frontend/public/sistema/` fica fora da análise do SonarQube Cloud e da cobertura do Vitest, porque é
-  o código do sistema atual trazido como está. O que é novo (servidor.js, tempo-real.js) também está lá. Testar essas
-  telas com Playwright é melhoria registrada.
+- O JavaScript das telas entra na análise do SonarQube Cloud e na cobertura do Vitest, como o resto do código. Os testes
+  das telas rodam no jsdom, com a API falsa respondendo dados fictícios, e incluem seis testes do projeto do estágio
+  convertidos para o Vitest. Testar as telas também num navegador de verdade (Playwright) é melhoria registrada.
 - A Remoção Interna, a Lista de Tarefas e o Painel da Gestão ficaram fora desta entrega (issues de melhoria). Pedido
   com destino em Joinville continua fora da fila de viagens externas, como no sistema atual.
 - Com mais de uma API rodando, o aviso de mudança passaria pelo PostgreSQL (LISTEN/NOTIFY). Hoje a máquina roda uma só.
