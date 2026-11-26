@@ -1,5 +1,5 @@
-// Esquema do banco do SIGEPAS. As tabelas entram com o fluxo 1, a partir da spec aprovada
-// (specs/001-importacao-fila/spec.md). Toda mudança aqui vira uma migração versionada.
+// Esquema do banco do SIGEPAS em arquitetura de servidor. Cada aba da planilha do SIGEPAS em Apps Script virou uma
+// tabela relacional (ADR 0016). Toda mudança aqui vira uma migração versionada em prisma/migrations.
 
 generator client {
   provider     = "prisma-client"
@@ -9,4 +9,264 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Papel {
+  GESTOR
+  OPERADOR
+}
+
+// Quem pode entrar no sistema (era a aba bd_operadores). A senha fica só como hash scrypt.
+model Conta {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  nome         String
+  papel        Papel
+  hashDaSenha  String   @map("hash_da_senha")
+  ativa        Boolean  @default(true)
+  criadaEm     DateTime @default(now()) @map("criada_em")
+  sessoes      Sessao[]
+
+  @@map("contas")
+}
+
+// Sessão no servidor. O navegador guarda só o token, num cookie HttpOnly. O banco guarda o SHA-256 dele.
+model Sessao {
+  id           String   @id // SHA-256 do token, em hexadecimal
+  contaId      Int      @map("conta_id")
+  conta        Conta    @relation(fields: [contaId], references: [id], onDelete: Cascade)
+  criadaEm     DateTime @default(now()) @map("criada_em")
+  ultimoUsoEm  DateTime @default(now()) @map("ultimo_uso_em")
+
+  @@index([contaId])
+  @@map("sessoes")
+}
+
+// Um pedido de transporte do dia (era a aba bd_viagens). Vem do arquivo do OLOSTECH ou é digitado à mão.
+// A chave é a impressão digital das oito colunas do compromisso (ADR 0010), com o contador de ocorrência. Ela é
+// calculada sobre a cidade e o local como vieram no arquivo, para não mudar quando o dicionário de locais mudar.
+model Pedido {
+  id                     Int      @id @default(autoincrement())
+  chave                  String   @unique
+  data                   String   // AAAA-MM-DD
+  cidadeOriginal         String   @default("") @map("cidade_original")
+  localOriginal          String   @default("") @map("local_original")
+  cidade                 String   @default("")
+  hora                   String   @default("")
+  localDestino           String   @default("") @map("local_destino")
+  tipoVeiculo            String   @default("") @map("tipo_veiculo")
+  restricoes             String   @default("")
+  objetivo               String   @default("")
+  bairro                 String   @default("")
+  enderecoResidencial    String   @default("") @map("endereco_residencial")
+  quantidadePessoas      Int      @default(1) @map("quantidade_pessoas")
+  tipoAtendimento        String   @default("") @map("tipo_atendimento")
+  matricula              String   @default("")
+  nomePaciente           String   @default("") @map("nome_paciente")
+  trecho                 String   @default("")
+  dataNascimento         String   @default("") @map("data_nascimento")
+  faixaEtaria            String   @default("") @map("faixa_etaria")
+  logradouro             String   @default("")
+  numero                 String   @default("")
+  telefones              String[] @default([])
+  acompanhante           String   @default("")
+  trechoAcompanhante     String   @default("") @map("trecho_acompanhante")
+  telefonesAcompanhante  String[] @default([]) @map("telefones_acompanhante")
+  canceladoNaOrigem      Boolean  @default(false) @map("cancelado_na_origem")
+  digitadoAMao           Boolean  @default(false) @map("digitado_a_mao")
+  enderecoEmbarque       String   @default("") @map("endereco_embarque")
+  ordemNaImportacao      Int      @default(0) @map("ordem_na_importacao")
+  criadoEm               DateTime @default(now()) @map("criado_em")
+
+  @@index([data])
+  @@map("pedidos")
+}
+
+// Pedido cancelado pelo operador na fila (era a aba bd_pedidos_cancelados). Fica pela chave, então sobrevive
+// a uma nova importação do mesmo dia.
+model CancelamentoNaFila {
+  chave       String   @id
+  data        String
+  quem        String   // paciente, setor ou outro
+  motivo      String
+  operador    String
+  canceladoEm DateTime @default(now()) @map("cancelado_em")
+
+  @@index([data])
+  @@map("cancelamentos_na_fila")
+}
+
+// Um carro que sai num dia (era o cabeçalho repetido em cada linha da bd_viagens_alocadas).
+model Viagem {
+  id                 String       @id // segmento de 8 caracteres, como no sistema atual
+  data               String       // AAAA-MM-DD
+  placa              String
+  tipoVeiculo        String       @default("") @map("tipo_veiculo")
+  motorista          String       @default("")
+  doisMotoristas     Boolean      @default(false) @map("dois_motoristas")
+  motorista2         String       @default("") @map("motorista_2")
+  horaSaida          String       @default("") @map("hora_saida")
+  localEmbarque      String       @default("") @map("local_embarque")
+  destino            String       @default("")
+  assentosBloqueados Int          @default(0) @map("assentos_bloqueados")
+  roteiro            String[]     @default([])
+  aviso              String       @default("")
+  avisoRegistro      String       @default("") @map("aviso_registro")
+  avisoAEnviar       Boolean      @default(false) @map("aviso_a_enviar")
+  ehCargaDoLacen     Boolean      @default(false) @map("eh_carga_do_lacen")
+  // Motorista fixado na Formação da escala: o rodízio não o troca (era a aba bd_motoristas_fixados).
+  motoristaFixado    String       @default("") @map("motorista_fixado")
+  motorista2Fixado   String       @default("") @map("motorista_2_fixado")
+  criadaEm           DateTime     @default(now()) @map("criada_em")
+  passageiros        Passageiro[]
+
+  @@index([data])
+  @@map("viagens")
+}
+
+// Uma pessoa dentro de um carro (era cada linha da bd_viagens_alocadas). Os dados do pedido são copiados, para o
+// carro manter o que era verdade no dia em que foi montado.
+model Passageiro {
+  id                  Int      @id @default(autoincrement())
+  viagemId            String   @map("viagem_id")
+  viagem              Viagem   @relation(fields: [viagemId], references: [id], onDelete: Cascade)
+  chaveDoPedido       String   @default("") @map("chave_do_pedido")
+  matricula           String   @default("")
+  nome                String   @default("")
+  nascimento          String   @default("")
+  telefones           String   @default("")
+  bairro              String   @default("")
+  enderecoEmbarque    String   @default("") @map("endereco_embarque")
+  acompanhante        String   @default("")
+  telefonesAcomp      String   @default("") @map("telefones_acomp")
+  quantidade          Int      @default(1)
+  trecho              String   @default("")
+  objetivo            String   @default("")
+  local               String   @default("")
+  observacao          String   @default("")
+  hora                String   @default("")
+  cidade              String   @default("")
+  tipoSolicitado      String   @default("") @map("tipo_solicitado")
+  enderecoResidencia  String   @default("") @map("endereco_residencia")
+  servidorNome        String   @default("") @map("servidor_nome")
+  servidorMatricula   String   @default("") @map("servidor_matricula")
+  // Confirmação por telefone (fluxo 3): Pendente, Confirmado, Não confirmado ou Cancelado.
+  statusConfirmacao   String   @default("Pendente") @map("status_confirmacao")
+  horaLigacao         String   @default("") @map("hora_ligacao")
+  quemAtendeu         String   @default("") @map("quem_atendeu")
+  atendente           String   @default("")
+  obsLigacao          String   @default("") @map("obs_ligacao")
+  horaSaidaNaLigacao  String   @default("") @map("hora_saida_na_ligacao")
+  criadoEm            DateTime @default(now()) @map("criado_em")
+
+  @@index([viagemId])
+  @@index([chaveDoPedido])
+  @@map("passageiros")
+}
+
+// Cadastro da frota (era bd_veiculos).
+model Veiculo {
+  placa       String  @id
+  tipo        String
+  capacidade  Int
+  propriedade String  // Público ou Terceirizado
+  status      String  @default("Ativo")
+  motivo      String  @default("")
+  corDeFundo  String  @default("") @map("cor_de_fundo")
+  observacao  String  @default("")
+
+  @@map("veiculos")
+}
+
+// Cadastro dos motoristas (era bd_motoristas). A ordem define o rodízio da escala.
+model Motorista {
+  id            Int     @id @default(autoincrement())
+  nome          String  @unique
+  vinculo       String  // Servidor ou Terceirizado
+  placaVinculada String @default("") @map("placa_vinculada")
+  status        String  @default("Ativo")
+  whatsapp      String  @default("")
+  motivo        String  @default("")
+  observacao    String  @default("")
+  ordem         Int     @default(0)
+
+  @@map("motoristas")
+}
+
+// Pontos de saída (era bd_embarques). Só um pode ser o padrão.
+model LocalDeEmbarque {
+  id      Int     @id @default(autoincrement())
+  nome    String  @unique
+  status  String  @default("Ativo")
+  motivo  String  @default("")
+  padrao  Boolean @default(false)
+  ordem   Int     @default(0)
+
+  @@map("locais_de_embarque")
+}
+
+// Dias não úteis (era bd_calendario). O que não está aqui é dia útil.
+model DiaNaoUtil {
+  data      String @id // AAAA-MM-DD
+  tipo      String
+  descricao String @default("")
+  bloco     String @default("")
+
+  @@map("dias_nao_uteis")
+}
+
+// Quem trabalha em cada dia e em que posição (era fato_escala_motoristas).
+model EscalaDoDia {
+  id              Int    @id @default(autoincrement())
+  data            String
+  motorista       String
+  vinculo         String @default("")
+  condicao        String @default("Disponível")
+  motivoAusencia  String @default("") @map("motivo_ausencia")
+  posicao         Int    @default(999)
+  observacao      String @default("")
+
+  @@unique([data, motorista])
+  @@map("escala_do_dia")
+}
+
+// Quais veículos estavam disponíveis em cada dia (era fato_frota_diaria).
+model FrotaDoDia {
+  id            Int    @id @default(autoincrement())
+  data          String
+  placa         String
+  propriedade   String @default("")
+  condicao      String @default("Disponível")
+  motivo        String @default("")
+  observacao    String @default("")
+
+  @@unique([data, placa])
+  @@map("frota_do_dia")
+}
+
+// Dicionário de padronização de cidade e local (era bd_dicionario_locais). A chave é a dupla original normalizada.
+model PadronizacaoDeLocal {
+  chave           String   @id
+  cidadeOriginal  String   @map("cidade_original")
+  localOriginal   String   @map("local_original")
+  cidadePadrao    String   @map("cidade_padrao")
+  localPadrao     String   @map("local_padrao")
+  decididoPor     String   @default("") @map("decidido_por")
+  decididoEm      DateTime @default(now()) @map("decidido_em")
+  origem          String   @default("manual")
+
+  @@map("padronizacoes_de_locais")
+}
+
+// Registro de cada importação do arquivo do OLOSTECH, para conferência.
+model Importacao {
+  id          Int      @id @default(autoincrement())
+  feitaEm     DateTime @default(now()) @map("feita_em")
+  operador    String
+  linhas      Int
+  canceladas  Int
+  corrigidas  Int
+  datas       String[] @default([])
+
+  @@map("importacoes")
 }

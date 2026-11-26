@@ -11,6 +11,13 @@ RUN npm ci --workspace backend --include-workspace-root=false --ignore-scripts
 COPY backend backend
 RUN npm run prisma:gerar --workspace backend && npm run build --workspace backend
 
+# Imagem que aplica as migrações do banco antes da API subir (serviço migracao do Compose de produção). Ela tem a linha
+# de comando do Prisma e o schema-engine, que a imagem da API não leva. Publicada com a tag <sha>-migracao.
+FROM construcao AS migracao
+WORKDIR /app/backend
+USER node
+CMD ["/app/node_modules/.bin/prisma", "migrate", "deploy"]
+
 FROM node:24-alpine AS execucao
 ENV NODE_ENV=production
 WORKDIR /app

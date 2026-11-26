@@ -14,6 +14,7 @@ export const VARIAVEIS_FICTICIAS: VariaveisDeAmbiente = {
   origensPermitidas: ['http://localhost:5173'],
   limiteDeRequisicoesPorMinuto: 100,
   nivelDeLog: 'silent',
+  semearDadosFicticios: false,
 };
 
 export async function criarAplicacaoDeTeste(opcoes: {
