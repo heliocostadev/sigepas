@@ -349,7 +349,8 @@
     }
     
     var d = dias[0]; // Apenas o dia solicitado
-    var dataOficial = envFormataDataOficial(dataStr);
+    // A data vem do campo da tela e entra no HTML da folha: sempre escapada (alerta do CodeQL).
+    var dataOficial = envEsc(envFormataDataOficial(dataStr));
     var numLinha = 0;
     // Uma tabela, uma grade — ver ENV_GRADE. Cada seção é um <tbody> próprio.
     var html = '<div class="env-sheet-wrapper" id="envSheetArea">' +

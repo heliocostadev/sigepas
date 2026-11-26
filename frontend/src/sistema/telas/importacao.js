@@ -41,7 +41,9 @@
       drop.classList.remove('com-arquivo');
       return;
     }
-    info.innerHTML = '<i class="ti ti-file-check"></i>' + escaparHtmlLocais(file.name) + ' · ' + (file.size / 1024).toFixed(1) + ' KB';
+    // O nome do arquivo entra como texto, nunca como HTML (alerta do CodeQL).
+    info.innerHTML = '<i class="ti ti-file-check"></i>';
+    info.appendChild(document.createTextNode(file.name + ' · ' + (file.size / 1024).toFixed(1) + ' KB'));
     info.classList.remove('ds-oculto');
     document.getElementById('impBtnProcessar').disabled = false;
     impStatus('ti-check', 'var(--ds-sucesso)', 'Pronto para processar o CSV.');

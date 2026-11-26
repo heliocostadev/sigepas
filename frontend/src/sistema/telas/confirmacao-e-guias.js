@@ -1248,7 +1248,8 @@ const estadoGuia = {
     const e = escGuia;
     const ri = !!(opc && opc.interna);
     const p2 = function (n) { return ('0' + n).slice(-2); };
-    const d = (dataOp || '').split('-');
+    // A data vem do campo da tela e entra no HTML da imagem: só passa no formato AAAA-MM-DD (alerta do CodeQL).
+    const d = (/^\d{4}-\d{2}-\d{2}$/.test(dataOp || '') ? dataOp : '').split('-');
     let dataBR = '', diaSem = '';
     if (d.length === 3) {
       dataBR = d[2] + '/' + d[1] + '/' + d[0];
