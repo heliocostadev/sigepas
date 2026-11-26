@@ -1,0 +1,29 @@
+/* =====================================================================
+     ABA IMPORTAR CSV — no padrão do design system desde 06/11/2026 (protótipo em
+     docs/design-system/SugestaoClaude/Importacao.prototipo.html). Os componentes ds- moram no
+     EstilosComuns; aqui fica só o que é desta tela, com o prefixo imp- e as cores dos tokens --ds-*.
+     Os id e os nomes de função não mudaram.
+     ===================================================================== */
+  /* Corpo na largura toda da tela, como as outras abas (06/11/2026: o protótipo parava em 1100 px). */
+  .imp-dash { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ds-esp-5); flex-wrap: wrap; }
+  .imp-passos { margin: 0; padding-left: 20px; color: var(--ds-texto-2); line-height: 1.8; flex: 1; min-width: 260px; }
+  .imp-passos b { color: var(--ds-texto); }
+  .imp-arquivo { display: flex; align-items: center; justify-content: center; gap: var(--ds-esp-2); margin-top: var(--ds-esp-2); font-weight: var(--ds-peso-semi); color: var(--ds-sucesso-texto); word-break: break-all; }
+  .imp-acoes { display: flex; align-items: center; gap: var(--ds-esp-3); margin-top: var(--ds-esp-4); flex-wrap: wrap; }
+  .imp-status { display: flex; align-items: center; gap: var(--ds-esp-2); color: var(--ds-texto-2); margin-right: auto; }
+  .imp-status .ti { font-size: 18px; }
+  /* Cartão de cada local pendente, na janela de padronização */
+  .imp-pend { padding: 12px 14px; margin-bottom: 10px; background: var(--ds-superficie-2); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-3); }
+  .imp-pend.decidida { background: var(--ds-sucesso-fundo); border: 2px solid var(--ds-sucesso-borda); }
+  .imp-pend-tit { font-weight: var(--ds-peso-forte); margin-bottom: 8px; }
+  .imp-pend-tit small { font-weight: var(--ds-peso-normal); color: var(--ds-texto-3); }
+  .imp-pend-acoes { display: flex; gap: var(--ds-esp-2); margin-top: 10px; flex-wrap: wrap; }
+  .imp-pend .ds-faixa + .ds-faixa { margin-top: 6px; }
+  .imp-edit { display: grid; grid-template-columns: 60px 1fr; gap: 8px; align-items: center; }
+  .imp-edit .ds-ajuda { grid-column: 2; }
+  .imp-decidida { display: flex; align-items: center; gap: var(--ds-esp-3); color: var(--ds-sucesso-texto); }
+  .imp-decidida .ds-link { margin-left: auto; }
+  @media (max-width: 760px) {
+    .imp-acoes { flex-direction: column; align-items: stretch; }
+    .imp-status { margin-right: 0; }
+  }

@@ -19,6 +19,8 @@ Uma decisão por arquivo, no modelo [`0000-modelo.md`](0000-modelo.md). ADR não
 | [0012](0012-metodo-de-trabalho-com-ia.md) | Método de trabalho com IA: Maestro enxuto | Aceita em 08/11/2026 |
 | [0013](0013-estrutura-e-versoes-do-esqueleto.md) | Estrutura do repositório e versões do esqueleto | Proposta em 16/11/2026, aguarda aprovação |
 | [0014](0014-regiao-maquina-e-https-do-deploy.md) | Deploy em us-east-2, numa t3.small, com HTTPS pelo Caddy | Aceita em 24/11/2026 |
+| [0015](0015-login-e-sessao-no-servidor.md) | Login com sessão no servidor, senha com scrypt e dois papéis | Proposta em 26/11/2026, aguarda revisão |
+| [0016](0016-porte-das-telas-e-tempo-real.md) | Porte do SIGEPAS em Apps Script, telas com a mesma aparência e tempo real por SSE | Proposta em 26/11/2026, aguarda revisão |
 
 As ADRs de 0001 a 0012 registram decisões tomadas pelo Hélio em 08/11/2026, exceto a 0005, decidida em 16/11/2026
 depois de uma prova de conceito. A IA propôs a redação de todas, e essa redação aguarda a revisão dele.

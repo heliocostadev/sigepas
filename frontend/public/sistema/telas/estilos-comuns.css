@@ -1,0 +1,1059 @@
+/* =====================================================================
+     DESIGN SYSTEM DO SIGEPAS (desde 06/11/2026)
+     Fonte: docs/design-system/SugestaoClaude/ (tokens.css e componentes.css, copiados tal e qual).
+     Ao mudar um componente, mude lá e aqui: o catálogo (componentes.html) e os protótipos leem de lá.
+     Tudo tem o prefixo ds- / --ds-: não colide com nenhuma classe antiga. As telas passam a usar estas
+     classes uma por vez (ordem no MAPA.md); até lá, nada muda nelas.
+     ===================================================================== */
+  /* =====================================================================
+     SIGEPAS · Design System · TOKENS
+     Sugestão do Claude, 05/10/2026.
+
+     Tudo que é decisão visual mora aqui, em variáveis --ds-*. Componentes e telas
+     NUNCA usam cor, tamanho ou sombra escritos à mão: usam estes tokens.
+     Para encaixar no sistema: este bloco vai para o topo do EstilosComuns.html,
+     que o Index inclui antes de todas as telas.
+     ===================================================================== */
+  :root {
+    /* ---- Marca: o azul petróleo da logo da Prefeitura (#05466C, medido no PNG oficial) ---- */
+    --ds-marca-50:  #eef5fa;
+    --ds-marca-100: #d7e8f3;
+    --ds-marca-200: #afd0e5;
+    --ds-marca-300: #7eb1d1;
+    --ds-marca-400: #4a8fba;
+    --ds-marca-500: #1e70a0;
+    --ds-marca-600: #0b5a87;
+    --ds-marca-700: #05466c;   /* a cor da logo */
+    --ds-marca-800: #043855;
+    --ds-marca-900: #032a40;
+
+    /* ---- Neutros (cinza frio, puxado para o azul da marca) ---- */
+    --ds-branco:        #ffffff;
+    --ds-fundo:         #f2f5f8;   /* fundo da página */
+    --ds-superficie:    #ffffff;   /* cards, tabelas, modais */
+    --ds-superficie-2:  #f7f9fb;   /* cabeçalho de tabela, área recuada */
+    --ds-superficie-3:  #edf1f5;   /* coluna do quadro, trilho */
+    --ds-borda:         #dde3ea;
+    --ds-borda-forte:   #c4ceda;
+    --ds-texto:         #14202c;
+    --ds-texto-2:       #475666;
+    --ds-texto-3:       #5f6b79;   /* 4,96:1 sobre o fundo (AA) */
+    --ds-texto-inativo: #a7b1bc;
+
+    /* ---- Semânticas: cada estado tem fundo, borda, texto e cor cheia ---- */
+    /* Sucesso: confirmado, registrado, disponível, cabe */
+    --ds-sucesso-fundo: #e7f5ed;
+    --ds-sucesso-borda: #b4dfc5;
+    --ds-sucesso-texto: #12663f;
+    --ds-sucesso:       #17804f;
+    /* Atenção: pendente, ligar, não atende, falta pouco */
+    --ds-atencao-fundo: #fdf4dd;
+    --ds-atencao-borda: #f0d48c;
+    --ds-atencao-texto: #7f5300;
+    --ds-atencao:       #c98a06;
+    /* Perigo: cancelado, excedido, erro, apagar */
+    --ds-perigo-fundo:  #fdecea;
+    --ds-perigo-borda:  #f4c1bb;
+    --ds-perigo-texto:  #a3221a;
+    --ds-perigo:        #cf3427;
+    /* Informação: dicas, avisos neutros */
+    --ds-info-fundo:    #eaf3fb;
+    --ds-info-borda:    #bcd8f0;
+    --ds-info-texto:    #0b5a87;
+    --ds-info:          #1e70a0;
+    /* Servidor: o selo azul-índigo que já existe (pedido de 17/09) */
+    --ds-servidor:       #3d56d6;
+    --ds-servidor-fundo: #eef1fd;
+    --ds-servidor-borda: #c9d1f5;
+    /* AVISO URGENTE: o vermelho mais forte do sistema, usado só nele */
+    /* Hemodiálise: paciente de rotina fixa na Remoção Interna (selo e faixa da linha). */
+    --ds-hemo:           #17635a;
+    --ds-hemo-fundo:     #eef6f4;
+    --ds-urgente:        #c8102e;
+    --ds-urgente-escuro: #9b0c23;
+    --ds-urgente-fundo:  #fff0f2;
+    --ds-urgente-borda:  #f2a7b3;
+    /* Laranja da folha oficial (Escala para Enviar) */
+    --ds-laranja:        #b85807;   /* texto branco a 4,73:1 */
+    --ds-laranja-fundo:  #fdebd9;
+    /* WhatsApp */
+    --ds-whatsapp:       #117f42;   /* verde do WhatsApp escurecido: texto branco a 5,07:1 */
+
+    /* ---- Veículos ----
+       As cores de cada TIPO vêm da planilha (bd_veiculos, "Cor de Fundo"), nunca daqui.
+       Estes valores são só os do protótipo, iguais aos da planilha em 09/09/2026, e o
+       padrão para terceirizado (que fica sem cor de propósito). */
+    --ds-veiculo-padrao: #1f3a5c;
+    --ds-veiculo-texto:  #ffffff;
+
+    /* ---- Tipografia ---- */
+    --ds-fonte-texto:  'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --ds-fonte-titulo: 'Archivo', 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --ds-fonte-mono:   'Cascadia Mono', 'Consolas', ui-monospace, monospace;
+
+    --ds-texto-xs:   11px;   /* legenda, rótulo de campo, selo */
+    --ds-texto-sm:   12px;   /* texto secundário, chip */
+    --ds-texto-md:   13px;   /* corpo e tabelas (o tamanho de trabalho) */
+    --ds-texto-lg:   14px;   /* corpo destacado, botões */
+    --ds-texto-xl:   16px;   /* título de card e de modal */
+    --ds-texto-2xl:  20px;   /* título da tela */
+    --ds-texto-3xl:  26px;   /* número de destaque (KPI) */
+
+    --ds-peso-normal: 400;
+    --ds-peso-medio:  500;
+    --ds-peso-semi:   600;
+    --ds-peso-forte:  700;
+    --ds-peso-extra:  800;
+
+    --ds-altura-linha:        1.45;
+    --ds-altura-linha-titulo: 1.2;
+
+    /* ---- Espaçamento (grade de 4 px) ---- */
+    --ds-esp-1: 4px;
+    --ds-esp-2: 8px;
+    --ds-esp-3: 12px;
+    --ds-esp-4: 16px;
+    --ds-esp-5: 20px;
+    --ds-esp-6: 24px;
+    --ds-esp-8: 32px;
+    --ds-esp-10: 40px;
+
+    /* ---- Cantos ---- */
+    --ds-raio-1: 4px;    /* chip pequeno, placa */
+    --ds-raio-2: 6px;    /* botão, campo */
+    --ds-raio-3: 10px;   /* card, tabela */
+    --ds-raio-4: 14px;   /* modal, painel */
+    --ds-raio-pilula: 999px;
+
+    /* ---- Sombras ---- */
+    --ds-sombra-1: 0 1px 2px rgba(16, 32, 48, .06);
+    --ds-sombra-2: 0 2px 6px rgba(16, 32, 48, .07), 0 1px 2px rgba(16, 32, 48, .05);
+    --ds-sombra-3: 0 16px 40px rgba(16, 32, 48, .20), 0 4px 10px rgba(16, 32, 48, .08);
+    --ds-anel-foco: 0 0 0 3px rgba(30, 112, 160, .28);
+
+    /* ---- Medidas de controle ---- */
+    --ds-controle-sm: 30px;
+    --ds-controle-md: 36px;
+    --ds-controle-lg: 44px;
+    --ds-nav-altura:  60px;
+
+    /* ---- Camadas ---- */
+    --ds-z-nav:    50;
+    --ds-z-barra:  55;
+    --ds-z-painel: 60;
+    --ds-z-modal:  80;
+    --ds-z-toast: 100;
+
+    /* ---- Movimento ---- */
+    --ds-trans-rapida: .12s ease;
+    --ds-trans:        .2s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root { --ds-trans-rapida: 0s; --ds-trans: 0s; }
+  }
+
+  /* ---------- Encaixe no SIGEPAS ----------
+     O Index tem "* { font-family: 'Segoe UI'... }" para as telas antigas. Esse * vale para cada elemento
+     e ganharia da fonte herdada dentro das áreas novas. Aqui a fonte volta a ser herdada nelas.
+     :where() deixa o seletor com peso zero, então qualquer classe ds- que defina a própria fonte vence. */
+  .ds-nav, .ds-toasts { font-family: var(--ds-fonte-texto); }
+  /* Janela e painel ficam fora da tela (no fim do body): precisam da base que a .ds-app dá às telas. */
+  .ds-modal-fundo, .ds-painel { font-family: var(--ds-fonte-texto); font-size: var(--ds-texto-md);
+    line-height: var(--ds-altura-linha); color: var(--ds-texto); }
+  :where(.ds-app, .ds-nav, .ds-toasts, .ds-modal-fundo, .ds-painel) * { font-family: inherit; }
+  /* No sistema as abas do menu são <li> com onclick (no protótipo eram links). */
+  li.ds-nav-aba { cursor: pointer; }
+
+  /* =====================================================================
+     SIGEPAS · Design System · COMPONENTES
+     Sugestão do Claude, 05/10/2026. Depende de tokens.css.
+
+     Regra: tudo aqui tem o prefixo ds- (o CSS do sistema é global, todas as
+     telas ficam na mesma página). Nenhum valor solto: só tokens --ds-*.
+     ===================================================================== */
+
+  /* ---------- Base ---------- */
+  .ds-app, .ds-app *, .ds-app *::before, .ds-app *::after { box-sizing: border-box; }
+  .ds-app {
+    margin: 0; min-height: 100vh;
+    font-family: var(--ds-fonte-texto); font-size: var(--ds-texto-md);
+    line-height: var(--ds-altura-linha); color: var(--ds-texto);
+    background: var(--ds-fundo); -webkit-font-smoothing: antialiased;
+  }
+  .ds-app h1, .ds-app h2, .ds-app h3, .ds-app h4 { margin: 0; font-family: var(--ds-fonte-titulo); line-height: var(--ds-altura-linha-titulo); }
+  .ds-app button, .ds-app input, .ds-app select, .ds-app textarea { font-family: inherit; }
+
+  /* ---------- Barra do topo (menu) ---------- */
+  .ds-nav {
+    position: sticky; top: 0; z-index: var(--ds-z-nav);
+    height: var(--ds-nav-altura); padding: 0 var(--ds-esp-5);
+    display: flex; align-items: center; gap: var(--ds-esp-3);
+    background: var(--ds-superficie); border-bottom: 1px solid var(--ds-borda);
+    box-shadow: var(--ds-sombra-1);
+  }
+  .ds-nav-marca { display: flex; align-items: center; gap: 10px; margin-right: var(--ds-esp-3); text-decoration: none; flex: none; }
+  .ds-nav-logo { height: 46px; width: auto; display: block; }
+  .ds-nav-textos { display: flex; flex-direction: column; line-height: 1.15; }
+  .ds-nav-nome { font-family: var(--ds-fonte-titulo); font-size: 19px; font-weight: var(--ds-peso-extra); color: var(--ds-marca-700); letter-spacing: .02em; }
+  .ds-nav-sub { font-size: 10.5px; font-weight: var(--ds-peso-semi); color: var(--ds-texto-2); }
+  .ds-nav-abas { display: flex; align-self: stretch; margin: 0; padding: 0; list-style: none; flex: 1; min-width: 0; }
+  .ds-nav-aba {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    padding: 0 14px; border-bottom: 3px solid transparent; border-top: 3px solid transparent;
+    font-size: 13.5px; font-weight: var(--ds-peso-semi); line-height: 1.2; color: var(--ds-texto-2);
+    text-decoration: none; white-space: nowrap; transition: background var(--ds-trans-rapida), color var(--ds-trans-rapida);
+  }
+  .ds-nav-aba:hover { color: var(--ds-marca-700); background: var(--ds-marca-50); }
+  .ds-nav-aba.ativa { color: var(--ds-marca-700); background: var(--ds-marca-50); border-bottom-color: var(--ds-marca-600); }
+  .ds-nav-aba:focus-visible { outline: none; box-shadow: inset var(--ds-anel-foco); }
+  .ds-nav-aba .ds-contador { margin-left: 6px; }
+  .ds-nav-operador { display: flex; align-items: center; gap: 6px; font-size: var(--ds-texto-sm); color: var(--ds-texto-2); white-space: nowrap; flex: none; }
+  .ds-nav-operador b { color: var(--ds-texto); font-weight: var(--ds-peso-semi); }
+
+  /* ---------- Estrutura da tela ---------- */
+  .ds-cab {
+    position: sticky; top: var(--ds-nav-altura); z-index: 40;
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--ds-esp-3) var(--ds-esp-5);
+    padding: var(--ds-esp-4) var(--ds-esp-6);
+    background: var(--ds-superficie); border-bottom: 1px solid var(--ds-borda);
+  }
+  .ds-cab-titulo { display: flex; align-items: center; gap: var(--ds-esp-2); font-family: var(--ds-fonte-titulo); font-size: var(--ds-texto-2xl); font-weight: var(--ds-peso-forte); color: var(--ds-texto); }
+  .ds-cab-titulo .ti { font-size: 22px; color: var(--ds-marca-600); }
+  .ds-cab-sub { font-size: var(--ds-texto-sm); color: var(--ds-texto-2); margin-top: 2px; }
+  .ds-cab-acoes { margin-left: auto; display: flex; align-items: center; gap: var(--ds-esp-2); flex-wrap: wrap; }
+  .ds-filtros {
+    display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--ds-esp-3);
+    padding: var(--ds-esp-3) var(--ds-esp-6);
+    background: var(--ds-superficie-2); border-bottom: 1px solid var(--ds-borda);
+  }
+  .ds-filtros .ds-cab-acoes { align-self: flex-end; }
+  .ds-corpo { padding: var(--ds-esp-5) var(--ds-esp-6) var(--ds-esp-10); display: flex; flex-direction: column; gap: var(--ds-esp-4); }
+  .ds-linha-acoes { display: flex; align-items: center; gap: var(--ds-esp-3); flex-wrap: wrap; }
+  .ds-linha-acoes .ds-empurra { margin-left: auto; }
+
+  /* ---------- Campos ---------- */
+  .ds-campo { display: flex; flex-direction: column; gap: var(--ds-esp-1); min-width: 140px; }
+  .ds-campo--cresce { flex: 1; min-width: 220px; }
+  .ds-campo--estreito { min-width: 110px; }
+  .ds-rotulo { font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-forte); color: var(--ds-texto-2); text-transform: uppercase; letter-spacing: .04em; }
+  .ds-rotulo .ds-obrig { color: var(--ds-perigo); }
+  .ds-input, .ds-select, .ds-textarea {
+    width: 100%; height: var(--ds-controle-md); padding: 0 10px;
+    font-size: var(--ds-texto-md); color: var(--ds-texto);
+    background: var(--ds-branco); border: 1px solid var(--ds-borda-forte); border-radius: var(--ds-raio-2);
+    transition: border-color var(--ds-trans-rapida), box-shadow var(--ds-trans-rapida);
+  }
+  .ds-select { padding-right: 28px; cursor: pointer; }
+  .ds-textarea { height: auto; min-height: 76px; padding: var(--ds-esp-2) 10px; resize: vertical; line-height: var(--ds-altura-linha); }
+  .ds-input:hover, .ds-select:hover, .ds-textarea:hover { border-color: var(--ds-marca-300); }
+  .ds-input:focus, .ds-select:focus, .ds-textarea:focus { outline: none; border-color: var(--ds-marca-500); box-shadow: var(--ds-anel-foco); }
+  .ds-input:disabled, .ds-select:disabled, .ds-textarea:disabled { background: var(--ds-superficie-2); color: var(--ds-texto-inativo); cursor: not-allowed; }
+  .ds-input--erro, .ds-select--erro, .ds-textarea--erro { border-color: var(--ds-perigo); background: var(--ds-perigo-fundo); }
+  .ds-textarea--urgente { border: 2px solid var(--ds-urgente-borda); background: var(--ds-urgente-fundo); }
+  .ds-textarea--urgente:focus { border-color: var(--ds-urgente); box-shadow: 0 0 0 3px rgba(200, 16, 46, .18); }
+  .ds-ajuda { font-size: var(--ds-texto-xs); color: var(--ds-texto-3); }
+  .ds-ajuda--erro { color: var(--ds-perigo-texto); font-weight: var(--ds-peso-semi); }
+  .ds-busca { position: relative; }
+  .ds-busca > .ti { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--ds-texto-3); font-size: 16px; pointer-events: none; }
+  .ds-busca .ds-input { padding-left: 32px; }
+  .ds-check { display: inline-flex; align-items: center; gap: var(--ds-esp-2); font-size: var(--ds-texto-md); color: var(--ds-texto); cursor: pointer; user-select: none; }
+  .ds-check input { width: 16px; height: 16px; margin: 0; accent-color: var(--ds-marca-600); cursor: pointer; }
+  .ds-form-grade { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-esp-3) var(--ds-esp-4); }
+  .ds-form-grade .ds-campo { min-width: 0; }
+  .ds-form-grade .ds-inteira { grid-column: 1 / -1; }
+
+  /* ---------- Botões ---------- */
+  .ds-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: var(--ds-controle-md); padding: 0 14px;
+    font-size: var(--ds-texto-lg); font-weight: var(--ds-peso-semi); line-height: 1;
+    border: 1px solid transparent; border-radius: var(--ds-raio-2);
+    cursor: pointer; white-space: nowrap; text-decoration: none;
+    transition: background var(--ds-trans-rapida), border-color var(--ds-trans-rapida), color var(--ds-trans-rapida), box-shadow var(--ds-trans-rapida);
+  }
+  .ds-btn .ti { font-size: 17px; }
+  .ds-btn:focus-visible { outline: none; box-shadow: var(--ds-anel-foco); }
+  .ds-btn:active:not(:disabled) { transform: translateY(1px); }
+  .ds-btn:disabled { cursor: not-allowed; background: var(--ds-superficie-3); color: var(--ds-texto-inativo); border-color: var(--ds-borda); box-shadow: none; }
+  .ds-btn--primario { background: var(--ds-marca-700); color: var(--ds-branco); box-shadow: var(--ds-sombra-1); }
+  .ds-btn--primario:hover:not(:disabled) { background: var(--ds-marca-800); }
+  .ds-btn--secundario { background: var(--ds-branco); color: var(--ds-marca-700); border-color: var(--ds-borda-forte); }
+  .ds-btn--secundario:hover:not(:disabled) { background: var(--ds-marca-50); border-color: var(--ds-marca-300); }
+  .ds-btn--fantasma { background: transparent; color: var(--ds-texto-2); }
+  .ds-btn--fantasma:hover:not(:disabled) { background: var(--ds-superficie-3); color: var(--ds-texto); }
+  .ds-btn--perigo { background: var(--ds-perigo); color: var(--ds-branco); }
+  .ds-btn--perigo:hover:not(:disabled) { background: var(--ds-perigo-texto); }
+  .ds-btn--perigo-suave { background: var(--ds-branco); color: var(--ds-perigo-texto); border-color: var(--ds-perigo-borda); }
+  .ds-btn--perigo-suave:hover:not(:disabled) { background: var(--ds-perigo-fundo); }
+  .ds-btn--sucesso { background: var(--ds-sucesso); color: var(--ds-branco); }
+  .ds-btn--sucesso:hover:not(:disabled) { background: var(--ds-sucesso-texto); }
+  .ds-btn--urgente { background: var(--ds-urgente); color: var(--ds-branco); }
+  .ds-btn--urgente:hover:not(:disabled) { background: var(--ds-urgente-escuro); }
+  .ds-btn--whatsapp { background: var(--ds-whatsapp); color: var(--ds-branco); }
+  .ds-btn--whatsapp:hover:not(:disabled) { filter: brightness(.92); }
+  .ds-btn--claro { background: var(--ds-branco); color: var(--ds-marca-800); }
+  .ds-btn--claro:hover:not(:disabled) { background: var(--ds-marca-50); }
+  .ds-btn--fantasma-claro { background: transparent; color: rgba(255, 255, 255, .82); }
+  .ds-btn--fantasma-claro:hover:not(:disabled) { background: rgba(255, 255, 255, .12); color: var(--ds-branco); }
+  .ds-btn--sm { height: var(--ds-controle-sm); padding: 0 10px; font-size: var(--ds-texto-sm); }
+  .ds-btn--sm .ti { font-size: 15px; }
+  .ds-btn--lg { height: var(--ds-controle-lg); padding: 0 20px; font-size: 15px; }
+  .ds-btn--icone { width: var(--ds-controle-md); padding: 0; }
+  .ds-btn--icone.ds-btn--sm { width: var(--ds-controle-sm); }
+  .ds-btn--bloco { width: 100%; }
+  .ds-grupo-btn { display: inline-flex; gap: var(--ds-esp-2); flex-wrap: wrap; }
+
+  /* ---------- Chips, selos, contadores, placas ---------- */
+  .ds-chip {
+    display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 9px;
+    font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-semi); line-height: 1; white-space: nowrap;
+    color: var(--ds-texto-2); background: var(--ds-superficie-3); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-pilula);
+  }
+  .ds-chip .ti { font-size: 13px; }
+  .ds-chip--marca    { color: var(--ds-marca-700);      background: var(--ds-marca-50);        border-color: var(--ds-marca-200); }
+  .ds-chip--sucesso  { color: var(--ds-sucesso-texto);  background: var(--ds-sucesso-fundo);   border-color: var(--ds-sucesso-borda); }
+  .ds-chip--atencao  { color: var(--ds-atencao-texto);  background: var(--ds-atencao-fundo);   border-color: var(--ds-atencao-borda); }
+  .ds-chip--perigo   { color: var(--ds-perigo-texto);   background: var(--ds-perigo-fundo);    border-color: var(--ds-perigo-borda); }
+  .ds-chip--info     { color: var(--ds-info-texto);     background: var(--ds-info-fundo);      border-color: var(--ds-info-borda); }
+  .ds-chip--servidor { color: var(--ds-servidor);       background: var(--ds-servidor-fundo);  border-color: var(--ds-servidor-borda); }
+  .ds-chip--clicavel { cursor: pointer; }
+  .ds-chip--clicavel:hover { filter: brightness(.96); }
+
+  .ds-selo {
+    display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px;
+    font-size: 10.5px; font-weight: var(--ds-peso-extra); letter-spacing: .06em; text-transform: uppercase;
+    line-height: 1; white-space: nowrap; color: var(--ds-branco); background: var(--ds-texto-2); border-radius: var(--ds-raio-1);
+    vertical-align: middle;
+  }
+  .ds-selo .ti { font-size: 12px; }
+  .ds-selo--servidor  { background: var(--ds-servidor); }
+  .ds-selo--urgente   { background: var(--ds-urgente); }
+  .ds-selo--cancelado { background: var(--ds-perigo-fundo); color: var(--ds-perigo-texto); box-shadow: inset 0 0 0 1px var(--ds-perigo-borda); }
+  .ds-selo--terc      { background: var(--ds-superficie-3); color: var(--ds-texto-2); box-shadow: inset 0 0 0 1px var(--ds-borda-forte); }
+  .ds-selo--publico   { background: var(--ds-marca-50); color: var(--ds-marca-700); box-shadow: inset 0 0 0 1px var(--ds-marca-200); }
+  .ds-selo--hemo      { background: var(--ds-hemo); }
+  .ds-selo--qtd       { background: var(--ds-superficie-3); color: var(--ds-texto-2); }
+  .ds-selo--volta     { background: var(--ds-atencao-fundo); color: var(--ds-atencao-texto); }
+  /* .ds-selo-pend ("não enviado", piscando) saiu em 05/10/2026, junto com a marca no sistema. */
+  @keyframes ds-pulso { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+
+  .ds-contador {
+    display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px;
+    font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-forte); line-height: 1;
+    color: var(--ds-marca-800); background: var(--ds-marca-100); border-radius: var(--ds-raio-pilula);
+  }
+  .ds-contador--perigo { color: var(--ds-branco); background: var(--ds-perigo); }
+  .ds-contador--neutro { color: var(--ds-texto-2); background: var(--ds-superficie-3); box-shadow: inset 0 0 0 1px var(--ds-borda); }
+
+  .ds-placa {
+    display: inline-block; padding: 2px 7px; font-family: var(--ds-fonte-mono); font-size: var(--ds-texto-sm);
+    font-weight: var(--ds-peso-forte); letter-spacing: .04em; color: var(--ds-texto);
+    background: var(--ds-superficie-2); border: 1px solid var(--ds-borda-forte); border-radius: var(--ds-raio-1); white-space: nowrap;
+  }
+  /* Chip do tipo de veículo: o fundo vem da planilha (style="--cor:#xxxxxx"); o texto é calculado (dsCorDeTexto). */
+  .ds-veic {
+    display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px;
+    font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-extra); letter-spacing: .03em; text-transform: uppercase; white-space: nowrap;
+    color: var(--cor-texto, var(--ds-veiculo-texto)); background: var(--cor, var(--ds-veiculo-padrao)); border-radius: var(--ds-raio-1);
+  }
+  /* Tipo SOLICITADO pelo posto (o pedido, ainda sem carro): contorno, para não confundir com o carro de verdade. */
+  .ds-pedido-veic {
+    display: inline-flex; align-items: center; justify-content: center; min-height: 22px; padding: 2px 8px; text-align: center;
+    font-size: 10.5px; font-weight: var(--ds-peso-extra); letter-spacing: .04em; text-transform: uppercase; line-height: 1.15;
+    color: var(--ds-marca-700); background: var(--ds-marca-50); border: 1px solid var(--ds-marca-200); border-radius: var(--ds-raio-1);
+  }
+  /* Pedido de ambulância em vermelho, como no sistema: "exige preparo". É o PEDIDO, não o carro (o carro usa a cor da planilha). */
+  .ds-pedido-veic--ambulancia { color: var(--ds-perigo-texto); background: var(--ds-perigo-fundo); border-color: var(--ds-perigo-borda); }
+  .ds-pedido-veic--van        { color: #016a85; background: #e6f5f9; border-color: #b5e0eb; }
+  .ds-hora {
+    display: inline-block; padding: 2px 8px; font-family: var(--ds-fonte-titulo); font-size: 15px; font-weight: var(--ds-peso-extra);
+    font-variant-numeric: tabular-nums; color: var(--ds-marca-800); background: var(--ds-marca-50);
+    border: 1px solid var(--ds-marca-200); border-radius: var(--ds-raio-2); line-height: 1.25;
+  }
+  .ds-hora--vazia { color: var(--ds-texto-3); background: var(--ds-superficie-2); border-color: var(--ds-borda); }
+  .ds-hora--sm { font-size: var(--ds-texto-md); padding: 1px 6px; }
+
+  /* ---------- Botão Cancelar da linha (desde 05/10/2026) ----------
+     Compacto, embaixo de um chip: o horário do passageiro na Confirmação e Guias e o veículo pedido em Montar
+     Carros. Contorno vermelho em repouso (não grita numa lista longa) e vermelho cheio no hover.
+     Dentro de .ds-pilha, chip e botão ficam com a MESMA largura (a do maior) e o texto centralizado.
+     Na linha clicável, o onclick do botão começa com event.stopPropagation() para não abrir a ficha junto. */
+  .ds-pilha { display: inline-flex; flex-direction: column; align-items: stretch; gap: 4px; flex: none; vertical-align: top; }
+  .ds-pilha > * { justify-content: center; text-align: center; }
+  .ds-btn-cancelar {
+    display: inline-flex; align-items: center; justify-content: center; gap: 3px; height: 20px; padding: 0 7px;
+    font: inherit; font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-forte); line-height: 1; white-space: nowrap;
+    color: var(--ds-perigo-texto); background: var(--ds-branco); border: 1px solid var(--ds-perigo-borda); border-radius: var(--ds-raio-1);
+    cursor: pointer; transition: background var(--ds-trans-rapida), border-color var(--ds-trans-rapida), color var(--ds-trans-rapida);
+  }
+  .ds-btn-cancelar .ti { font-size: 13px; }
+  .ds-btn-cancelar:hover { color: var(--ds-branco); background: var(--ds-perigo); border-color: var(--ds-perigo); }
+  .ds-btn-cancelar:focus-visible { outline: none; box-shadow: var(--ds-anel-foco); }
+  .ds-btn-cancelar:disabled { cursor: not-allowed; color: var(--ds-texto-inativo); background: var(--ds-superficie-3); border-color: var(--ds-borda); }
+  .ds-mono { font-family: var(--ds-fonte-mono); font-size: var(--ds-texto-sm); color: var(--ds-texto-3); }
+  .ds-vazio-traco { color: var(--ds-texto-inativo); }
+
+  /* ---------- Avatar ---------- */
+  .ds-avatar {
+    width: 32px; height: 32px; flex: none; display: grid; place-items: center; border-radius: 50%;
+    font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-forte); color: var(--ds-marca-800); background: var(--ds-marca-100);
+  }
+  .ds-avatar--servidor { color: var(--ds-servidor); background: var(--ds-servidor-fundo); }
+  .ds-avatar--sm { width: 26px; height: 26px; font-size: 10.5px; }
+  .ds-pessoa { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .ds-pessoa-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; align-items: flex-start; }
+  .ds-pessoa-nome { font-weight: var(--ds-peso-forte); color: var(--ds-texto); line-height: 1.2; }
+  .ds-pessoa-sub { font-family: var(--ds-fonte-mono); font-size: var(--ds-texto-xs); color: var(--ds-texto-3); }
+
+  /* ---------- Cards ---------- */
+  .ds-card { background: var(--ds-superficie); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-3); box-shadow: var(--ds-sombra-1); }
+  .ds-card--destaque { border-left: 4px solid var(--ds-marca-600); }
+  .ds-card--sucesso { border-left: 4px solid var(--ds-sucesso); }
+  .ds-card-cab { display: flex; align-items: center; gap: var(--ds-esp-3); padding: 14px var(--ds-esp-4); border-bottom: 1px solid var(--ds-borda); flex-wrap: wrap; }
+  .ds-card-titulo { display: flex; align-items: center; gap: var(--ds-esp-2); font-family: var(--ds-fonte-titulo); font-size: var(--ds-texto-xl); font-weight: var(--ds-peso-forte); color: var(--ds-texto); }
+  .ds-card-titulo .ti { color: var(--ds-marca-600); font-size: 19px; }
+  .ds-card-desc { font-size: var(--ds-texto-md); color: var(--ds-texto-2); margin-top: 2px; }
+  .ds-card-corpo { padding: var(--ds-esp-4); }
+  .ds-card-pe { display: flex; justify-content: flex-end; align-items: center; gap: var(--ds-esp-2); padding: var(--ds-esp-3) var(--ds-esp-4); border-top: 1px solid var(--ds-borda); background: var(--ds-superficie-2); border-radius: 0 0 var(--ds-raio-3) var(--ds-raio-3); }
+  .ds-card-cab-dir { margin-left: auto; display: flex; align-items: center; gap: var(--ds-esp-2); flex-wrap: wrap; }
+  /* Sanfona: o cabeçalho abre e fecha o corpo */
+  .ds-sanfona > .ds-card-cab { cursor: pointer; user-select: none; }
+  .ds-sanfona > .ds-card-cab:hover { background: var(--ds-superficie-2); }
+  .ds-sanfona-seta { color: var(--ds-texto-3); font-size: 18px; transition: transform var(--ds-trans); }
+  .ds-sanfona.recolhido > .ds-card-cab { border-bottom-color: transparent; }
+  .ds-sanfona.recolhido .ds-sanfona-seta { transform: rotate(-90deg); }
+  .ds-sanfona.recolhido > .ds-card-corpo { display: none; }
+
+  /* ---------- Tabela ---------- */
+  .ds-tabela-caixa { background: var(--ds-superficie); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-3); box-shadow: var(--ds-sombra-1); overflow: auto; }
+  .ds-tabela { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--ds-texto-md); }
+  .ds-tabela th {
+    position: sticky; top: 0; z-index: 1; padding: 9px 12px; text-align: left; white-space: nowrap;
+    font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-forte); text-transform: uppercase; letter-spacing: .04em;
+    color: var(--ds-texto-2); background: var(--ds-superficie-2); border-bottom: 1px solid var(--ds-borda);
+  }
+  .ds-tabela td { padding: 9px 12px; border-bottom: 1px solid var(--ds-borda); vertical-align: middle; color: var(--ds-texto); }
+  .ds-tabela tbody tr:last-child td { border-bottom: none; }
+  .ds-tabela tbody tr.ds-clicavel { cursor: pointer; }
+  .ds-tabela tbody tr:hover td { background: var(--ds-marca-50); }
+  .ds-tabela tbody tr.selecionada td { background: #e2eef7; }
+  .ds-tabela tbody tr.cancelada td { color: var(--ds-texto-3); }
+  .ds-tabela tbody tr.cancelada .ds-pessoa-nome { text-decoration: line-through; color: var(--ds-texto-3); }
+  .ds-tabela .ds-col-check { width: 40px; }
+  .ds-tabela .ds-col-acoes { width: 1%; white-space: nowrap; text-align: right; }
+  /* Cabeçalho de grupo (cidade) e de subgrupo (hora) dentro da tabela */
+  .ds-tabela tr.ds-grupo td { background: var(--ds-marca-700); color: var(--ds-branco); font-weight: var(--ds-peso-forte); padding: 9px 12px; border-bottom: none; }
+  .ds-tabela tr.ds-grupo:hover td { background: var(--ds-marca-700); }
+  .ds-tabela tr.ds-subgrupo td { background: var(--ds-marca-50); color: var(--ds-marca-800); font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-semi); border-bottom: 1px solid var(--ds-marca-200); padding: 7px 12px; }
+  .ds-tabela tr.ds-subgrupo:hover td { background: var(--ds-marca-50); }
+  .ds-grupo-conteudo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .ds-grupo-conteudo .ds-chip { background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .25); color: var(--ds-branco); }
+  .ds-caps { text-transform: uppercase; letter-spacing: .02em; font-size: var(--ds-texto-sm); }
+  .ds-num { font-variant-numeric: tabular-nums; }
+  .ds-corta { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* ---------- Abas internas (sub-abas) ---------- */
+  .ds-abas { display: inline-flex; gap: 4px; padding: 4px; background: var(--ds-superficie-3); border: 1px solid var(--ds-borda); border-radius: 9px; }
+  .ds-aba {
+    display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 14px;
+    font-size: var(--ds-texto-lg); font-weight: var(--ds-peso-semi); color: var(--ds-texto-2);
+    background: transparent; border: none; border-radius: var(--ds-raio-2); cursor: pointer; white-space: nowrap;
+  }
+  .ds-aba .ti { font-size: 16px; }
+  .ds-aba:hover { color: var(--ds-texto); }
+  .ds-aba.ativa { background: var(--ds-superficie); color: var(--ds-marca-700); box-shadow: var(--ds-sombra-2); }
+  .ds-aba:focus-visible { outline: none; box-shadow: var(--ds-anel-foco); }
+  /* Variante em linha, para dentro de painel e modal */
+  .ds-abas--linha { padding: 0; gap: 0; background: transparent; border: none; border-bottom: 1px solid var(--ds-borda); border-radius: 0; width: 100%; }
+  .ds-abas--linha .ds-aba { border-radius: 0; height: 38px; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .ds-abas--linha .ds-aba.ativa { background: transparent; box-shadow: none; border-bottom-color: var(--ds-marca-600); }
+
+  /* ---------- Modal ---------- */
+  .ds-modal-fundo {
+    position: fixed; inset: 0; z-index: var(--ds-z-modal); display: none; align-items: center; justify-content: center;
+    padding: var(--ds-esp-6); background: rgba(8, 22, 36, .5);
+  }
+  .ds-modal-fundo.aberto { display: flex; animation: ds-aparecer var(--ds-trans); }
+  .ds-modal {
+    width: min(560px, 100%); max-height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden;
+    background: var(--ds-superficie); border-radius: var(--ds-raio-4); box-shadow: var(--ds-sombra-3); animation: ds-subir .2s ease;
+  }
+  .ds-modal--lg { width: min(860px, 100%); }
+  .ds-modal--tela { width: min(1320px, 100%); height: calc(100vh - 48px); }
+  .ds-modal-cab { display: flex; align-items: flex-start; gap: var(--ds-esp-3); padding: 18px var(--ds-esp-5) 14px; border-bottom: 1px solid var(--ds-borda); }
+  .ds-modal-titulo { font-family: var(--ds-fonte-titulo); font-size: var(--ds-texto-xl); font-weight: var(--ds-peso-forte); color: var(--ds-texto); }
+  .ds-modal-sub { font-size: var(--ds-texto-md); color: var(--ds-texto-2); margin-top: 2px; }
+  .ds-modal-cab .ds-modal-fechar { margin-left: auto; margin-top: -4px; }
+  .ds-modal-corpo { padding: 18px var(--ds-esp-5); overflow: auto; flex: 1; }
+  .ds-modal-pe { display: flex; align-items: center; gap: var(--ds-esp-2); padding: 14px var(--ds-esp-5); border-top: 1px solid var(--ds-borda); background: var(--ds-superficie-2); }
+  .ds-modal-pe .ds-dica { margin-right: auto; font-size: var(--ds-texto-sm); color: var(--ds-texto-2); }
+  .ds-modal-pe .ds-dica--erro { color: var(--ds-perigo-texto); font-weight: var(--ds-peso-semi); }
+  @keyframes ds-aparecer { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes ds-subir { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: none; } }
+
+  /* ---------- Painel lateral ---------- */
+  .ds-painel-fundo { position: fixed; inset: 0; z-index: var(--ds-z-painel); background: rgba(8, 22, 36, .36); opacity: 0; pointer-events: none; transition: opacity var(--ds-trans); }
+  .ds-painel-fundo.aberto { opacity: 1; pointer-events: auto; }
+  .ds-painel {
+    position: fixed; top: 0; right: 0; z-index: calc(var(--ds-z-painel) + 1); height: 100%; width: 480px; max-width: 94vw;
+    display: flex; flex-direction: column; background: var(--ds-superficie); box-shadow: var(--ds-sombra-3);
+    transform: translateX(104%); transition: transform .24s ease;
+  }
+  .ds-painel.aberto { transform: none; }
+  .ds-painel-cab { display: flex; align-items: flex-start; gap: var(--ds-esp-3); padding: 18px var(--ds-esp-5); border-bottom: 1px solid var(--ds-borda); }
+  .ds-painel-titulo { font-family: var(--ds-fonte-titulo); font-size: 18px; font-weight: var(--ds-peso-forte); color: var(--ds-texto); }
+  .ds-painel-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; font-size: var(--ds-texto-sm); color: var(--ds-texto-2); }
+  .ds-painel-cab .ds-modal-fechar { margin-left: auto; margin-top: -4px; }
+  .ds-painel-corpo { flex: 1; overflow: auto; padding: var(--ds-esp-4) var(--ds-esp-5); display: flex; flex-direction: column; gap: var(--ds-esp-4); }
+  .ds-secao-titulo { margin: 0 0 var(--ds-esp-2); font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-extra); text-transform: uppercase; letter-spacing: .06em; color: var(--ds-texto-3); }
+  .ds-dados { display: grid; grid-template-columns: 130px 1fr; gap: 7px var(--ds-esp-3); margin: 0; font-size: var(--ds-texto-md); }
+  .ds-dados dt { color: var(--ds-texto-3); }
+  .ds-dados dd { margin: 0; color: var(--ds-texto); font-weight: var(--ds-peso-medio); }
+  .ds-mensagem { padding: var(--ds-esp-3); font-size: 12.5px; line-height: 1.55; white-space: pre-wrap; background: var(--ds-superficie-2); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-3); }
+
+  /* ---------- Faixas de aviso ---------- */
+  .ds-faixa { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; font-size: var(--ds-texto-md); border: 1px solid; border-radius: var(--ds-raio-2); }
+  .ds-faixa > .ti { font-size: 18px; flex: none; margin-top: 1px; }
+  .ds-faixa b { font-weight: var(--ds-peso-forte); }
+  .ds-faixa--info    { color: var(--ds-info-texto);    background: var(--ds-info-fundo);    border-color: var(--ds-info-borda); }
+  .ds-faixa--atencao { color: var(--ds-atencao-texto); background: var(--ds-atencao-fundo); border-color: var(--ds-atencao-borda); }
+  .ds-faixa--sucesso { color: var(--ds-sucesso-texto); background: var(--ds-sucesso-fundo); border-color: var(--ds-sucesso-borda); }
+  .ds-faixa--perigo  { color: var(--ds-perigo-texto);  background: var(--ds-perigo-fundo);  border-color: var(--ds-perigo-borda); }
+  /* AVISO URGENTE: cheio, vermelho forte, borda grossa à esquerda. O mais chamativo do sistema. */
+  .ds-faixa--urgente { color: var(--ds-branco); background: var(--ds-urgente); border-color: var(--ds-urgente-escuro); border-left: 6px solid var(--ds-urgente-escuro); }
+  .ds-faixa-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .ds-faixa-titulo { font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-extra); letter-spacing: .08em; text-transform: uppercase; }
+  .ds-faixa-texto { font-size: var(--ds-texto-lg); font-weight: var(--ds-peso-forte); white-space: pre-wrap; }
+  .ds-faixa-meta { font-size: var(--ds-texto-xs); opacity: .88; }
+
+  /* ---------- Aviso rápido (toast) ---------- */
+  .ds-toasts { position: fixed; right: var(--ds-esp-5); bottom: var(--ds-esp-5); z-index: var(--ds-z-toast); display: flex; flex-direction: column; align-items: flex-end; gap: var(--ds-esp-2); pointer-events: none; }
+  .ds-toast {
+    display: flex; align-items: center; gap: 10px; min-width: 260px; max-width: 440px; padding: 11px 14px;
+    font-size: var(--ds-texto-md); font-weight: var(--ds-peso-medio); color: var(--ds-branco);
+    background: #172534; border-radius: var(--ds-raio-3); box-shadow: var(--ds-sombra-3);
+    animation: ds-subir .2s ease; transition: opacity var(--ds-trans), transform var(--ds-trans); pointer-events: auto;
+  }
+  .ds-toast .ti { font-size: 19px; flex: none; }
+  .ds-toast--ok .ti    { color: #6ee0a6; }
+  .ds-toast--erro .ti  { color: #ff8f85; }
+  .ds-toast--aviso .ti { color: #ffd36b; }
+  .ds-toast--info .ti  { color: #93cdf2; }
+  .ds-toast.saindo { opacity: 0; transform: translateY(6px); }
+
+  /* ---------- Estados: vazio e carregando ---------- */
+  .ds-vazio { padding: 44px var(--ds-esp-5); text-align: center; font-size: var(--ds-texto-md); color: var(--ds-texto-3); }
+  .ds-vazio > .ti { display: block; margin-bottom: var(--ds-esp-2); font-size: 36px; color: var(--ds-borda-forte); }
+  .ds-vazio-titulo { font-size: var(--ds-texto-lg); font-weight: var(--ds-peso-forte); color: var(--ds-texto-2); margin-bottom: 2px; }
+  .ds-carregando { display: flex; align-items: center; justify-content: center; gap: 10px; padding: var(--ds-esp-8); color: var(--ds-texto-3); }
+  .ds-giro { width: 18px; height: 18px; border: 2px solid var(--ds-marca-200); border-top-color: var(--ds-marca-600); border-radius: 50%; animation: ds-girar .8s linear infinite; }
+  .ds-esqueleto { height: 12px; border-radius: var(--ds-raio-1); background: linear-gradient(90deg, var(--ds-superficie-3) 25%, var(--ds-superficie-2) 50%, var(--ds-superficie-3) 75%); background-size: 200% 100%; animation: ds-brilho 1.2s ease-in-out infinite; }
+  @keyframes ds-girar { to { transform: rotate(360deg); } }
+  @keyframes ds-brilho { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+  /* ---------- Indicadores (KPI) e progresso ---------- */
+  .ds-kpis { display: flex; flex-wrap: wrap; gap: var(--ds-esp-3); }
+  .ds-kpi {
+    display: flex; flex-direction: column; gap: 3px; min-width: 128px; padding: 10px 14px;
+    background: var(--ds-superficie); border: 1px solid var(--ds-borda); border-top: 3px solid var(--ds-marca-600); border-radius: var(--ds-raio-3);
+    text-align: left; font: inherit; color: inherit;
+  }
+  button.ds-kpi { cursor: pointer; transition: box-shadow var(--ds-trans-rapida), transform var(--ds-trans-rapida); }
+  button.ds-kpi:hover { box-shadow: var(--ds-sombra-2); }
+  button.ds-kpi.ativo { box-shadow: var(--ds-anel-foco); }
+  .ds-kpi-num { font-family: var(--ds-fonte-titulo); font-size: var(--ds-texto-3xl); font-weight: var(--ds-peso-extra); line-height: 1; color: var(--ds-texto); font-variant-numeric: tabular-nums; }
+  .ds-kpi-rotulo { font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-forte); text-transform: uppercase; letter-spacing: .04em; color: var(--ds-texto-2); }
+  .ds-kpi--sucesso { border-top-color: var(--ds-sucesso); }
+  .ds-kpi--atencao { border-top-color: var(--ds-atencao); }
+  .ds-kpi--perigo  { border-top-color: var(--ds-perigo); }
+  .ds-kpi--info    { border-top-color: var(--ds-info); }
+  .ds-progresso { display: flex; height: 8px; overflow: hidden; background: var(--ds-superficie-3); border-radius: var(--ds-raio-pilula); }
+  .ds-progresso > span { height: 100%; transition: width var(--ds-trans); }
+  .ds-progresso .ok      { background: var(--ds-sucesso); }
+  .ds-progresso .atencao { background: var(--ds-atencao); }
+  .ds-progresso .perigo  { background: var(--ds-perigo); }
+  .ds-progresso .marca   { background: var(--ds-marca-500); }
+  .ds-legenda { display: flex; flex-wrap: wrap; gap: var(--ds-esp-3); font-size: var(--ds-texto-xs); color: var(--ds-texto-2); }
+  .ds-legenda i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+
+  /* ---------- Barra de ação (aparece quando há seleção) ---------- */
+  .ds-barra-acao {
+    position: fixed; left: 50%; bottom: var(--ds-esp-5); z-index: var(--ds-z-barra);
+    display: flex; align-items: center; gap: var(--ds-esp-3); padding: 10px 12px 10px 18px;
+    color: var(--ds-branco); background: var(--ds-marca-900); border-radius: var(--ds-raio-4); box-shadow: var(--ds-sombra-3);
+    transform: translate(-50%, 160%); transition: transform .24s ease;
+  }
+  .ds-barra-acao.visivel { transform: translate(-50%, 0); }
+  .ds-barra-acao-n { font-weight: var(--ds-peso-forte); white-space: nowrap; }
+  .ds-barra-acao-extra { font-size: var(--ds-texto-sm); color: rgba(255, 255, 255, .75); white-space: nowrap; }
+
+  /* ---------- Passos (fluxo em etapas) ---------- */
+  .ds-passos { display: flex; align-items: center; gap: var(--ds-esp-2); font-size: var(--ds-texto-sm); color: var(--ds-texto-3); }
+  .ds-passo { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .ds-passo-n { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-forte); color: var(--ds-texto-2); background: var(--ds-superficie-3); }
+  .ds-passo.ativo { color: var(--ds-marca-700); font-weight: var(--ds-peso-forte); }
+  .ds-passo.ativo .ds-passo-n { color: var(--ds-branco); background: var(--ds-marca-700); }
+  .ds-passo.feito .ds-passo-n { color: var(--ds-branco); background: var(--ds-sucesso); }
+  .ds-passo-sep { width: 28px; height: 1px; background: var(--ds-borda-forte); }
+
+  /* ---------- Quadro de tarefas ---------- */
+  .ds-quadro { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: var(--ds-esp-4); align-items: start; }
+  .ds-coluna { padding: 10px; background: var(--ds-superficie-3); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-3); }
+  .ds-coluna-cab { display: flex; align-items: center; gap: var(--ds-esp-2); padding: 4px 4px 10px; }
+  .ds-coluna-titulo { font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-extra); text-transform: uppercase; letter-spacing: .05em; color: var(--ds-texto-2); }
+  .ds-coluna-lista { display: flex; flex-direction: column; gap: var(--ds-esp-2); }
+  .ds-tarefa {
+    display: flex; flex-direction: column; gap: var(--ds-esp-2); padding: 10px 12px;
+    background: var(--ds-superficie); border: 1px solid var(--ds-borda); border-left: 4px solid var(--cor-tipo, var(--ds-marca-600));
+    border-radius: 8px; box-shadow: var(--ds-sombra-1);
+  }
+  .ds-tarefa-topo { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .ds-tarefa-desc { font-size: var(--ds-texto-md); white-space: pre-line; color: var(--ds-texto); }
+  .ds-tarefa-pe { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-esp-2); font-size: var(--ds-texto-xs); color: var(--ds-texto-3); }
+  /* Feita mantém a cor do tipo (é ela que diz o que foi): só esmaece, como no sistema. */
+  .ds-tarefa--feita { background: var(--ds-superficie-2); opacity: .85; }
+
+  /* ---------- Envio de arquivo ---------- */
+  .ds-upload { padding: 36px var(--ds-esp-5); text-align: center; cursor: pointer; background: var(--ds-superficie-2); border: 2px dashed var(--ds-borda-forte); border-radius: var(--ds-raio-3); transition: border-color var(--ds-trans-rapida), background var(--ds-trans-rapida); }
+  .ds-upload:hover, .ds-upload.arrastando { border-color: var(--ds-marca-500); background: var(--ds-marca-50); }
+  .ds-upload > .ti { font-size: 42px; color: var(--ds-marca-400); }
+  .ds-upload-titulo { margin-top: var(--ds-esp-2); font-size: var(--ds-texto-lg); font-weight: var(--ds-peso-forte); color: var(--ds-texto); }
+  .ds-upload-sub { font-size: var(--ds-texto-sm); color: var(--ds-texto-2); }
+  .ds-upload.com-arquivo { border-style: solid; border-color: var(--ds-sucesso-borda); background: var(--ds-sucesso-fundo); }
+  .ds-upload.com-arquivo > .ti { color: var(--ds-sucesso); }
+
+  /* ---------- Itens arrastáveis ---------- */
+  .ds-arrastavel { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--ds-superficie); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-2); cursor: grab; transition: border-color var(--ds-trans-rapida), box-shadow var(--ds-trans-rapida), opacity var(--ds-trans-rapida); }
+  .ds-arrastavel:hover { border-color: var(--ds-marca-300); }
+  .ds-arrastavel.arrastando { opacity: .45; }
+  .ds-arrastavel.alvo { border-color: var(--ds-marca-500); box-shadow: var(--ds-anel-foco); }
+  .ds-arrastavel .ds-alca { margin-left: auto; color: var(--ds-texto-inativo); }
+  .ds-posicao { min-width: 28px; font-family: var(--ds-fonte-titulo); font-weight: var(--ds-peso-extra); color: var(--ds-marca-700); }
+
+  /* =====================================================================
+     COMPONENTES QUE VIERAM DA AUDITORIA (05/10/2026)
+     Peças que o sistema já usa e que o design system não tinha: o seletor de mais e
+     menos, a barra de lotação, o editor de roteiro, o chip de passageiro, o interruptor,
+     a lista de sugestões, o calendário, a janela com "carregando/sucesso", o antes e
+     depois da troca, o marcador "agora", a carga em pontinhos e o rodapé de versões.
+     ===================================================================== */
+
+  /* ---------- Seletor de mais e menos (assentos bloqueados, quantidade de pessoas) ---------- */
+  .ds-stepper { display: inline-flex; align-items: center; gap: 4px; padding: 2px; background: var(--ds-superficie); border: 1px solid var(--ds-borda-forte); border-radius: var(--ds-raio-pilula); }
+  .ds-stepper button { width: 26px; height: 26px; display: grid; place-items: center; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: var(--ds-peso-forte); line-height: 1; color: var(--ds-marca-800); background: var(--ds-marca-50); }
+  .ds-stepper button:hover:not(:disabled) { color: var(--ds-branco); background: var(--ds-marca-600); }
+  .ds-stepper button:disabled { opacity: .35; cursor: not-allowed; }
+  .ds-stepper-valor { min-width: 40px; text-align: center; font-weight: var(--ds-peso-forte); font-variant-numeric: tabular-nums; }
+
+  /* ---------- Barra de lotação do carro ---------- */
+  .ds-medidor { display: flex; flex-direction: column; gap: 5px; }
+  .ds-medidor-info { display: flex; justify-content: space-between; gap: var(--ds-esp-3); font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-semi); color: var(--ds-texto-2); }
+  .ds-medidor-barra { display: flex; height: 12px; overflow: hidden; background: var(--ds-superficie-3); border-radius: var(--ds-raio-pilula); }
+  .ds-medidor-barra .ocupado { background: var(--ds-sucesso); transition: width var(--ds-trans); }
+  .ds-medidor-barra .bloqueado { background: repeating-linear-gradient(45deg, #94a3b8, #94a3b8 5px, #cbd5e1 5px, #cbd5e1 10px); transition: width var(--ds-trans); }
+  .ds-medidor.cheio .ocupado { background: var(--ds-perigo); }
+
+  /* ---------- Editor de roteiro (origem › paradas › destino) ---------- */
+  .ds-roteiro { display: flex; flex-direction: column; gap: 6px; }
+  .ds-roteiro-dica { font-size: var(--ds-texto-xs); font-style: italic; color: var(--ds-texto-3); text-transform: none; letter-spacing: 0; font-weight: var(--ds-peso-medio); }
+  .ds-roteiro-dica .ds-link { font-style: normal; }
+  .ds-rt-fluxo { display: flex; align-items: stretch; gap: 6px; flex-wrap: wrap; }
+  .ds-rt-seta { display: flex; align-items: center; color: var(--ds-texto-3); font-weight: var(--ds-peso-forte); font-size: 16px; }
+  .ds-rt-chip { display: flex; flex-direction: column; gap: 2px; min-width: 124px; padding: 6px 9px; background: var(--ds-marca-50); border: 1px solid var(--ds-marca-200); border-radius: var(--ds-raio-2); }
+  .ds-rt-chip[draggable="true"] { cursor: grab; }
+  .ds-rt-chip.origem { background: var(--ds-superficie-2); border-color: var(--ds-borda); justify-content: center; }
+  .ds-rt-chip.destino { background: var(--ds-sucesso-fundo); border: 2px solid var(--ds-sucesso-borda); }
+  .ds-rt-chip.arrastando { opacity: .5; }
+  .ds-rt-chip.alvo { outline: 2px dashed var(--ds-marca-500); outline-offset: 1px; }
+  .ds-rt-topo { display: flex; align-items: center; gap: 6px; }
+  .ds-rt-lbl { flex: 1; font-size: 9.5px; font-weight: var(--ds-peso-forte); text-transform: uppercase; letter-spacing: .04em; color: var(--ds-marca-700); }
+  .ds-rt-chip.origem .ds-rt-lbl { color: var(--ds-texto-3); }
+  .ds-rt-chip.destino .ds-rt-lbl { color: var(--ds-sucesso-texto); }
+  .ds-rt-cidade { display: flex; align-items: center; gap: 5px; font-size: var(--ds-texto-lg); font-weight: var(--ds-peso-forte); color: var(--ds-marca-800); }
+  .ds-rt-chip.destino .ds-rt-cidade { color: var(--ds-sucesso-texto); }
+  .ds-rt-hora { padding: 1px 6px; border-radius: var(--ds-raio-1); font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-forte); color: var(--ds-marca-800); background: var(--ds-marca-100); }
+  .ds-rt-chip.destino .ds-rt-hora { color: var(--ds-sucesso-texto); background: #cfeedd; }
+  .ds-rt-info { font-size: var(--ds-texto-xs); color: var(--ds-marca-600); }
+  .ds-rt-chip.destino .ds-rt-info { color: var(--ds-sucesso); }
+  .ds-rt-acoes { display: flex; gap: 1px; }
+  .ds-rt-acoes button { width: 18px; height: 18px; padding: 0; border: none; border-radius: var(--ds-raio-1); cursor: pointer; font-size: 9px; line-height: 1; color: var(--ds-marca-800); background: var(--ds-marca-100); }
+  .ds-rt-acoes button:hover:not(:disabled) { color: var(--ds-branco); background: var(--ds-marca-600); }
+  .ds-rt-acoes button:disabled { opacity: .3; cursor: not-allowed; }
+  .ds-rt-acoes .ds-rt-x { color: var(--ds-perigo-texto); background: var(--ds-perigo-fundo); }
+  .ds-rt-acoes .ds-rt-x:hover { color: var(--ds-branco); background: var(--ds-perigo); }
+  .ds-rt-add select { height: 100%; min-height: 52px; padding: 0 8px; cursor: pointer; font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-semi); color: var(--ds-marca-600); background: var(--ds-superficie); border: 1px dashed var(--ds-borda-forte); border-radius: var(--ds-raio-2); }
+
+  /* ---------- Chip de passageiro (dentro do carro) ---------- */
+  .ds-pax { display: flex; flex-direction: column; gap: 5px; padding: 7px 9px; background: var(--ds-marca-50); border: 1px solid var(--ds-marca-200); border-radius: var(--ds-raio-2); }
+  .ds-pax.clicavel { cursor: pointer; }
+  .ds-pax.clicavel:hover { border-color: var(--ds-marca-400); }
+  .ds-pax.perigo { background: var(--ds-perigo-fundo); border-color: var(--ds-perigo-borda); }
+  .ds-pax-l1 { display: flex; align-items: center; gap: var(--ds-esp-2); min-width: 0; }
+  .ds-pax-l2 { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .ds-pax-nome { font-weight: var(--ds-peso-forte); color: var(--ds-texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ds-pax-nome small { font-weight: var(--ds-peso-normal); color: var(--ds-texto-2); font-size: var(--ds-texto-sm); }
+  .ds-pax-info { flex: 1; min-width: 0; padding-left: var(--ds-esp-2); border-left: 1px solid var(--ds-marca-200); font-size: var(--ds-texto-sm); color: var(--ds-texto-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ds-pax.perigo .ds-pax-info { border-left-color: var(--ds-perigo-borda); color: var(--ds-perigo-texto); }
+  .ds-pax-vagas { flex: none; padding: 2px 8px; font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-forte); color: var(--ds-texto-2); background: var(--ds-superficie); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-pilula); }
+  .ds-pax-tirar { flex: none; border: none; background: none; cursor: pointer; font-size: 18px; line-height: 1; padding: 0 2px; color: var(--ds-perigo); }
+  .ds-pax-embarque { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; font-size: var(--ds-texto-xs); background: var(--ds-superficie-3); border-radius: var(--ds-raio-1); }
+  .ds-pax-embarque select { max-width: 170px; height: 22px; padding: 0 4px; font-size: var(--ds-texto-xs); border: 1px solid var(--ds-borda-forte); border-radius: 3px; background: var(--ds-branco); }
+  .ds-pax-embarque select.falta { border-color: var(--ds-perigo); background: var(--ds-perigo-fundo); }
+  .ds-cidade-tag { flex: none; padding: 2px 8px; font-size: 10.5px; font-weight: var(--ds-peso-forte); white-space: nowrap; color: var(--ds-marca-700); background: var(--ds-superficie); border: 1px solid var(--ds-marca-200); border-radius: var(--ds-raio-pilula); }
+  .ds-cidade-tag.fora { color: var(--ds-perigo-texto); background: var(--ds-perigo-fundo); border-color: var(--ds-perigo-borda); }
+  .ds-cidade-tag .ds-link { color: inherit; }
+  .ds-obs { padding: 2px 6px; font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-semi); color: var(--ds-perigo-texto); background: var(--ds-superficie); border: 1px solid var(--ds-perigo-borda); border-radius: var(--ds-raio-1); }
+  .ds-servidor-ident { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 6px 8px; font-size: var(--ds-texto-xs); background: var(--ds-servidor-fundo); border: 1px solid var(--ds-servidor-borda); border-radius: var(--ds-raio-2); }
+  .ds-servidor-ident label { font-weight: var(--ds-peso-forte); color: var(--ds-servidor); }
+  .ds-servidor-ident input { height: 26px; padding: 0 6px; font-size: var(--ds-texto-sm); border: 1px solid var(--ds-borda-forte); border-radius: var(--ds-raio-1); }
+  .ds-servidor-ident input.falta { border-color: var(--ds-perigo); background: var(--ds-perigo-fundo); }
+  .ds-servidor-obj { font-weight: var(--ds-peso-forte); color: var(--ds-texto); margin-right: 6px; }
+
+  /* ---------- Alertas de idade e restrição (cadeirinha, idoso sem acompanhante...) ---------- */
+  .ds-alerta { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-semi); white-space: nowrap; border: 1px solid transparent; border-radius: var(--ds-raio-pilula); }
+  .ds-alerta--perigo { color: var(--ds-perigo-texto); background: var(--ds-perigo-fundo); border-color: var(--ds-perigo-borda); }
+  .ds-alerta--aviso  { color: var(--ds-atencao-texto); background: var(--ds-atencao-fundo); border-color: var(--ds-atencao-borda); }
+  .ds-alerta--info   { color: var(--ds-info-texto); background: var(--ds-info-fundo); border-color: var(--ds-info-borda); }
+
+  /* ---------- Interruptor (liga e desliga) ---------- */
+  .ds-interruptor { position: relative; display: inline-block; width: 38px; height: 22px; flex: none; }
+  .ds-interruptor input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .ds-interruptor span { position: absolute; inset: 0; cursor: pointer; border-radius: var(--ds-raio-pilula); background: var(--ds-borda-forte); transition: background var(--ds-trans-rapida); }
+  .ds-interruptor span::before { content: ""; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--ds-branco); box-shadow: var(--ds-sombra-1); transition: transform var(--ds-trans-rapida); }
+  .ds-interruptor input:checked + span { background: var(--ds-sucesso); }
+  .ds-interruptor input:checked + span::before { transform: translateX(16px); }
+  .ds-interruptor input:focus-visible + span { box-shadow: var(--ds-anel-foco); }
+
+  /* ---------- Lista de sugestões (autocompletar) ---------- */
+  .ds-auto { position: relative; }
+  .ds-sugestoes { position: absolute; left: 0; right: 0; top: calc(100% + 2px); z-index: 5; display: none; max-height: 260px; overflow: auto; background: var(--ds-superficie); border: 1px solid var(--ds-borda-forte); border-radius: var(--ds-raio-2); box-shadow: var(--ds-sombra-3); }
+  .ds-sugestoes.on { display: block; }
+  .ds-sugestao { display: flex; flex-direction: column; gap: 1px; padding: 7px 10px; cursor: pointer; }
+  .ds-sugestao:hover, .ds-sugestao.on { background: var(--ds-marca-50); }
+  .ds-sugestao b { font-weight: var(--ds-peso-semi); color: var(--ds-texto); }
+  .ds-sugestao span { font-size: var(--ds-texto-xs); color: var(--ds-texto-3); }
+  .ds-sugestoes-vazio { padding: 10px; font-size: var(--ds-texto-sm); color: var(--ds-texto-3); }
+  /* Dentro de painel que rola, a lista vai no fluxo, logo abaixo do campo (flutuando, seria cortada). */
+  .ds-auto--fluxo .ds-sugestoes { position: static; margin-top: 4px; box-shadow: var(--ds-sombra-2); }
+
+  /* ---------- Calendário (substitui o seletor nativo dentro do Apps Script) ---------- */
+  .ds-calendario { position: absolute; z-index: 30; display: none; width: 260px; padding: 10px; background: var(--ds-superficie); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-3); box-shadow: var(--ds-sombra-3); }
+  .ds-calendario.on { display: block; }
+  .ds-cal-topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .ds-cal-mes { font-weight: var(--ds-peso-forte); text-transform: capitalize; }
+  .ds-cal-grade { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .ds-cal-sem { padding: 4px 0; text-align: center; font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-forte); color: var(--ds-texto-3); }
+  .ds-cal-dia { height: 30px; border: none; border-radius: var(--ds-raio-2); cursor: pointer; font-size: var(--ds-texto-md); color: var(--ds-texto); background: transparent; }
+  .ds-cal-dia:hover:not(:disabled) { background: var(--ds-marca-50); }
+  .ds-cal-dia.fds { color: var(--ds-texto-3); }
+  .ds-cal-dia.hoje { box-shadow: inset 0 0 0 1px var(--ds-marca-400); font-weight: var(--ds-peso-forte); }
+  .ds-cal-dia.sel { color: var(--ds-branco); background: var(--ds-marca-700); }
+  .ds-cal-dia:disabled { cursor: default; }
+
+  /* ---------- Janela em estado de carregando ou sucesso (ação gravando na planilha) ---------- */
+  .ds-modal-estado { padding: 34px var(--ds-esp-5); text-align: center; }
+  .ds-modal-estado .ti { display: block; margin: 0 auto 10px; font-size: 48px; }
+  .ds-modal-estado.carregando .ti { color: var(--ds-marca-500); animation: ds-girar 1s linear infinite; }
+  .ds-modal-estado.sucesso .ti { color: var(--ds-sucesso); animation: ds-subir .3s ease; }
+  .ds-modal-estado.erro .ti { color: var(--ds-perigo); }
+  .ds-modal-estado-txt { font-size: var(--ds-texto-xl); font-weight: var(--ds-peso-forte); color: var(--ds-texto); }
+  .ds-modal-estado-sub { margin-top: 4px; color: var(--ds-texto-2); }
+
+  /* ---------- Antes e depois de uma troca (motoristas ou pacientes) ---------- */
+  .ds-antes-depois { display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--ds-esp-3); align-items: center; }
+  .ds-ad-col { display: flex; flex-direction: column; gap: var(--ds-esp-2); }
+  .ds-ad-tit { font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-extra); text-transform: uppercase; letter-spacing: .05em; color: var(--ds-texto-3); }
+  .ds-ad-meio { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--ds-texto-3); font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-forte); text-transform: uppercase; text-align: center; }
+  .ds-ad-meio .ti { font-size: 28px; color: var(--ds-marca-500); }
+  .ds-mini-card { display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; background: var(--ds-superficie-2); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-2); font-size: var(--ds-texto-sm); color: var(--ds-texto-2); }
+  .ds-mini-card b { color: var(--ds-texto); font-size: var(--ds-texto-md); }
+
+  /* ---------- Marcador de "agora" numa lista por horário ---------- */
+  .ds-agora { display: flex; align-items: center; gap: var(--ds-esp-2); margin: 2px 0; }
+  .ds-agora-ponto { width: 9px; height: 9px; border-radius: 50%; background: var(--ds-perigo); box-shadow: 0 0 0 3px var(--ds-perigo-fundo); }
+  .ds-agora-tag { font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-extra); text-transform: uppercase; letter-spacing: .05em; color: var(--ds-perigo-texto); }
+  .ds-agora-risca { flex: 1; height: 2px; background: var(--ds-perigo-borda); border-radius: 2px; }
+
+  /* ---------- Carga em pontinhos (quantas remoções a pessoa já tem) ---------- */
+  .ds-carga { display: inline-flex; gap: 3px; vertical-align: middle; }
+  .ds-carga i { width: 7px; height: 7px; border-radius: 50%; background: var(--ds-superficie-3); box-shadow: inset 0 0 0 1px var(--ds-borda-forte); }
+  .ds-carga i.cheio { background: var(--ds-marca-500); box-shadow: none; }
+  .ds-hora-perto { color: var(--ds-atencao-texto); background: var(--ds-atencao-fundo); border-color: var(--ds-atencao-borda); }
+
+  /* ---------- Título de grupo com contagem e risca ---------- */
+  .ds-grupo-titulo { display: flex; align-items: center; gap: var(--ds-esp-2); margin: var(--ds-esp-2) 0; }
+  .ds-grupo-titulo h3 { font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-extra); text-transform: uppercase; letter-spacing: .06em; color: var(--ds-texto-3); font-family: var(--ds-fonte-texto); }
+  .ds-grupo-titulo .ds-risca { flex: 1; height: 1px; background: var(--ds-borda); }
+
+  /* ---------- Link de texto (ação discreta dentro de uma frase) ---------- */
+  .ds-link { color: var(--ds-marca-600); font-weight: var(--ds-peso-semi); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font: inherit; }
+  .ds-link:hover { color: var(--ds-marca-800); }
+
+  /* ---------- Rodapé de versões e faixa de arquivo incompleto (Index) ---------- */
+  .ds-rodape-versoes { position: fixed; right: 8px; bottom: 4px; z-index: 40; padding: 2px 8px; font-size: 10.5px; color: var(--ds-texto-3); background: rgba(255, 255, 255, .88); border-radius: var(--ds-raio-2); }
+  .ds-banner-versao { display: none; padding: 8px var(--ds-esp-5); text-align: center; font-size: var(--ds-texto-md); font-weight: var(--ds-peso-semi); color: var(--ds-branco); background: var(--ds-perigo); }
+  .ds-banner-versao.on { display: block; }
+
+  /* ---------- Faixa de grupo fora de tabela (cidade de destino na Guia, dia na Escala) ---------- */
+  .ds-banda { display: flex; align-items: center; gap: 10px; padding: 7px 12px; margin-bottom: var(--ds-esp-2); background: var(--ds-marca-700); border-left: 4px solid var(--ds-marca-400); border-radius: 0 var(--ds-raio-2) var(--ds-raio-2) 0; }
+  .ds-banda-nome { font-family: var(--ds-fonte-titulo); font-size: var(--ds-texto-lg); font-weight: var(--ds-peso-extra); letter-spacing: .02em; color: var(--ds-branco); }
+  .ds-banda-meta { font-size: var(--ds-texto-sm); color: rgba(255, 255, 255, .78); }
+
+  /* ---------- Contadores que filtram (fila de trabalho: Ligar, Confirmados, Enviados...) ---------- */
+  .ds-contadores { display: flex; gap: var(--ds-esp-2); flex-wrap: wrap; }
+  .ds-contador-filtro { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 11px; cursor: pointer; font: inherit; font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-semi); color: var(--ds-texto-2); background: var(--ds-superficie); border: 1px solid var(--ds-borda-forte); border-radius: var(--ds-raio-pilula); }
+  .ds-contador-filtro b { font-weight: var(--ds-peso-extra); }
+  .ds-contador-filtro .ti { font-size: 12px; }
+  .ds-contador-filtro.ativo { outline: 2px solid var(--ds-marca-600); outline-offset: 1px; }
+  .ds-contador-filtro--ligar      { color: var(--ds-texto-2);      background: var(--ds-superficie-3); border-color: var(--ds-borda); }
+  .ds-contador-filtro--confirmado { color: var(--ds-sucesso-texto); background: var(--ds-sucesso-fundo); border-color: var(--ds-sucesso-borda); }
+  .ds-contador-filtro--enviado    { color: var(--ds-info-texto);    background: var(--ds-info-fundo);    border-color: var(--ds-info-borda); }
+  .ds-contador-filtro--nao-atende { color: var(--ds-atencao-texto); background: var(--ds-atencao-fundo); border-color: var(--ds-atencao-borda); }
+
+  /* ---------- Selo do resultado da ligação (no card do passageiro) ---------- */
+  .ds-status { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; font-size: 10.5px; font-weight: var(--ds-peso-forte); white-space: nowrap; border: 1px solid; border-radius: var(--ds-raio-pilula); }
+  .ds-status .ti { font-size: 11px; }
+  .ds-status--ligar      { color: var(--ds-texto-2);      background: var(--ds-superficie-3); border-color: var(--ds-borda); }
+  .ds-status--confirmado { color: var(--ds-sucesso-texto); background: var(--ds-sucesso-fundo); border-color: var(--ds-sucesso-borda); }
+  .ds-status--nao-atende { color: var(--ds-atencao-texto); background: var(--ds-atencao-fundo); border-color: var(--ds-atencao-borda); }
+  .ds-status--enviado    { color: var(--ds-info-texto);    background: var(--ds-info-fundo);    border-color: var(--ds-info-borda); }
+  .ds-status--cancelado  { color: var(--ds-perigo-texto);  background: var(--ds-perigo-fundo);  border-color: var(--ds-perigo-borda); }
+
+  /* ---------- Três botões grandes de resultado (Confirmou, Não atende, Cancelar) ---------- */
+  .ds-acoes-rapidas { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ds-esp-2); }
+  .ds-acao-rapida { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 9px 8px; cursor: pointer; font: inherit; font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-forte); border: 1px solid; border-radius: var(--ds-raio-3); transition: background var(--ds-trans-rapida), color var(--ds-trans-rapida), box-shadow var(--ds-trans-rapida); }
+  .ds-acao-rapida .ti { font-size: 18px; }
+  .ds-acao-rapida--ok     { color: var(--ds-sucesso-texto); background: var(--ds-sucesso-fundo); border-color: var(--ds-sucesso-borda); }
+  .ds-acao-rapida--ok:hover, .ds-acao-rapida--ok.ativo { color: var(--ds-branco); background: var(--ds-sucesso); border-color: var(--ds-sucesso); box-shadow: var(--ds-sombra-2); }
+  .ds-acao-rapida--aviso  { color: var(--ds-atencao-texto); background: var(--ds-atencao-fundo); border-color: var(--ds-atencao-borda); }
+  .ds-acao-rapida--aviso:hover, .ds-acao-rapida--aviso.ativo { color: var(--ds-branco); background: var(--ds-laranja); border-color: var(--ds-laranja); box-shadow: var(--ds-sombra-2); }
+  .ds-acao-rapida--perigo { color: var(--ds-perigo-texto); background: var(--ds-perigo-fundo); border-color: var(--ds-perigo-borda); }
+  .ds-acao-rapida--perigo:hover { color: var(--ds-branco); background: var(--ds-perigo); border-color: var(--ds-perigo); box-shadow: var(--ds-sombra-2); }
+
+  /* ---------- Chips de escolha única (Quem atendeu) ---------- */
+  .ds-escolhas { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ds-escolha { padding: 5px 11px; cursor: pointer; font: inherit; font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-semi); color: var(--ds-texto-2); background: var(--ds-superficie-3); border: 1px solid var(--ds-borda-forte); border-radius: var(--ds-raio-2); }
+  .ds-escolha:hover { background: var(--ds-borda); }
+  .ds-escolha.sel { color: var(--ds-branco); background: var(--ds-marca-700); border-color: var(--ds-marca-700); }
+
+  /* ---------- Cartão de telefone com ação (enviar WhatsApp) ---------- */
+  .ds-cartao-fone { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: var(--ds-sucesso-fundo); border: 1px solid var(--ds-sucesso-borda); border-radius: var(--ds-raio-3); }
+  .ds-cartao-fone-num { display: block; font-family: var(--ds-fonte-mono); font-size: var(--ds-texto-md); font-weight: var(--ds-peso-forte); color: var(--ds-sucesso-texto); }
+  .ds-cartao-fone-tipo { display: block; font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-semi); color: var(--ds-sucesso); }
+
+  /* ---------- Cartão de carro candidato (transferir paciente para ele) ---------- */
+  .ds-candidato { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: var(--ds-superficie-2); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-3); transition: border-color var(--ds-trans-rapida), background var(--ds-trans-rapida); }
+  .ds-candidato:hover { background: var(--ds-marca-50); border-color: var(--ds-marca-300); }
+  .ds-candidato-l1 { display: flex; align-items: center; gap: 6px; font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-forte); }
+  .ds-candidato-l2 { margin-top: 2px; font-size: var(--ds-texto-xs); color: var(--ds-texto-2); }
+
+  /* ---------- Nota de regra (texto de apoio com ícone, sem urgência) ---------- */
+  .ds-nota { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; font-size: var(--ds-texto-sm); line-height: 1.45; color: var(--ds-texto-2); background: var(--ds-superficie-2); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-2); }
+  .ds-nota > .ti { flex: none; margin-top: 1px; font-size: 15px; color: var(--ds-marca-500); }
+  .ds-nota--info { color: var(--ds-info-texto); background: var(--ds-info-fundo); border-color: var(--ds-info-borda); }
+  .ds-nota--info > .ti { color: var(--ds-info-texto); }
+  .ds-obs--info { color: var(--ds-info-texto); border-color: var(--ds-info-borda); background: var(--ds-info-fundo); }
+  .ds-obs--cancelado { color: var(--ds-perigo-texto); background: var(--ds-perigo-fundo); font-weight: var(--ds-peso-forte); }
+
+  /* ---------- Utilidades ---------- */
+  .ds-oculto { display: none !important; }
+  .ds-texto-2 { color: var(--ds-texto-2); }
+  .ds-texto-3 { color: var(--ds-texto-3); }
+  .ds-forte { font-weight: var(--ds-peso-forte); }
+  .ds-mono { font-family: var(--ds-fonte-mono); font-variant-numeric: tabular-nums; }
+  .ds-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .ds-grade-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-esp-4); }
+  .ds-pilha { display: flex; flex-direction: column; gap: var(--ds-esp-3); }
+
+  /* Tela abaixo de ~1640 px: os nomes das abas quebram em duas linhas (como já acontece hoje no sistema)
+     e o operador mostra só o nome, para o menu nunca invadir o canto direito. */
+  @media (max-width: 1640px) {
+    .ds-nav-aba { white-space: normal; max-width: 132px; padding: 0 10px; }
+    .ds-nav-op-rot { display: none; }
+  }
+  @media (max-width: 1180px) {
+    .ds-nav { padding: 0 var(--ds-esp-3); }
+    .ds-nav-aba { padding: 0 8px; font-size: 12.5px; max-width: 110px; }
+    .ds-nav-sub { display: none; }
+    .ds-cab, .ds-filtros { padding-left: var(--ds-esp-4); padding-right: var(--ds-esp-4); }
+    .ds-corpo { padding-left: var(--ds-esp-4); padding-right: var(--ds-esp-4); }
+    .ds-grade-2 { grid-template-columns: 1fr; }
+  }
+  /* ===================== fim do design system ===================== */
+
+  .alerta-pill{font-size:11px;font-weight:600;padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px;border:1px solid transparent;}
+  .a-perigo{background:var(--vermelho-claro);color:#991b1b;border-color:#fecaca;}
+  .stepper{display:flex;align-items:center;gap:5px;background:#fff;border:1px solid #d1d5db;border-radius:18px;padding:1px;}
+  .stepper button{width:24px;height:24px;border:none;background:var(--azul-claro);color:var(--azul-escuro);border-radius:50%;font-size:15px;font-weight:700;cursor:pointer;line-height:1;}
+  .stepper button:hover{background:var(--azul);color:#fff;}
+  .stepper .qtd{min-width:54px;text-align:center;font-weight:700;font-size:12px;}
+  
+  .cv-topo { padding: 10px 14px; background: #fff; border-bottom: 1px solid var(--ds-borda); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; transition: background 0.15s; font-size: 13.5px; font-weight: 500; color: var(--ds-texto); }
+  .cv-topo-left, .cv-topo-right { display: flex; align-items: center; gap: 12px; }
+  .cv-topo-left { flex: 1; min-width: 0; }
+  .cv-topo:hover { background: var(--ds-superficie-2); }
+  .cv-topo .cv-hora-saida { font-weight: 700; font-size: 13.5px; background: var(--ds-marca-100); color: var(--ds-marca-800); padding: 2px 8px; border-radius: 5px; flex-shrink: 0; }
+  .cv-topo .cv-hora-saida.vazia { background: var(--ds-superficie-3); color: var(--ds-texto-inativo); }
+  .cv-topo .cv-rota { font-size: 13px; font-weight: 600; color: var(--ds-marca-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .cv-topo .cv-rota .cv-rota-local { color: var(--ds-texto-3); font-weight: 500; }
+  .cv-rota-destino { color: var(--ds-sucesso-texto); font-weight: 700; }
+  .card-veiculo.concluido .cv-topo { background: var(--ds-sucesso-fundo); }
+  .cv-topo-item { display: flex; align-items: center; line-height: 1; height: 100%; }
+  .cv-topo .seta-sanfona { font-size: 10px; color: var(--ds-texto-inativo); transition: transform 0.2s; width: 12px; }
+  .cv-topo.recolhido .seta-sanfona { transform: rotate(-90deg); }
+  .cv-topo .tipo-label { font-weight: 700; color: var(--ds-texto); }
+  .cv-topo .vagas-badge { font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 12px; background: var(--ds-sucesso-fundo); color: var(--ds-sucesso); }
+  .cv-topo .vagas-badge.sem-vaga { background: var(--ds-perigo-fundo); color: var(--ds-perigo); }
+  .cv-topo .vagas-badge.excedido { background: var(--ds-perigo-fundo); color: var(--ds-perigo); }
+  .cv-topo .placa-badge { font-family: var(--ds-fonte-mono); font-weight: 800; font-size: 13px; background: var(--ds-texto); color: #fff; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px; }
+  .cv-topo .cat-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; background: var(--ds-superficie-3); color: var(--ds-texto-2); }
+  .cv-topo .cat-badge.terc { background: #f3e8ff; color: #6b21a8; }
+  .cv-topo .motorista-label { font-weight: 600; color: var(--ds-marca-800); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cv-corpo { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.25s ease-out; }
+  .cv-corpo.recolhido { grid-template-rows: 0fr; }
+  .cv-corpo-inner { overflow: hidden; }
+  .cv-medidor{padding:8px 13px;}
+  .medidor-info{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;font-weight:600;color:var(--cinza-texto);}
+  .barra{height:13px;border-radius:7px;background:#eef2f7;overflow:hidden;display:flex;}
+  .barra .seg-ocupado{background:var(--verde);height:100%;transition:width .2s;}
+  .barra .seg-bloqueado{background:repeating-linear-gradient(45deg,#94a3b8,#94a3b8 5px,#cbd5e1 5px,#cbd5e1 10px);height:100%;transition:width .2s;}
+  
+  /* BARRINHA VERMELHA TAMBÉM NA VISÃO DETALHADA QUANDO SEM VAGAS */
+  .card-veiculo.cheio .seg-ocupado{background:var(--vermelho) !important;}
+  
+  .cv-controles{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:0 13px 8px;}
+  /* ---------- editor de roteiro multi-parada ---------- */
+  .cv-roteiro{flex:1 1 100%;display:flex;flex-direction:column;gap:5px;}
+  .cv-roteiro > label{font-size:10px;font-weight:700;color:var(--cinza-texto);text-transform:uppercase;letter-spacing:.3px;display:flex;align-items:center;gap:8px;}
+  .cv-roteiro .rt-dica{font-weight:500;text-transform:none;letter-spacing:0;font-style:italic;color:#94a3b8;font-size:10.5px;}
+  .rt-fluxo{display:flex;align-items:stretch;gap:6px;flex-wrap:wrap;}
+  .rt-seta{display:flex;align-items:center;color:#94a3b8;font-size:16px;font-weight:700;}
+  .rt-chip{display:flex;flex-direction:column;gap:2px;min-width:118px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:6px 9px;}
+  .rt-chip.origem{background:#f1f5f9;border-color:#e2e8f0;justify-content:center;}
+  .rt-chip.destino{background:#ecfdf5;border:2px solid #6ee7b7;}
+  .rt-chip-top{display:flex;align-items:center;gap:6px;}
+  .rt-chip-lbl{font-size:9px;font-weight:700;color:#1d4ed8;text-transform:uppercase;letter-spacing:.3px;flex:1;}
+  .rt-chip.origem .rt-chip-lbl{color:#64748b;}
+  .rt-chip.destino .rt-chip-lbl{color:#047857;}
+  .rt-chip-cidade{font-size:14px;font-weight:700;color:#1e3a8a;display:flex;align-items:center;gap:5px;}
+  .rt-chip.destino .rt-chip-cidade{color:#065f46;}
+  .rt-chip-hora{font-size:12px;font-weight:700;color:#1e3a8a;background:#dbeafe;border-radius:4px;padding:1px 6px;}
+  .rt-chip.destino .rt-chip-hora{color:#065f46;background:#d1fae5;}
+  .rt-chip-info{font-size:10.5px;color:#2563eb;}
+  .rt-chip.destino .rt-chip-info{color:#059669;}
+  .rt-auto-link{text-decoration:underline;cursor:pointer;color:#2563eb;}
+  .rt-auto-link:hover{color:#1e3a8a;}
+  .rt-chip-acoes{display:flex;gap:1px;}
+  .rt-chip-acoes button{width:18px;height:18px;border:none;background:#dbeafe;color:#1e3a8a;border-radius:4px;font-size:9px;cursor:pointer;line-height:1;padding:0;}
+  .rt-chip-acoes button:hover:not(:disabled){background:#2563eb;color:#fff;}
+  .rt-chip-acoes button:disabled{opacity:.3;cursor:not-allowed;}
+  .rt-chip-acoes .rt-x{background:#fee2e2;color:#b91c1c;}
+  .rt-chip-acoes .rt-x:hover{background:#dc2626;color:#fff;}
+  .rt-add{display:flex;align-items:center;}
+  .rt-add select{border:1px dashed #cbd5e1;border-radius:8px;background:#fff;color:#2563eb;font-size:12.5px;font-weight:600;padding:0 8px;height:100%;min-height:50px;cursor:pointer;}
+  .rt-chip[draggable="true"]{cursor:grab;}
+  .rt-chip.rt-dragging{opacity:.5;}
+  .rt-chip.rt-drag-over{outline:2px dashed var(--azul);outline-offset:1px;}
+  .bloqueio{display:flex;flex-direction:column;gap:3px;}
+  .bloqueio label{font-size:10px;font-weight:700;color:var(--cinza-texto);text-transform:uppercase;letter-spacing:.3px;}
+  .bloqueio .stepper button{background:#e2e8f0;color:#334155;}
+  .bloqueio .stepper button:hover{background:#94a3b8;color:#fff;}
+  
+  .cv-passageiros{padding:5px 13px 11px;display:flex;flex-direction:column;gap:6px;min-height:36px;}
+  
+  .cp-novo-linha1 { display: flex; align-items: center; gap: 8px; width: 100%; }
+  .cp-n-hora { font-weight: 700; background: #dbeafe; padding: 2px 7px; border-radius: 4px; color: #1e3a8a; font-size: 13.5px; }
+  .cp-n-nome { font-weight: 700; color: #0f172a; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cp-n-info { font-size: 11.5px; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; border-left: 1px solid #bfdbfe; padding-left: 8px; }
+  .chip-passageiro-novo.perigo .cp-n-info { border-left-color: #fca5a5; color: #7f1d1d; }
+  .cp-n-vagas { font-size: 11px; font-weight: 700; background: #fff; border-radius: 12px; padding: 2px 8px; flex-shrink: 0; color: #475569; border: 1px solid #e2e8f0; }
+  .cp-cidade-tag { font-size: 10.5px; font-weight: 700; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 12px; padding: 2px 8px; flex-shrink: 0; white-space: nowrap; }
+  .cp-cidade-tag.fora { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+  .cp-add-parada { text-decoration: underline; cursor: pointer; }
+  .cp-add-parada:hover { color: #7f1d1d; }
+  
+  .cp-novo-linha2 { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+  .obs-texto { font-size: 11.5px; font-weight: 600; color: #991b1b; background: #fff; border: 1px solid #fecaca; padding: 2px 6px; border-radius: 4px; }
+  
+  .btn-remover{border:none;background:none;color:var(--vermelho);font-size:18px;cursor:pointer;line-height:1;padding:0 2px;}
+  .btn-remover:hover { transform: scale(1.1); }
+
+  /* --- segunda passada (01/09): a base de .card-veiculo, do chip de
+     passageiro, dos botões do modal e do bloco de logística. A primeira
+     passada as deixou para trás por confundir "classe citada" com
+     "classe estilizada" — ver ferramentas/css_analise.py. --- */
+  .card-veiculo{flex-shrink:0;background:var(--ds-superficie);border:1px solid var(--ds-borda);border-radius:var(--ds-raio-3);box-shadow:var(--ds-sombra-1);transition:border-color .15s,box-shadow .15s;overflow:hidden;}
+  .card-veiculo.cheio{border-color:var(--ds-borda-forte);}
+  .card-veiculo.concluido { border-left: 4px solid var(--ds-sucesso); background: var(--ds-sucesso-fundo); }
+  
+  .cv-logistica-input { display:flex; flex-direction:column; gap:3px; }
+  .cv-logistica-input label { font-size:10px; font-weight:700; color:var(--cinza-texto); text-transform:uppercase; letter-spacing:.3px; }
+  
+  /* PADRONIZAÇÃO DO SELECT IDENTICO AO INPUT NATIVO */
+  .cv-logistica-input input, .cv-logistica-input select { padding:6px 8px; border:1px solid #d1d5db; border-radius:6px; font-size:13px; color:#1e293b; background: white; width: 100%; }
+  
+  .chip-passageiro-novo { display: flex; flex-direction: column; gap: 5px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 8px; cursor: pointer; transition: 0.15s; }
+  .chip-passageiro-novo:hover { border-color: #60a5fa; background: #e0f2fe; }
+  .chip-passageiro-novo.perigo { background: #fef2f2; border-color: #fecaca; }
+  .chip-passageiro-novo.perigo:hover { background: #fee2e2; border-color: #f87171; }
+  .btn-salvar{flex:1;background:var(--verde);color:#fff;border:none;padding:11px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;}
+  .btn-cancelar{background:#fff;border:1px solid #d1d5db;color:#475569;padding:11px 18px;border-radius:6px;font-weight:600;cursor:pointer;}
+
+  /* ================== CAIXA DE CONFIRMAÇÃO — de todo o sistema ==================
+     Sobreposição, caixa, título, botões e os ícones de carregando/sucesso.
+
+     ⚠️ MORAVAM na Aba1.html até 01/09/2026, e cinco telas dependiam delas sem que
+     ninguém tivesse decidido isso: Aba 3, Guia dos Motoristas, Importação, Remoção
+     Interna e Escala de Viagens. Era o mesmo enredo da Aba 2 — o CSS é global, então
+     "funcionava", e a conta só apareceria no dia de apagar a Aba 1.
+
+     ⚠️ Os ajustes do modal DA Aba 1 (`#modalConfirmacao ...`) ficaram lá: são dela.
+     ============================================================================= */
+  /* =====================================================================
+     MODAIS — as definições BASE abaixo são herdadas pela Aba 2
+     (.btn-modal-*, .loader-icon, .success-icon, @keyframes surgeModal).
+     NÃO alterar: mudanças aqui vazam para a Aba 2. O visual próprio é
+     aplicado só nos modais da Aba 1, via overrides escopados mais abaixo.
+     ===================================================================== */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.active { display: flex; }
+  .modal-box { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: surgeModal 0.2s ease-out; }
+  .modal-title { font-size: 18px; color: var(--vermelho); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; font-weight: bold; }
+  .modal-text { font-size: 14.5px; color: var(--cinza-texto); margin-bottom: 25px; line-height: 1.5; }
+  .modal-buttons { display: flex; justify-content: flex-end; gap: 12px; }
+  .btn-modal-cancelar { padding: 10px 18px; border: 1px solid #d1d5db; background: white; border-radius: 6px; cursor: pointer; color: #374151; font-weight: 600; transition: 0.2s; }
+  .btn-modal-cancelar:hover { background: #f3f4f6; }
+  .btn-modal-confirmar { padding: 10px 18px; border: none; background: var(--verde); color: white; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+  .btn-modal-confirmar:hover { background: #15803d; }
+  .loader-icon { font-size: 50px; margin-bottom: 15px; display: inline-block; animation: pulseLoader 1.2s infinite ease-in-out; }
+  .success-icon { font-size: 60px; margin-bottom: 15px; display: inline-block; animation: surgeModal 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  /* ⚠️ As animações vêm JUNTO das regras que as usam: `.modal-box` pede surgeModal e
+     `.loader-icon` pede pulseLoader. Sem o @keyframes a regra continua válida e o
+     modal simplesmente APARECE SEM MOVIMENTO — falha muda, e em cinco telas. */
+  @keyframes surgeModal { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes pulseLoader { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+
+  /* AVISO URGENTE do carro (29/09/2026) — Guia dos Motoristas E Carros Montados, que usam o mesmo
+     card-veiculo (HTML em cvAvisoSeloHTML/cvAvisoFaixaHTML, no WhatsappFormatter). Vermelho forte
+     de propósito: é o que o operador não pode deixar passar antes de mandar a mensagem ao motorista.
+     O selo fica no cabeçalho para aparecer também com o card recolhido. */
+  .cv-aviso-selo { display: inline-flex; align-items: center; gap: 5px; background: var(--ds-urgente-fundo); color: var(--ds-urgente);
+                   border: 1px solid var(--ds-urgente-borda); border-radius: var(--ds-raio-1); padding: 2px 8px; font-size: 11.5px;
+                   font-weight: 800; letter-spacing: .03em; white-space: nowrap; }
+  .cv-aviso-selo .ti { font-size: 14px; }
+  /* [REMOVIDO em 05/10/2026] .cv-aviso-pend e @keyframes cvAvisoPulsa: a marca "não enviado", piscando,
+     saiu da tela a pedido do Hélio. */
+  .cv-aviso-faixa { display: flex; gap: 10px; align-items: flex-start; background: var(--ds-urgente-fundo); border: 2px solid var(--ds-urgente);
+                    border-radius: var(--ds-raio-3); padding: 10px 12px; margin: 4px 0 12px; color: var(--ds-urgente-escuro); }
+  .cv-aviso-faixa > .ti { font-size: 22px; color: var(--ds-urgente); margin-top: 1px; }
+  .cv-aviso-tit { font-weight: 800; font-size: 12.5px; letter-spacing: .05em; }
+  .cv-aviso-txt { font-size: 14px; font-weight: 600; white-space: pre-line; margin-top: 2px; line-height: 1.4; }
+  .cv-aviso-meta { font-size: 11.5px; color: var(--ds-urgente); margin-top: 4px; }
+
+  /* Campos da janela "Cancelar paciente" (05/10/2026): a mesma na Guia e em Viagens Externas (HTML em
+     cancelamentoCamposHTML, no WhatsappFormatter). Também servem a caixinha do AVISO URGENTE da Guia.
+     Vieram do GuiaMotoristas, com o mesmo nome, para as duas telas dividirem. */
+  .gm-form-lbl { font-size: 12px; font-weight: 600; color: var(--ds-texto-3); display: block; margin-top: 10px; }
+  .gm-form-sel, .gm-form-txt { width: 100%; padding: 8px 10px; border: 1px solid var(--ds-borda-forte); border-radius: 7px; font-size: 13px; color: var(--ds-texto); margin-top: 4px; font-family: inherit; box-sizing: border-box; }
+  .gm-form-txt { resize: vertical; min-height: 60px; }

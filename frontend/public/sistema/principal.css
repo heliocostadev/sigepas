@@ -1,0 +1,21 @@
+/* Estilos gerais da página, trazidos do Index do SIGEPAS em Apps Script. */
+:root {
+  --azul-escuro:#1e3a8a; --azul:#2563eb; --azul-claro:#dbeafe;
+  --amarelo:#facc15; --amarelo-claro:#fef3c7;
+  --verde:#16a34a; --verde-claro:#dcfce7;
+  --vermelho:#dc2626; --vermelho-claro:#fef2f2;
+  --laranja:#ea580c; --laranja-claro:#ffedd5;
+  --roxo:#7c3aed; --roxo-claro:#ede9fe;
+  --cinza-bg:#f4f6f9; --cinza-borda:#e5e7eb; --cinza-texto:#475569;
+  --branco:#fff; --raio:8px;
+  --sombra:0 2px 8px rgba(0,0,0,0.06);
+}
+* { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI', Tahoma, sans-serif; }
+body { background-color: var(--cinza-bg); color: var(--cinza-texto); }
+/* Nome em duas linhas com a quebra fixa. */
+.nav-2l { display:block; text-align:center; line-height:1.2; white-space:nowrap; }
+.tab-content { display:none; animation:fadeIn 0.3s; }
+.tab-content.active { display:block; }
+@keyframes fadeIn { from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:translateY(0);} }
+/* Operador logado e o botão de sair, no canto da barra. */
+.ds-nav-operador { display:flex; align-items:center; gap:8px; }

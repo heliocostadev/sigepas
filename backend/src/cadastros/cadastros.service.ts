@@ -242,7 +242,7 @@ export class CadastrosService {
       else await cliente.diaNaoUtil.delete({ where: { data: atual.data } });
     } else throw new BadRequestException(`Ação desconhecida no calendário: ${acao}.`);
     this.avisar(operador);
-    this.eventos.avisar('escala', [], operador);
+    this.eventos.avisar('escala', []);
     return true;
   }
 
@@ -270,7 +270,7 @@ export class CadastrosService {
     const atual = await this.banco.cliente.padronizacaoDeLocal.findUnique({ where: { chave } });
     if (!atual) throw new NotFoundException('Esse nome não está mais na padronização (alguém excluiu). Recarregue a lista.');
     await this.banco.cliente.padronizacaoDeLocal.update({ where: { chave }, data: { cidadePadrao, localPadrao, decididoPor: operador, decididoEm: new Date(), origem: 'manual' } });
-    this.eventos.avisar('padronizacao', [], operador);
+    this.eventos.avisar('padronizacao', []);
     return this.padronizacoes();
   }
 

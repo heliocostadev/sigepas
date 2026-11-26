@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Subject, type Observable } from 'rxjs';
+import { telaDeOrigem } from './tela-de-origem';
 
 // Assuntos que mudam e que as telas abertas precisam saber na hora (ADR 0016).
 // operacao: pedidos e carros de um dia (Viagens Externas e Confirmação e Guias).
@@ -13,8 +14,10 @@ export interface Mudanca {
   datas: string[];
   // Marcador que sobe a cada gravação. A tela compara com o que já tem para saber se precisa recarregar.
   versao: string;
-  // Quem gravou, para a tela de quem gravou não recarregar o que ela mesma acabou de desenhar.
+  // A aba do navegador que gravou, para ela não recarregar o que acabou de desenhar (tela-de-origem.ts).
   origem: string;
+  // Nome de quem gravou, para a outra tela poder dizer quem mudou o dia.
+  quemGravou: string;
 }
 
 // Avisa as telas abertas de cada mudança gravada. Uma instância só, na memória da API: a máquina de produção roda uma
@@ -29,10 +32,11 @@ export class EventosService {
     return `${this.inicio}-${this.contador}`;
   }
 
-  avisar(assunto: AssuntoDaMudanca, datas: string[], origem = ''): string {
+  avisar(assunto: AssuntoDaMudanca, datas: string[], quemGravou = ''): string {
+    const origem = telaDeOrigem();
     this.contador += 1;
     const versao = this.versaoAtual();
-    this.mudancas.next({ assunto, datas: [...new Set(datas)].sort(), versao, origem });
+    this.mudancas.next({ assunto, datas: [...new Set(datas)].sort(), versao, origem, quemGravou });
     return versao;
   }
 

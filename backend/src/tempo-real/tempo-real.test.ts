@@ -7,9 +7,9 @@ describe('tempo real entre as telas', () => {
     const eventos = new EventosService();
     const antes = eventos.versaoAtual();
     const recebida = firstValueFrom(eventos.acompanhar());
-    const versao = eventos.avisar('operacao', ['2026-12-02', '2026-12-01', '2026-12-02'], 'Operador');
+    const versao = eventos.avisar('operacao', ['2026-12-02', '2026-12-01', '2026-12-02']);
     expect(versao).not.toBe(antes);
-    expect(await recebida).toEqual({ assunto: 'operacao', datas: ['2026-12-01', '2026-12-02'], versao, origem: 'Operador' });
+    expect(await recebida).toEqual({ assunto: 'operacao', datas: ['2026-12-01', '2026-12-02'], versao, origem: '', quemGravou: '' });
   });
 
   it('o canal de eventos entrega a mudança e o sinal de vida', async () => {
