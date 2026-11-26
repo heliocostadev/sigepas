@@ -90,8 +90,8 @@ describe.skipIf(!ENDERECO_DO_BANCO_DE_TESTE)('fluxos 2 e 3: carros, escala e con
     const p = carro(confirmado.body, 'TST1A01').passageiros.find((x) => x.matricula === a.matricula);
     expect(p).toMatchObject({ statusConfirmacao: 'Confirmado', quemAtendeu: 'Mãe', observacao: 'Vai de muleta' });
 
-    const naoConfirmado = await c.chamar('/operacao/confirmar-passageiro', [DIA, 'TST1A01', pacientes[1]?.matricula, 'Não confirmado', 'Ninguém atendeu']).expect(200);
-    expect(carro(naoConfirmado.body, 'TST1A01').passageiros.find((x) => x.matricula === pacientes[1]?.matricula)?.statusConfirmacao).toBe('Não confirmado');
+    const naoConfirmado = await c.chamar('/operacao/confirmar-passageiro', [DIA, 'TST1A01', pacientes[1]?.matricula, 'Não atende', 'Ninguém atendeu']).expect(200);
+    expect(carro(naoConfirmado.body, 'TST1A01').passageiros.find((x) => x.matricula === pacientes[1]?.matricula)?.statusConfirmacao).toBe('Não atende');
 
     const mudou = await c.chamar('/operacao/editar-carro', [DIA, 'TST1A01', { horaSaida: '05:30', localEmbarque: 'Terminal Central', bloqueados: 1, embarques: { [a.matricula]: 'Rua Fictícia, 1' } }, '', '']).expect(200);
     const depois = carro(mudou.body, 'TST1A01').passageiros.find((x) => x.matricula === a.matricula);

@@ -24,7 +24,8 @@ type ViagemComPassageiros = Viagem & { passageiros: Passageiro[] };
 type Objeto = Record<string, unknown>;
 
 const QUEM_ATENDEU_PADRAO = ['Paciente', 'Mãe', 'Pai', 'Filho(a)', 'Cônjuge', 'Irmão(ã)', 'Acompanhante', 'Vizinho'];
-const STATUS_DA_CONFIRMACAO = new Set(['Pendente', 'Confirmado', 'Não confirmado', 'Não Confirmado', 'Cancelado']);
+// Fluxo 3: a ligação termina em Confirmado ou Não atende. Cancelado tira o passageiro do carro. Sem WhatsApp nesta entrega.
+const STATUS_DA_CONFIRMACAO = new Set(['Pendente', 'Confirmado', 'Não atende', 'Não confirmado', 'Cancelado']);
 const CAPACIDADE_QUANDO_NAO_CADASTRADA = 4;
 const TAMANHO_MAXIMO_DE_TEXTO = 2000;
 

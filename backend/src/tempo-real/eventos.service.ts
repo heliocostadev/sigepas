@@ -36,7 +36,7 @@ export class EventosService {
     const origem = telaDeOrigem();
     this.contador += 1;
     const versao = this.versaoAtual();
-    this.mudancas.next({ assunto, datas: [...new Set(datas)].sort(), versao, origem, quemGravou });
+    this.mudancas.next({ assunto, datas: [...new Set(datas)].sort((a, b) => a.localeCompare(b)), versao, origem, quemGravou });
     return versao;
   }
 

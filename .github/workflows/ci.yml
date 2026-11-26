@@ -48,10 +48,9 @@ jobs:
 
       # As tabelas do banco de teste vêm das mesmas migrações que vão para produção.
       - name: Migrações no banco de teste
-        working-directory: backend
         env:
           DATABASE_URL: ${{ env.DATABASE_URL_DE_TESTE }}
-        run: npx prisma migrate deploy
+        run: npm run prisma:migrar --workspace backend
 
       - name: Checagem de tipos
         run: npm run typecheck && npm run typecheck --workspaces
