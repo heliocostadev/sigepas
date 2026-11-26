@@ -13,6 +13,10 @@ export interface VariaveisDeAmbiente {
   origensPermitidas: string[];
   limiteDeRequisicoesPorMinuto: number;
   nivelDeLog: NivelDeLog;
+  // Conta de gestor criada na primeira subida, se ainda não existir. Só o hash scrypt da senha chega aqui.
+  gestorInicial?: { email: string; nome: string; hashDaSenha: string };
+  // Com "sim", a API cadastra motoristas, carros e locais fictícios quando o cadastro está vazio (demonstração).
+  semearDadosFicticios: boolean;
 }
 
 const PORTA_PADRAO = 3000;
@@ -73,5 +77,17 @@ export function lerVariaveisDeAmbiente(ambiente: Record<string, string | undefin
       LIMITE_PADRAO_DE_REQUISICOES_POR_MINUTO,
     ),
     nivelDeLog: lerNivelDeLog(ambiente['NIVEL_DE_LOG']),
+    gestorInicial: lerGestorInicial(ambiente),
+    semearDadosFicticios: ambiente['SEMEAR_DADOS_FICTICIOS']?.trim().toLowerCase() === 'sim',
   };
+}
+
+function lerGestorInicial(ambiente: Record<string, string | undefined>): VariaveisDeAmbiente['gestorInicial'] {
+  const email = ambiente['EMAIL_DO_GESTOR_INICIAL']?.trim().toLowerCase() ?? '';
+  const hashDaSenha = ambiente['HASH_DA_SENHA_DO_GESTOR_INICIAL']?.trim() ?? '';
+  if (!email && !hashDaSenha) return undefined;
+  if (!email || !hashDaSenha.startsWith('scrypt$')) {
+    throw new Error('As variáveis EMAIL_DO_GESTOR_INICIAL e HASH_DA_SENHA_DO_GESTOR_INICIAL andam juntas, e o hash começa com "scrypt$".');
+  }
+  return { email, nome: ambiente['NOME_DO_GESTOR_INICIAL']?.trim() || 'Gestor', hashDaSenha };
 }

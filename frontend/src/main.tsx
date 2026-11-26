@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import './entrada.css';
 import { PaginaInicial } from './PaginaInicial';
 
 const raiz = document.getElementById('raiz');

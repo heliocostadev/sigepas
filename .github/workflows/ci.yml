@@ -46,6 +46,12 @@ jobs:
       - name: Cliente do Prisma
         run: npm run prisma:gerar --workspace backend
 
+      # As tabelas do banco de teste vêm das mesmas migrações que vão para produção.
+      - name: Migrações no banco de teste
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL_DE_TESTE }}
+        run: npm run prisma:migrar --workspace backend
+
       - name: Checagem de tipos
         run: npm run typecheck && npm run typecheck --workspaces
 
@@ -84,6 +90,9 @@ jobs:
 
       - name: Construir a imagem da API
         run: docker build -f backend/Dockerfile -t sigepas-api:teste .
+
+      - name: Construir a imagem das migrações do banco
+        run: docker build -f backend/Dockerfile --target migracao -t sigepas-api:teste-migracao .
 
       - name: Construir a imagem das telas
         run: docker build -f frontend/Dockerfile -t sigepas-web:teste .

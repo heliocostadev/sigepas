@@ -118,6 +118,22 @@ aws login --profile sigepas --region us-east-2
   ```
 - **Não leia segredo pelo Run Command.** A saída do Run Command fica guardada na AWS. Para ler o `.env`, use a sessão
   do Session Manager.
+- **Migrações do banco:** a cada deploy, o serviço `migracao` do Compose roda `prisma migrate deploy` com a imagem
+  `sigepas-api:<sha>-migracao` e termina. A API só sobe depois que ele termina bem. Uma migração que falha deixa a
+  versão anterior da API no ar, e o workflow `Deploy` reprova.
+- **Gestor inicial (conta para entrar no site):** nenhuma senha fica no repositório. O script
+  `SIGEPAS/criar-gestor-do-sigepas-no-ar.ps1`, na pasta do Hélio, gera a senha, calcula o hash scrypt no contêiner da
+  API local e grava só o hash no segredo `HASH_DA_SENHA_DO_GESTOR_INICIAL` do GitHub, com o e-mail na variável
+  `EMAIL_DO_GESTOR_INICIAL`. O deploy leva os dois para o `/opt/sigepas/.env`, e a API cria a conta na subida se ela
+  ainda não existir. A senha fica em `ACESSO_AO_SIGEPAS_NO_AR.md`, fora do repositório.
+- **Outras contas:** na máquina, pela sessão do Session Manager, rode o comando de criar conta dentro do contêiner da
+  API. Sem `SENHA_DA_CONTA`, o comando gera uma senha forte e a mostra uma vez só.
+  ```bash
+  sudo docker compose -f /opt/sigepas/infraestrutura/producao/docker-compose.yml --env-file /opt/sigepas/.env exec api node backend/dist/comandos/criar-conta.js --email pessoa@exemplo.org --nome "Nome" --papel operador
+  ```
+- **Dados fictícios:** com `SEMEAR_DADOS_FICTICIOS=sim`, a API cadastra motoristas, carros e locais inventados quando o
+  cadastro está vazio. O arquivo de pedidos fictício para importar está em `docs/exemplos/olostech-ficticio.csv` e na
+  própria tela Importar CSV.
 - **Trocar o domínio:** mude a variável `DOMINIO` no GitHub e aponte o DNS do domínio novo para o `ip_publico`.
   Depois, rode o workflow `Deploy`. O Caddy pede o certificado novo sozinho.
 - **Desligar tudo:** só com a decisão do Hélio. Perto do Demo Day, a IA avisa com o custo acumulado, e ele decide se

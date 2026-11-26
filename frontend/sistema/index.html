@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIGEPAS - Sistema de Gestão de Transportes de Pacientes e Servidores</title>
+  <!--
+    Telas do SIGEPAS em Apps Script trazidas para o SIGEPAS em arquitetura de servidor (ADR 0016). O HTML, o CSS e o
+    JavaScript de cada tela são os mesmos que o setor conhece. A diferença: cada google.script.run virou uma chamada à
+    API em /api/ (servidor.js), e as mudanças de outras telas chegam na hora (tempo-real.js).
+  -->
+  <link rel="stylesheet" href="/sistema/icones/tabler-icons.min.css">
+  <link rel="stylesheet" href="/sistema/principal.css">
+  <link rel="stylesheet" href="/sistema/telas/estilos-comuns.css">
+  <link rel="stylesheet" href="/sistema/telas/importacao.css">
+  <link rel="stylesheet" href="/sistema/telas/viagens-externas.css">
+  <link rel="stylesheet" href="/sistema/telas/confirmacao-e-guias.css">
+  <link rel="stylesheet" href="/sistema/telas/escala-de-viagens.css">
+  <link rel="stylesheet" href="/sistema/telas/escala-para-enviar.css">
+  <link rel="stylesheet" href="/sistema/telas/configuracoes.css">
+</head>
+<body>
+
+  <div id="bannerVersao" class="ds-banner-versao"></div>
+  <header class="ds-nav">
+    <div class="ds-nav-marca"><span class="ds-nav-textos"><span class="ds-nav-nome">SIGEPAS</span><span class="ds-nav-sub">Sistema de Gestão de Transportes<br>de Pacientes e Servidores</span></span></div>
+    <ul class="ds-nav-abas">
+      <li class="ds-nav-aba ativa" onclick="mudarAba('importacao', this)">Importar CSV</li>
+      <li class="ds-nav-aba" onclick="mudarAba('demandas', this)">Viagens Externas</li>
+      <li class="ds-nav-aba" id="navGuia" onclick="mudarAba('guia', this)"><span class="nav-2l">Confirmação e<br>Guias de Viagens</span></li>
+      <li class="ds-nav-aba" onclick="mudarAba('escala', this)">Escala de Viagens</li>
+      <li class="ds-nav-aba" onclick="mudarAba('escalaEnviar', this)">Escala para Enviar</li>
+      <li class="ds-nav-aba" onclick="mudarAba('aba3', this)">Configurações</li>
+    </ul>
+    <div class="ds-nav-operador"><span id="navbarOperador"></span>
+      <button type="button" class="ds-btn ds-btn--fantasma ds-btn--pequeno" onclick="sairDoSistema()" title="Sair do sistema"><i class="ti ti-logout"></i>Sair</button>
+    </div>
+  </header>
+
+  <!-- ===== estilos-comuns ===== -->
+<!--
+  ESTILOS COMUNS — o visual que mais de uma tela usa.
+
+  POR QUE ESTE ARQUIVO EXISTE
+  Todo o CSS do sistema é GLOBAL: o Index inclui as abas uma após a outra e o navegador
+  junta tudo num só. Por causa disso, nove telas passaram a depender de regras que moravam
+  dentro da Aba 2 — sem que ninguém tivesse decidido isso. Apagar a Aba 2 quebraria o
+  visual de Demandas do Dia e da Guia dos Motoristas, que são as telas em uso.
+
+  Medido em 01/09/2026: das 296 regras do CSS da Aba 2, 87 eram usadas por outras telas,
+  cobrindo 54 classes que só ela definia.
+
+  ⚠️ A ORDEM IMPORTA. Este arquivo é incluído PRIMEIRO no Index, antes de qualquer tela.
+  Assim qualquer regra de tela que repita um seletor daqui continua vencendo, como vencia
+  quando a origem era a Aba 2. Mudar essa posição muda quem ganha na cascata.
+
+  ⚠️ NÃO É LUGAR DE ESTILO NOVO DE UMA TELA SÓ. Aqui entra o que MAIS DE UMA tela usa. O
+  que é de uma só continua no arquivo dela — senão isto vira a nova Aba 2 daqui a um ano.
+-->
+
+  <!-- ===== importacao ===== -->
+<div id="importacao" class="tab-content active ds-app">
+
+  <section class="ds-cab">
+    <div>
+      <div class="ds-cab-titulo"><i class="ti ti-file-import"></i>Importar CSV</div>
+      <div class="ds-cab-sub">Carregue o CSV do dia e padronize os locais de atendimento.</div>
+    </div>
+    <div class="ds-cab-acoes">
+      <button id="btnRevisarLocais" onclick="abrirRevisaoLocais()" class="ds-btn ds-btn--secundario" title="Revisar padronização de cidades e locais de atendimento">
+        <i class="ti ti-map-pin-search"></i>Revisar locais<span id="impBadgePendentes" class="ds-contador ds-contador--perigo" style="display:none;"></span>
+      </button>
+    </div>
+  </section>
+
+  <div class="ds-corpo imp-corpo">
+
+    <!-- No SIGEPAS em arquitetura de servidor, a demonstração usa um arquivo fictício no formato do OLOSTECH. -->
+    <section class="ds-card ds-card--destaque">
+      <div class="ds-card-cab"><div><div class="ds-card-titulo"><i class="ti ti-layout-dashboard"></i>De onde vem o CSV</div><div class="ds-card-desc">O arquivo do dia sai do OLOSTECH, em CSV.</div></div></div>
+      <div class="ds-card-corpo imp-dash">
+        <ol class="imp-passos">
+          <li>No OLOSTECH, exporte a tabela das solicitações em <b>CSV</b>.</li>
+          <li>Carregue o arquivo baixado no quadro abaixo.</li>
+          <li>Para a demonstração, use o arquivo fictício, que tem pedidos de 27/11 a 18/12/2026.</li>
+        </ol>
+        <a class="ds-btn ds-btn--secundario" href="/sistema/exemplos/olostech-ficticio.csv" download><i class="ti ti-download"></i>Baixar o CSV fictício</a>
+      </div>
+    </section>
+
+    <section class="ds-card ds-card--destaque">
+      <div class="ds-card-cab"><div><div class="ds-card-titulo"><i class="ti ti-cloud-upload"></i>Arquivo do dia</div><div class="ds-card-desc">Arraste o CSV das solicitações aqui, ou clique para escolher. As viagens substituem a demanda do dia.</div></div></div>
+      <div class="ds-card-corpo">
+        <div id="impDrop" class="ds-upload" onclick="document.getElementById('impArquivo').click()">
+          <i class="ti ti-file-type-csv"></i>
+          <div class="ds-upload-titulo">Arraste o arquivo CSV para cá</div>
+          <div class="ds-upload-sub">ou clique para escolher no computador</div>
+          <div id="impNomeArquivo" class="imp-arquivo ds-oculto"></div>
+        </div>
+        <input type="file" id="impArquivo" aria-label="Arquivo CSV do OLOSTECH" accept=".csv" onchange="aoEscolherArquivoImp()" style="display:none;">
+        <div class="imp-acoes">
+          <span id="impStatus" class="imp-status"><i class="ti ti-info-circle"></i>Aguardando arquivo...</span>
+          <button id="impBtnProcessar" onclick="importarCSV()" class="ds-btn ds-btn--primario" disabled><i class="ti ti-database-import"></i>Processar arquivo</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="impResumo" class="ds-card ds-card--sucesso ds-oculto">
+      <div class="ds-card-cab"><div><div class="ds-card-titulo"><i class="ti ti-report-analytics" style="color:var(--ds-sucesso)"></i>Resumo da importação</div><div class="ds-card-desc">O que entrou no banco nesta importação.</div></div></div>
+      <div class="ds-card-corpo"><div id="impResumoChips" class="ds-kpis"></div></div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Padronização de locais. O rodapé (contagem e botões) é fixo; o corpo muda conforme o estado. -->
+<div id="modalLocais" class="ds-modal-fundo" data-sem-fechar-fora>
+  <div class="ds-modal ds-modal--lg" role="dialog" aria-modal="true" aria-labelledby="impLocTit">
+    <div class="ds-modal-cab">
+      <div><div class="ds-modal-titulo" id="impLocTit"><i class="ti ti-map-pin"></i> Padronização de locais</div>
+        <div class="ds-modal-sub">Confira a grafia da cidade e do local de atendimento. As decisões viram um dicionário e passam a corrigir as próximas importações automaticamente.</div></div>
+      <button class="ds-btn ds-btn--fantasma ds-btn--icone ds-modal-fechar" onclick="fecharModalLocais()" title="Fechar"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ds-modal-corpo" id="conteudoModalLocais"></div>
+    <div class="ds-modal-pe" id="impLocPe">
+      <span class="ds-dica ds-forte" id="impLocDica"></span>
+      <button class="ds-btn ds-btn--secundario" onclick="fecharModalLocais()">Deixar para depois</button>
+      <button class="ds-btn ds-btn--primario" id="impLocSalvar" onclick="salvarDecisoesLocaisFront()"><i class="ti ti-device-floppy"></i>Salvar decisões</button>
+    </div>
+  </div>
+</div>
+
+  <!-- ===== viagens-externas ===== -->
+<div id="demandas" class="tab-content">
+
+  <div class="dm-toolbar">
+    <div class="dm-campo">
+      <label>Data da operação</label>
+      <input type="date" id="dmData" aria-label="Data da operação" onchange="iniciarDemandas(true)">
+    </div>
+    <div class="dm-campo">
+      <label>Cidade de destino</label>
+      <select id="dmFCidade" aria-label="Cidade de destino" onchange="dmRender()"><option value="">Todas</option></select>
+    </div>
+    <div class="dm-campo">
+      <label>Local de atendimento</label>
+      <select id="dmFLocal" aria-label="Local de atendimento" onchange="dmRender()"><option value="">Todos</option></select>
+    </div>
+    <div class="dm-campo">
+      <label>Veículo solicitado</label>
+      <select id="dmFVeic" aria-label="Veículo solicitado" onchange="dmRender()"><option value="">Todos</option></select>
+    </div>
+    <div class="dm-campo dm-busca">
+      <label>Buscar</label>
+      <input type="text" id="dmBusca" aria-label="Buscar na fila" placeholder="nome, matrícula, bairro, placa, motorista..." oninput="dmRender()">
+    </div>
+    <button class="dm-btn-cancel dm-so-fila" id="dmBtnCancel" onclick="dmAlternarCancelados()"
+            title="Pedidos cancelados pelo posto">
+      <i class="ti ti-ban"></i> Cancelados <span class="n" id="dmNCancel">0</span>
+    </button>
+    <button class="dm-btn-novo dm-so-fila" id="dmBtnNovoPac" onclick="dmAbrirModalNovoPaciente()"
+            title="Adicionar paciente manualmente na fila deste dia">
+      <i class="ti ti-user-plus"></i> Adicionar paciente
+    </button>
+    <div class="dm-resumo" id="dmResumo"></div>
+  </div>
+
+  <div class="dm-modos" id="dmModos">
+    <button id="dmModoFila" class="on" onclick="dmTrocarModo('fila')">
+      Montar Carros <span class="dm-modo-n" id="dmModoFilaN">0</span>
+    </button>
+    <button id="dmModoCarros" onclick="dmTrocarModo('carros')">
+      Editar Carros <span class="dm-modo-n" id="dmModoCarrosN">0</span>
+    </button>
+  </div>
+
+  <div class="dm-corpo" id="dmCorpo">
+    <div class="dm-vazio"><span class="dm-ico"><i class="ti ti-clipboard-list"></i></span>Escolha a data para carregar as demandas.</div>
+  </div>
+
+  <div class="dm-barra" id="dmBarra">
+    <span class="dm-barra-n" id="dmBarraN"></span>
+    <button class="dm-btn-montar" onclick="dmMontarCarro()"><i class="ti ti-car"></i> Montar carro</button>
+    <button class="dm-btn-limpar" onclick="dmLimparSelecao()">Limpar</button>
+    <div class="dm-ext" id="dmExt"></div>
+  </div>
+
+  <div class="dm-drawer-fundo" id="dmDrawerFundo" onclick="dmFecharDrawer()"></div>
+  <aside class="dm-drawer" id="dmDrawer">
+    <div class="dm-dr-topo">
+      <div>
+        <div class="dm-dr-nome" id="dmDrNome"></div>
+        <div class="dm-dr-sub" id="dmDrSub"></div>
+      </div>
+      <button class="dm-dr-x" onclick="dmFecharDrawer()" aria-label="Fechar">&times;</button>
+    </div>
+    <div class="dm-dr-corpo" id="dmDrCorpo"></div>
+  </aside>
+
+  <div class="dm-cfm-fundo" id="dmCfmFundo" onclick="dmFecharConfirma()"></div>
+  <div class="dm-cfm" id="dmCfm" role="dialog" aria-modal="true" aria-labelledby="dmCfmTit">
+    <div class="dm-cfm-tit" id="dmCfmTit"></div>
+    <div class="dm-cfm-corpo" id="dmCfmCorpo"></div>
+    <div class="dm-cfm-pe">
+      <button class="dm-mo-cancelar" onclick="dmFecharConfirma()">Cancelar</button>
+      <button class="dm-mo-next" id="dmCfmOk">Confirmar</button>
+    </div>
+  </div>
+
+  <div class="dm-mo-fundo" id="dmMoFundo" onclick="dmFecharModal()"></div>
+  <div class="dm-modal" id="dmModal" role="dialog" aria-modal="true" aria-labelledby="dmMoTit">
+    <div class="dm-mo-topo">
+      <div>
+        <div class="dm-mo-tit" id="dmMoTit">Montar carro</div>
+        <div class="dm-mo-sub" id="dmMoSub"></div>
+      </div>
+      <button class="dm-mo-x" onclick="dmFecharModal()" aria-label="Fechar">&times;</button>
+    </div>
+    <div class="dm-mo-tabs" id="dmMoTabs">
+      <button id="dmMoTabPub" class="on" onclick="dmModalAba('publico')">Frota prefeitura</button>
+      <button id="dmMoTabTer" onclick="dmModalAba('terceirizado')">Frota terceirizada</button>
+    </div>
+    <div class="dm-mo-corpo" id="dmMoCorpo"></div>
+    <div class="dm-mo-alerta" id="dmMoAlerta"><b id="dmMoAlertaTxt"></b><span id="dmMoAlertaSub"></span></div>
+    <div class="dm-mo-pe">
+      <span class="dm-mo-dica" id="dmMoDica">Escolha uma placa.</span>
+      <div class="dm-mo-acoes" id="dmMoAcoes"></div>
+    </div>
+  </div>
+
+  <div class="dm-en-fundo" id="dmEnFundo" onclick="dmFecharEncaixe()"></div>
+  <div class="dm-en" id="dmEnModal" role="dialog" aria-modal="true" aria-labelledby="dmEnTit">
+    <div class="dm-mo-topo">
+      <div>
+        <div class="dm-mo-tit" id="dmEnTit">Encaixe</div>
+        <div class="dm-mo-sub" id="dmEnSub"></div>
+      </div>
+      <button class="dm-mo-x" onclick="dmFecharEncaixe()" aria-label="Fechar">&times;</button>
+    </div>
+    <div class="dm-mo-tabs">
+      <button id="dmEnTabFila" class="on" onclick="dmEncaixeAba('fila')">Da fila do dia</button>
+      <button id="dmEnTabMao" onclick="dmEncaixeAba('mao')">Digitar à mão</button>
+    </div>
+    <div class="dm-en-barra" id="dmEnBarra">
+      <div class="cresce">
+        <label for="dmEnBusca">Buscar</label>
+        <input type="text" id="dmEnBusca" placeholder="nome, matrícula, bairro, objetivo..."
+               oninput="dmEncaixeBuscar(this.value)">
+      </div>
+      <div>
+        <label for="dmEnCidade">Cidade</label>
+        <select id="dmEnCidade" onchange="dmEncaixeRender()"></select>
+      </div>
+      <label class="dm-en-rota">
+        <input type="checkbox" class="dm-chk" id="dmEnSoRota" checked onchange="dmEncaixeRender()">
+        só quem vai para a rota deste carro
+      </label>
+    </div>
+    <div class="dm-mo-corpo" id="dmEnCorpo"></div>
+    <div class="dm-mo-alerta" id="dmEnAlerta"><b id="dmEnAlertaTxt"></b><span id="dmEnAlertaSub"></span></div>
+    <div class="dm-mo-pe">
+      <span class="dm-mo-dica" id="dmEnDica"></span>
+      <div class="dm-mo-acoes" id="dmEnAcoes"></div>
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar Paciente Manual na Fila -->
+  <div class="dm-en-fundo" id="dmNovoFundo" onclick="dmFecharModalNovoPaciente()"></div>
+  <div class="dm-en" id="dmNovoModal" role="dialog" aria-modal="true" aria-labelledby="dmNovoTit">
+    <div class="dm-mo-topo">
+      <div>
+        <div class="dm-mo-tit" id="dmNovoTit">Adicionar paciente na fila</div>
+        <div class="dm-mo-sub" id="dmNovoSub">Demanda avulsa para a data selecionada</div>
+      </div>
+      <button class="dm-mo-x" onclick="dmFecharModalNovoPaciente()" aria-label="Fechar">&times;</button>
+    </div>
+    <div class="dm-mo-corpo" id="dmNovoCorpo"></div>
+    <div class="dm-mo-alerta" id="dmNovoAlerta"><b id="dmNovoAlertaTxt"></b><span id="dmNovoAlertaSub"></span></div>
+    <div class="dm-mo-pe">
+      <span class="dm-mo-dica" id="dmNovoDica">Preencha os campos obrigatórios (*).</span>
+      <div class="dm-mo-acoes" id="dmNovoAcoes">
+        <button class="dm-mo-cancelar" onclick="dmFecharModalNovoPaciente()">Cancelar</button>
+        <button class="dm-mo-next" id="dmNovoSalvarBtn" onclick="dmSalvarNovoPaciente()">Salvar e incluir na fila</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+  <!-- ===== confirmacao-e-guias ===== -->
+<div id="guia" class="tab-content ds-app">
+  <div class="guia-fixo">
+    <section class="ds-cab">
+      <div>
+        <div class="ds-cab-titulo"><i class="ti ti-clipboard-check"></i>Confirmação e Guias de Viagens</div>
+        <div class="ds-cab-sub" id="guiaResumo"></div>
+      </div>
+      <div class="guia-contadores" id="guiaContadores"></div>
+    </section>
+    <div class="ds-filtros">
+      <div class="ds-campo">
+        <label class="ds-rotulo" for="gFiltroData">Data da operação</label>
+        <input type="date" id="gFiltroData" class="ds-input" onchange="iniciarGuia()">
+      </div>
+      <div class="ds-campo">
+        <label class="ds-rotulo" for="gFiltroCidade">Cidade de destino</label>
+        <select id="gFiltroCidade" class="ds-select" onchange="renderGuia()"><option value="">Todas as Cidades</option></select>
+      </div>
+      <div class="ds-campo">
+        <label class="ds-rotulo" for="gFiltroLocal">Local de atendimento</label>
+        <select id="gFiltroLocal" class="ds-select" onchange="renderGuia()"><option value="">Todos os Locais</option></select>
+      </div>
+      <div class="ds-campo">
+        <label class="ds-rotulo" for="gFiltroStatusConf">Confirmação</label>
+        <select id="gFiltroStatusConf" class="ds-select" onchange="renderGuia()">
+          <option value="">Todas</option>
+          <option value="Pendente">Pendentes</option>
+          <option value="Confirmado">Confirmado</option>
+          <option value="Não atende">Não atende</option>
+          <option value="Enviada por WhatsApp">Enviada</option>
+        </select>
+      </div>
+      <label class="ds-check guia-check-livres">
+        <input type="checkbox" id="gSomenteLivres" onchange="renderGuia()"> Somente lugares livres
+      </label>
+      <div class="ds-campo ds-campo--cresce">
+        <label class="ds-rotulo" for="gBusca">Buscar</label>
+        <div class="ds-busca">
+          <i class="ti ti-search"></i>
+          <input type="text" id="gBusca" class="ds-input" autocomplete="off" oninput="renderGuia()" placeholder="carro, nome, placa, motorista, bairro...">
+        </div>
+      </div>
+      <div class="guia-baixar">
+        <button class="ds-btn ds-btn--secundario" id="guiaBaixarBtn" onclick="guiaBaixarMenu(event)"
+                title="Baixar a guia (imagem) de cada carro do dia, sem abrir o WhatsApp">
+          <i class="ti ti-photo-down"></i>Baixar guias<i class="ti ti-chevron-down"></i>
+        </button>
+        <div class="guia-baixar-menu" id="guiaBaixarMenu" role="menu">
+          <button role="menuitem" id="guiaBaixarTerc" onclick="guiaBaixarTodas('terceirizado')"><i class="ti ti-truck"></i>Terceiros<span class="n"></span></button>
+          <button role="menuitem" id="guiaBaixarServ" onclick="guiaBaixarTodas('publico')"><i class="ti ti-steering-wheel"></i>Servidores<span class="n"></span></button>
+          <div class="dica">Um arquivo por carro, com o mesmo nome do download do carro. Não abre o WhatsApp.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="guia-corpo" id="guiaCorpo">
+    <div class="guia-vazio">Carregando…</div>
+  </div>
+
+  <!-- Gaveta Lateral Flutuante (Slide-Over Drawer) -->
+  <div class="guia-drawer-overlay" id="guiaDrawerOverlay" onclick="fecharPainelPax()"></div>
+  <div class="guia-slide-drawer" id="guiaSlideDrawer" role="dialog" aria-modal="true" aria-labelledby="guiaDNomePax">
+    <div class="guia-dh">
+      <div class="guia-dh-info">
+        <h2><span id="guiaDNomePax">Nome do Paciente</span><span class="guia-dh-idade" id="guiaDIdade"></span></h2>
+        <div class="guia-dh-linha" id="guiaDLinha1"></div>
+        <div class="guia-dh-linha" id="guiaDLinha2"></div>
+      </div>
+      <button class="guia-btn-close" onclick="fecharPainelPax()" aria-label="Fechar">&times;</button>
+    </div>
+
+    <!-- Barra de ações rápidas no topo (1 clique) -->
+    <div class="guia-qcb">
+      <div class="guia-qcb-label">Registrar resultado do contato</div>
+      <div class="guia-qcb-actions">
+        <button class="guia-btn-qcb conf" id="guiaBtnConf" onclick="registrarConfirmacaoPanel('Confirmado')">
+          <i class="ti ti-check"></i>
+          <span>Confirmou</span>
+        </button>
+        <button class="guia-btn-qcb zap" id="guiaBtnConfZap" onclick="registrarConfirmacaoPanel('Confirmado por WhatsApp')">
+          <i class="ti ti-brand-whatsapp"></i>
+          <span>Confirmou por WhatsApp</span>
+        </button>
+        <button class="guia-btn-qcb nao" id="guiaBtnNao" onclick="registrarConfirmacaoPanel('Não atende')">
+          <i class="ti ti-phone-off"></i>
+          <span>Não atende</span>
+        </button>
+        <button class="guia-btn-qcb canc" onclick="confirmarCancelarPax()">
+          <i class="ti ti-user-x"></i>
+          <span>Cancelar</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Abas -->
+    <div class="guia-drawer-tabs">
+      <button class="guia-d-tab ativo" id="guiaTabBtnLigacao" onclick="trocarAbaDrawerGuia('ligacao')">
+        <i class="ti ti-phone-call"></i> Detalhes da Ligação
+      </button>
+      <button class="guia-d-tab" id="guiaTabBtnZap" onclick="trocarAbaDrawerGuia('zap')">
+        <i class="ti ti-brand-whatsapp"></i> WhatsApp
+      </button>
+      <button class="guia-d-tab" id="guiaTabBtnMover" onclick="trocarAbaDrawerGuia('mover')">
+        <i class="ti ti-arrows-exchange"></i> Mover / Trocar
+      </button>
+    </div>
+
+    <!-- Conteúdo da aba ativa -->
+    <div class="guia-drawer-corpo" id="guiaDrawerContent"></div>
+  </div>
+
+  <div class="guia-modal-overlay" id="guiaModalOverlay">
+    <div class="guia-modal-box" id="guiaModalBox"></div>
+  </div>
+</div>
+
+  <!-- ===== escala-de-viagens ===== -->
+<div id="escala" class="tab-content ds-app">
+
+  <section class="ds-cab">
+    <div>
+      <div class="ds-cab-titulo"><i class="ti ti-calendar-week"></i>Escala de Viagens</div>
+      <div class="ds-cab-sub">Formação e escala do dia numa tela só.</div>
+    </div>
+    <div class="ds-cab-acoes esc-filtros">
+      <div class="esc-data">
+        <button class="ds-btn ds-btn--secundario ds-btn--icone" onclick="escMudarDia(-1)" title="Dia anterior" aria-label="Dia anterior"><i class="ti ti-chevron-left"></i></button>
+        <input class="ds-input" type="date" id="escFData" onchange="escTrocarData()" aria-label="Data da escala">
+        <button class="ds-btn ds-btn--secundario ds-btn--icone" onclick="escMudarDia(1)" title="Dia seguinte" aria-label="Dia seguinte"><i class="ti ti-chevron-right"></i></button>
+      </div>
+      <span class="esc-chip" id="escCtxChip"></span>
+      <button class="ds-btn ds-btn--secundario" onclick="escIrParaEnviar()"><i class="ti ti-photo"></i>Escala para Enviar</button>
+    </div>
+  </section>
+
+  <div class="ds-corpo esc-uni" id="escUni">
+    <section class="esc-sec" id="escSec1">
+      <div class="esc-sec-tit"><span class="esc-sec-num">1</span><h2>Formação</h2>
+        <small id="escSec1Sub">quem trabalha hoje e em que ordem</small>
+        <button class="esc-sec-recolher" onclick="escRecolherFormacao()"><i class="ti ti-chevron-up"></i><span>recolher</span></button></div>
+      <div class="escf-corpo" id="escFCorpo"><div class="escf-carregando">Carregando...</div></div>
+    </section>
+    <section class="esc-sec">
+      <div class="esc-sec-tit"><span class="esc-sec-num">2</span><h2>Viagens externas</h2>
+        <small>somente servidores · troque motorista e carro pelas pílulas</small>
+        <span class="escf-vg-leg" style="margin-left:auto"><span><i class="ti ti-lock-open"></i>segue a ordem da escala</span>
+          <span><i class="ti ti-lock"></i>fixado: não muda com a ordem</span></span></div>
+      <div class="esc-folhas" id="escFViagens"></div>
+    </section>
+    <section class="esc-sec">
+      <div class="esc-sec-tit"><span class="esc-sec-num">3</span><h2>Remoção interna</h2>
+        <small>somente servidores · sai da ordem da escala</small></div>
+      <div class="esc-folhas" id="escSecInternas"></div>
+    </section>
+    <section class="esc-sec">
+      <div class="esc-sec-tit"><span class="esc-sec-num">4</span><h2>Terceirizados</h2>
+        <small>viagens e remoções internas · o carro é do motorista</small></div>
+      <div class="esc-folhas" id="escFViagensTerc"></div>
+    </section>
+    <section class="esc-sec">
+      <div class="esc-sec-tit"><span class="esc-sec-num">5</span><h2>Observações</h2>
+        <small>quem está fora e por quê</small></div>
+      <div class="esc-obs-grade" id="escSecObs"></div>
+    </section>
+  </div>
+
+  <div class="esc-barra">
+    <span class="esc-pend" id="escPend" style="display:none"></span>
+    <span class="escf-dica" id="escFDica"></span>
+    <button class="ds-btn ds-btn--secundario" onclick="escDesfazer()">Desfazer mudanças</button>
+    <button class="ds-btn ds-btn--primario" id="escFOk" onclick="escFGravar()"><i class="ti ti-device-floppy"></i>Gravar escala</button>
+  </div>
+</div>
+
+  <!-- ===== escala-para-enviar ===== -->
+<div id="escalaEnviar" class="tab-content ds-app">
+
+  <section class="ds-cab">
+    <div>
+      <div class="ds-cab-titulo"><i class="ti ti-photo"></i>Escala para Enviar</div>
+      <div class="ds-cab-sub">A escala no formato da planilha oficial, pronta para virar imagem no WhatsApp. Somente leitura.</div>
+    </div>
+
+    <!-- env-date-btn e env-today-btn ficam como ganchos: o envBuscar trava esses botões enquanto carrega. -->
+    <div class="env-nav-data" id="envDataWrap">
+      <button class="ds-btn ds-btn--secundario ds-btn--icone env-date-btn" onclick="envNavegar(-1)" title="Dia anterior"><i class="ti ti-chevron-left"></i></button>
+      <button type="button" class="env-data-txt" onclick="envCalAbrir()" title="Escolher a data"><i class="ti ti-calendar-event"></i><span id="envDataVisual">Carregando...</span></button>
+      <input type="date" id="envData" aria-label="Data da escala" class="env-date-hidden">
+      <button class="ds-btn ds-btn--secundario ds-btn--icone env-date-btn" onclick="envNavegar(1)" title="Próximo dia"><i class="ti ti-chevron-right"></i></button>
+      <button class="ds-btn ds-btn--fantasma env-today-btn" onclick="envIrParaHoje()">Hoje</button>
+      <div class="env-cal" id="envCal"></div>
+    </div>
+
+    <div class="ds-cab-acoes">
+      <span class="ds-chip ds-chip--marca env-resumo" id="envResumoFrotas"></span>
+      <button class="ds-btn ds-btn--primario" onclick="envBaixarPNG(event)" title="Baixar a imagem para o WhatsApp">
+        <i class="ti ti-photo-down"></i>Baixar imagem
+      </button>
+    </div>
+  </section>
+
+  <!-- Conteúdo Principal -->
+  <div class="ds-corpo env-dash">
+    <div id="envCorpo">
+      <div class="ds-carregando"><span class="ds-giro"></span>Carregando escala do dia...</div>
+    </div>
+  </div>
+</div>
+
+  <!-- ===== configuracoes ===== -->
+<div id="aba3" class="tab-content ds-app">
+  <section class="ds-cab">
+    <div>
+      <div class="ds-cab-titulo"><i class="ti ti-settings"></i>Configurações</div>
+      <div class="ds-cab-sub">Cadastros do setor. Uma indisponibilidade marcada aqui vale até a situação terminar.</div>
+    </div>
+    <!-- Sub-abas: ícones no lugar dos emojis (06/11/2026, design system). -->
+    <div class="ds-abas aba3-abas">
+      <button class="ds-aba ativa" onclick="mudarSubAba3('veiculos')"><i class="ti ti-car"></i>Veículos</button>
+      <button class="ds-aba" onclick="mudarSubAba3('motoristas')"><i class="ti ti-steering-wheel"></i>Motoristas</button>
+      <button class="ds-aba" onclick="mudarSubAba3('locais')"><i class="ti ti-map-pin"></i>Locais de embarque</button>
+      <button class="ds-aba" onclick="mudarSubAba3('padronizacao')"><i class="ti ti-replace"></i>Padronização de locais</button>
+      <button class="ds-aba" onclick="mudarSubAba3('calendario')"><i class="ti ti-calendar"></i>Calendário</button>
+    </div>
+  </section>
+
+  <div class="ds-corpo">
+    <!-- Seção Veículos -->
+    <div id="sec-veiculos" class="aba3-section ativo">
+      <div class="aba3-secao-cab">
+        <h2>Frota de veículos</h2>
+        <div class="ds-cab-acoes"><span id="baixados-veiculos"></span><button class="ds-btn ds-btn--primario" onclick="abrirModalConfig('veiculos', 'novo')"><i class="ti ti-plus"></i>Novo veículo</button></div>
+      </div>
+      <div class="ds-tabela-caixa">
+        <table class="ds-tabela aba3-tabela">
+          <thead>
+            <tr><th>Placa</th><th>Tipo</th><th>Assentos</th><th>Propriedade</th><th>Situação</th><th class="ds-col-acoes">Ações</th></tr>
+          </thead>
+          <tbody id="tbody-veiculos">
+            <tr><td colspan="6" class="aba3-loading">Carregando dados...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Seção Motoristas -->
+    <div id="sec-motoristas" class="aba3-section">
+      <div class="aba3-secao-cab">
+        <h2>Motoristas</h2>
+        <div class="ds-cab-acoes"><span id="baixados-motoristas"></span><button class="ds-btn ds-btn--primario" onclick="abrirModalConfig('motoristas', 'novo')"><i class="ti ti-plus"></i>Novo motorista</button></div>
+      </div>
+      <div class="ds-tabela-caixa">
+        <table class="ds-tabela aba3-tabela">
+          <thead>
+            <tr><th>Nome</th><th>Vínculo</th><th>Placa vinculada</th><th>WhatsApp</th><th>Situação</th><th class="ds-col-acoes">Ações</th></tr>
+          </thead>
+          <tbody id="tbody-motoristas">
+            <tr><td colspan="6" class="aba3-loading">Carregando dados...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Seção Padronização de locais (11/11/2026): a bd_dicionario_locais, para conferir e corrigir. -->
+    <div id="sec-padronizacao" class="aba3-section">
+      <div class="aba3-secao-cab">
+        <h2>Padronização de locais</h2><span class="ds-chip" id="padN"></span>
+        <div class="ds-cab-acoes"><button class="ds-btn ds-btn--secundario" onclick="aba3PadCarregar(true)"><i class="ti ti-refresh"></i>Atualizar</button></div>
+      </div>
+      <p class="aba3-sub">Como cada cidade e local chega no CSV dos postos, e como o sistema passa a escrever. A lista se forma na revisão do
+        <b>Importar CSV</b>; aqui dá para conferir e corrigir. A mudança vale da próxima importação em diante.</p>
+      <div class="aba3-pad-filtros">
+        <div class="ds-campo ds-campo--cresce">
+          <label class="ds-rotulo" for="padBusca">Buscar</label>
+          <div class="ds-busca"><i class="ti ti-search"></i><input class="ds-input" id="padBusca" type="text" placeholder="cidade ou local, como vem ou como fica" oninput="aba3PadFiltrar()"></div>
+        </div>
+        <div class="ds-campo">
+          <label class="ds-rotulo" for="padCidade">Cidade (como fica)</label>
+          <select class="ds-select" id="padCidade" onchange="aba3PadFiltrar()"><option value="">Todas</option></select>
+        </div>
+        <div class="ds-campo">
+          <label class="ds-rotulo" for="padOrigem">Como foi decidido</label>
+          <select class="ds-select" id="padOrigem" onchange="aba3PadFiltrar()">
+            <option value="">Todos</option><option value="sugestao_dicionario">Sugestão</option><option value="sugestao_google">Google</option>
+            <option value="manual">Digitado</option><option value="mantido_original">Mantido como veio</option>
+          </select>
+        </div>
+        <label class="ds-check"><input type="checkbox" id="padSoMuda" checked onchange="aba3PadFiltrar()"> Só os que corrigem algo</label>
+        <button class="ds-btn ds-btn--fantasma ds-btn--sm aba3-pad-limpar" onclick="aba3PadLimpar()"><i class="ti ti-x"></i>Limpar filtros</button>
+      </div>
+      <div class="ds-tabela-caixa">
+        <table class="ds-tabela aba3-tabela aba3-pad">
+          <thead>
+            <tr><th style="width:28%">Como vem no CSV</th><th></th><th style="width:32%">Como fica no sistema</th><th>Decidido</th><th>Por quem / quando</th><th class="ds-col-acoes">Ações</th></tr>
+          </thead>
+          <tbody id="tbody-padronizacao">
+            <tr><td colspan="6" class="aba3-loading">Carregando dados...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="aba3-pad-pe"><span id="padInfo"></span><span class="aba3-pad-pag" id="padPag"></span></div>
+    </div>
+
+    <!-- Seção Calendário -->
+    <div id="sec-calendario" class="aba3-section">
+      <div class="aba3-secao-cab">
+        <h2>Calendário — dias que não são dia útil</h2>
+        <div class="ds-cab-acoes">
+          <button class="ds-btn ds-btn--secundario" onclick="abrirModalImportar()"><i class="ti ti-cloud-download"></i>Importar do site</button>
+          <button class="ds-btn ds-btn--primario" onclick="abrirModalCal('novo')"><i class="ti ti-plus"></i>Novo dia</button>
+        </div>
+      </div>
+      <div class="ds-tabela-caixa">
+        <table class="ds-tabela aba3-tabela">
+          <thead>
+            <tr><th>Data</th><th>Dia</th><th>Tipo</th><th>Descrição</th><th>Bloco</th><th class="ds-col-acoes">Ações</th></tr>
+          </thead>
+          <tbody id="tbody-calendario">
+            <tr><td colspan="6" class="aba3-loading">Carregando dados...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Seção Locais de Embarque -->
+    <div id="sec-locais" class="aba3-section">
+      <div class="aba3-secao-cab">
+        <h2>Locais de embarque</h2>
+        <div class="ds-cab-acoes"><span id="baixados-locais"></span><button class="ds-btn ds-btn--primario" onclick="abrirModalConfig('locais', 'novo')"><i class="ti ti-plus"></i>Novo local</button></div>
+      </div>
+      <!-- 11/09: esta seção lia uma bd_locais_embarque que nunca existiu. Agora é a
+           bd_embarques, a mesma lista do select de embarque das Demandas. Sem coluna de
+           cidade: embarque é ponto de saída; cidade é do destino (bd_dicionario_locais). -->
+      <p class="aba3-sub">De onde os carros saem — é a lista do campo <b>Local de embarque</b> ao montar um carro em Viagens Externas. A estrela marca o local que já vem escolhido.</p>
+      <div class="ds-tabela-caixa">
+        <table class="ds-tabela aba3-tabela">
+          <thead>
+            <tr><th>Local</th><th style="width:130px;">Padrão</th><th style="width:170px;">Situação</th><th class="ds-col-acoes">Ações</th></tr>
+          </thead>
+          <tbody id="tbody-locais">
+            <tr><td colspan="4" class="aba3-loading">Carregando dados...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmação da baixa. Janela própria em vez de confirm() nativo: dentro do iframe do Apps Script o
+     navegador prefixa o alerta com "Uma página incorporada em n-...googleusercontent.com diz", o que
+     assusta e polui a mensagem. -->
+<div id="modalBaixaAba3" class="ds-modal-fundo">
+  <div class="ds-modal" role="dialog" aria-modal="true" aria-labelledby="modalBaixaTitulo">
+    <div class="ds-modal-cab">
+      <div class="ds-modal-titulo aba3-titulo-perigo" id="modalBaixaTitulo"><i class="ti ti-trash"></i> Dar baixa</div>
+      <button class="ds-btn ds-btn--fantasma ds-btn--icone ds-modal-fechar" onclick="fecharModalBaixa()" title="Fechar"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ds-modal-corpo"><div id="modalBaixaTexto"></div></div>
+    <div class="ds-modal-pe">
+      <span class="ds-dica"></span>
+      <button class="ds-btn ds-btn--secundario" onclick="fecharModalBaixa()">Cancelar</button>
+      <button class="ds-btn ds-btn--perigo" id="btnConfirmarBaixa">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tirar de operação: situação + observação, num passo só.
+     📌 Janela AQUI e inline na Formação da Escala, e a diferença é a tarefa: lá se marcam vários
+     ausentes de uma vez; aqui é um por vez e a mudança JÁ GRAVA — a janela é o único lugar onde a
+     observação cabe antes de gravar.
+     ⚠️ Janela PRÓPRIA, pelo mesmo motivo do calendário abaixo: o botão Salvar do modalConfig é
+     compartilhado entre os cadastros, e mais um dono para ele seria pedir o bug que já aconteceu uma vez.
+     📌 data-ao-fechar: fechar pelo Esc ou pelo X também devolve o select ao que era (aba3SituacaoEsc). -->
+<div id="modalSituacao" class="ds-modal-fundo" data-sem-fechar-fora data-ao-fechar="aba3SituacaoEsc">
+  <div class="ds-modal" role="dialog" aria-modal="true" aria-labelledby="modalSitTit">
+    <div class="ds-modal-cab">
+      <div><div class="ds-modal-titulo" id="modalSitTit"><i class="ti ti-user-off"></i> Tirar de operação</div>
+        <div class="ds-modal-sub" id="modalSitQuem"></div></div>
+      <button class="ds-btn ds-btn--fantasma ds-btn--icone ds-modal-fechar" onclick="aba3FecharSituacao(false)" title="Fechar"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ds-modal-corpo aba3-form">
+      <div class="ds-campo">
+        <label class="ds-rotulo" for="modalSitMotivo">Situação</label>
+        <select class="ds-select" id="modalSitMotivo"></select>
+      </div>
+      <div class="ds-campo">
+        <label class="ds-rotulo" for="modalSitObs">Observação (opcional)</label>
+        <textarea class="ds-textarea" id="modalSitObs" rows="3" maxlength="200"
+                  placeholder="Ex.: atestado até 15/09, volta na segunda"></textarea>
+        <span class="ds-ajuda">Aparece na <b>Escala de Viagens</b>, no quadrante Observações, embaixo do motivo.</span>
+      </div>
+    </div>
+    <div class="ds-modal-pe">
+      <span class="ds-dica"></span>
+      <button class="ds-btn ds-btn--secundario" onclick="aba3FecharSituacao(false)">Cancelar</button>
+      <button class="ds-btn ds-btn--primario" onclick="aba3FecharSituacao(true)">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- INATIVO com vínculo de terceirizado (10/11/2026). Carro e motorista terceirizados andam juntos: ao
+     inativar um deles, esta janela diz quem é o outro e pergunta se ele vai junto. Os botões de ação
+     entram pelo JS (mudam conforme se começou pelo carro ou pelo motorista).
+     📌 data-ao-fechar: fechar pelo Esc ou pelo X vale como Cancelar e devolve o select ao que era. -->
+<div id="modalVinculoAba3" class="ds-modal-fundo" data-sem-fechar-fora data-ao-fechar="aba3VinculoAoFechar">
+  <div class="ds-modal" role="dialog" aria-modal="true" aria-labelledby="modalVincTit">
+    <div class="ds-modal-cab">
+      <div class="ds-modal-titulo" id="modalVincTit"><i class="ti ti-link"></i> Carro e motorista vinculados</div>
+      <button class="ds-btn ds-btn--fantasma ds-btn--icone ds-modal-fechar" onclick="aba3FecharVinculo()" title="Fechar"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ds-modal-corpo aba3-form">
+      <div id="modalVincTexto"></div>
+      <div class="ds-campo">
+        <label class="ds-rotulo" for="modalVincObs">Observação (opcional)</label>
+        <textarea class="ds-textarea" id="modalVincObs" rows="2" maxlength="200"
+                  placeholder="Ex.: contrato encerrado, carro devolvido à empresa"></textarea>
+      </div>
+    </div>
+    <div class="ds-modal-pe" id="modalVincPe"></div>
+  </div>
+</div>
+
+<!-- Reposição: o carro do terceirizado foi inativado e o motorista ficou sem veículo (10/11/2026).
+     Escolhe um carro terceirizado livre da lista ou cadastra um novo; nos dois casos, uma confirmação
+     mostra o par motorista + carro antes de gravar. -->
+<div id="modalReporAba3" class="ds-modal-fundo" data-sem-fechar-fora>
+  <div class="ds-modal" role="dialog" aria-modal="true" aria-labelledby="modalReporTit">
+    <div class="ds-modal-cab">
+      <div><div class="ds-modal-titulo" id="modalReporTit"><i class="ti ti-car"></i> Vincular outro veículo</div>
+        <div class="ds-modal-sub" id="modalReporQuem"></div></div>
+      <button class="ds-btn ds-btn--fantasma ds-btn--icone ds-modal-fechar" onclick="aba3FecharRepor()" title="Fechar"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ds-modal-corpo aba3-form">
+      <div class="ds-faixa ds-faixa--info"><span>Motorista terceirizado não trabalha sem veículo: a contratada precisa repor o carro.
+        Escolha um carro terceirizado que esteja sem motorista ou cadastre o novo.</span></div>
+      <div class="ds-campo">
+        <label class="ds-rotulo" for="modalReporCarro">Carros terceirizados sem motorista</label>
+        <select class="ds-select" id="modalReporCarro" onchange="aba3ReporEscolheu()"></select>
+        <span class="ds-ajuda" id="modalReporAjuda"></span>
+      </div>
+    </div>
+    <div class="ds-modal-pe">
+      <button class="ds-btn ds-btn--secundario" onclick="aba3ReporCadastrar()"><i class="ti ti-plus"></i>Cadastrar carro novo</button>
+      <span class="ds-dica"></span>
+      <button class="ds-btn ds-btn--secundario" onclick="aba3FecharRepor()">Agora não</button>
+      <button class="ds-btn ds-btn--primario" id="modalReporOk" onclick="aba3ReporVincular()" disabled>Vincular este carro</button>
+    </div>
+  </div>
+</div>
+
+<!-- Importação do calendário oficial. Janela PRÓPRIA de propósito: o modalConfig tem um botão Salvar
+     compartilhado entre os cadastros, e mais um dono para ele seria pedir o mesmo bug que já aconteceu. -->
+<div id="modalImportarCal" class="ds-modal-fundo" data-sem-fechar-fora>
+  <div class="ds-modal ds-modal--lg" role="dialog" aria-modal="true" aria-labelledby="calImpTit">
+    <div class="ds-modal-cab">
+      <div class="ds-modal-titulo" id="calImpTit"><i class="ti ti-cloud-download"></i> Importar calendário de uma publicação</div>
+      <button class="ds-btn ds-btn--fantasma ds-btn--icone ds-modal-fechar" onclick="fecharModalImportar()" title="Fechar"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ds-modal-corpo aba3-form">
+      <div class="aba3-linha-busca">
+        <div class="ds-campo ds-campo--estreito" style="width:120px;">
+          <label class="ds-rotulo" for="cal_imp_ano">Ano</label>
+          <input class="ds-input" type="number" id="cal_imp_ano" value="2026" min="2020" max="2099">
+        </div>
+        <div class="ds-campo ds-campo--cresce">
+          <label class="ds-rotulo" for="cal_imp_url">Endereço da publicação</label>
+          <input class="ds-input" type="text" id="cal_imp_url" placeholder="https://www.joinville.sc.gov.br/publicacoes/...">
+        </div>
+        <button class="ds-btn ds-btn--primario" id="cal_imp_btn" onclick="analisarImportacao()">Analisar</button>
+      </div>
+      <div class="ds-campo">
+        <label class="ds-rotulo" for="cal_imp_texto">Ou cole aqui o texto da tabela (funciona mesmo se o site recusar a busca)</label>
+        <textarea class="ds-textarea" id="cal_imp_texto" rows="4"
+                  placeholder="01/01 - Ano-novo&#10;16/02 e 17/02 - Carnaval..."></textarea>
+      </div>
+      <div id="cal_imp_previa" class="aba3-previa"></div>
+    </div>
+    <div class="ds-modal-pe">
+      <span class="ds-dica" id="cal_imp_dica"></span>
+      <button class="ds-btn ds-btn--secundario" onclick="fecharModalImportar()">Cancelar</button>
+      <button class="ds-btn ds-btn--primario" id="cal_imp_ok" onclick="confirmarImportacao()" disabled>Importar selecionados</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cadastro (veículo, motorista, local) e dia do calendário: os campos entram pelo JS. -->
+<div id="modalConfig" class="ds-modal-fundo" data-sem-fechar-fora data-ao-fechar="aba3ConfigAoFechar">
+  <div class="ds-modal" role="dialog" aria-modal="true" aria-labelledby="modalConfigTitle">
+    <div class="ds-modal-cab">
+      <div class="ds-modal-titulo" id="modalConfigTitle">Nova Configuração</div>
+      <button class="ds-btn ds-btn--fantasma ds-btn--icone ds-modal-fechar" onclick="fecharModalConfig()" title="Fechar"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ds-modal-corpo">
+      <div id="modalConfigForm" class="aba3-form">
+        <!-- Campos dinâmicos injetados via JS -->
+      </div>
+    </div>
+    <div class="ds-modal-pe">
+      <span class="ds-dica"></span>
+      <button class="ds-btn ds-btn--secundario" onclick="fecharModalConfig()">Cancelar</button>
+      <button class="ds-btn ds-btn--primario" id="btnSalvarConfig" onclick="salvarConfigForm()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Editar padronização de local (11/11/2026). O "como vem" fica travado: é a chave que a importação procura. -->
+<div id="modalPadLocal" class="ds-modal-fundo" data-sem-fechar-fora>
+  <div class="ds-modal" role="dialog" aria-modal="true" aria-labelledby="padEdTit">
+    <div class="ds-modal-cab">
+      <div><div class="ds-modal-titulo" id="padEdTit"><i class="ti ti-replace"></i> Editar padronização</div>
+        <div class="ds-modal-sub">Vale da próxima importação em diante.</div></div>
+      <button class="ds-btn ds-btn--fantasma ds-btn--icone ds-modal-fechar" onclick="dsFechar('modalPadLocal')" title="Fechar"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ds-modal-corpo aba3-form">
+      <div class="aba3-pad-travado" id="padEdOrig"></div>
+      <div class="ds-campo">
+        <label class="ds-rotulo" for="padEdCidade">Cidade (como fica)</label>
+        <input class="ds-input" id="padEdCidade" type="text" list="padCidadesLista" maxlength="80">
+        <datalist id="padCidadesLista"></datalist>
+      </div>
+      <div class="ds-campo">
+        <label class="ds-rotulo" for="padEdLocal">Local (como fica)</label>
+        <input class="ds-input" id="padEdLocal" type="text" maxlength="120">
+      </div>
+      <div class="ds-faixa ds-faixa--atencao"><span>Trocar a <b>cidade</b> muda o destino de todo paciente que chegar com esse nome no CSV.
+        Antes de gravar, o sistema pede confirmação mostrando a cidade antiga e a nova.</span></div>
+    </div>
+    <div class="ds-modal-pe">
+      <span class="ds-dica"></span>
+      <button class="ds-btn ds-btn--secundario" onclick="dsFechar('modalPadLocal')">Cancelar</button>
+      <button class="ds-btn ds-btn--primario" id="padEdOk" onclick="aba3PadSalvar()"><i class="ti ti-device-floppy"></i>Salvar</button>
+    </div>
+  </div>
+</div>
+
+  <div class="ds-toasts" id="toastArea"></div>
+  <div id="rodapeVersoes" class="ds-rodape-versoes"></div>
+
+  <script type="module" src="/src/sistema/iniciar-sistema.js"></script>
+</body>
+</html>

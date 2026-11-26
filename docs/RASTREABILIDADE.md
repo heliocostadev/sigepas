@@ -266,3 +266,22 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
   fazem parte do sistema entregue.
 - Prova: a conferência de escrita deu o mesmo resultado antes e depois da troca das expressões regulares, nos 181
   arquivos Markdown. O script de mensagens aprovou os 43 commits da publicação. `npm run verificar` passou.
+
+## R-0019 · 26/11/2026 · Porte dos três fluxos do SIGEPAS em Apps Script
+
+- Decisões: ADR 0015 (login com sessão no servidor) e ADR 0016 (abas viram tabelas, telas com a mesma aparência e
+  tempo real por Server-Sent Events). Modo acelerado da entrega de 27/11: commit, PR e merge sem a leitura prévia do
+  Hélio, com os testes automáticos mantidos.
+- Banco: uma migração versionada com as tabelas dos três fluxos. Em produção, o serviço `migracao` a aplica antes da
+  API subir.
+- Testes: 117 no back-end, com PostgreSQL real, e 95% das linhas; 232 no front-end, com as telas no jsdom, e 98,9%
+  das linhas. Seis testes do projeto do estágio foram convertidos para o Vitest. No modo acelerado, teste e
+  implementação entraram no mesmo commit.
+- Defeitos herdados do Apps Script achados pelos testes e corrigidos: o trecho da demanda digitada voltava para
+  Completo; Salvar anotações desfazia a confirmação do paciente; a imagem da escala dependia de um site de fora.
+- Análise: SonarQube Cloud aprovado no PR https://github.com/heliocostadev/sigepas/pull/38, com cobertura do código
+  novo de 87,4% na primeira análise e os 21 apontamentos de confiabilidade e segurança corrigidos. O CodeQL apontou
+  dados da página chegando ao HTML; a data e o nome do arquivo passaram a ser escapados ou remontados a partir de
+  números.
+- Prova no ambiente local: entrada, importação do CSV fictício, padronização de locais, montagem de carro,
+  confirmação, e um cancelamento feito por fora apareceu na tela aberta sem recarregar a página.

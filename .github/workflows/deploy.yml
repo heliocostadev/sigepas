@@ -49,6 +49,12 @@ jobs:
               --label "org.opencontainers.image.revision=$VERSAO" -t "$imagem" .
             docker push "$imagem"
           done
+          # A imagem que aplica as migrações do banco fica no mesmo pacote da API, com a tag <sha>-migracao.
+          imagem="ghcr.io/heliocostadev/sigepas-api:$VERSAO-migracao"
+          docker build -f backend/Dockerfile --target migracao \
+            --label "org.opencontainers.image.source=https://github.com/$REPOSITORIO" \
+            --label "org.opencontainers.image.revision=$VERSAO" -t "$imagem" .
+          docker push "$imagem"
 
   publicar:
     name: atualizar a máquina na AWS
@@ -77,6 +83,9 @@ jobs:
           DOMINIO: ${{ vars.DOMINIO }}
           ID_DA_MAQUINA: ${{ vars.AWS_ID_DA_MAQUINA }}
           REPOSITORIO: ${{ github.repository }}
+          # Gestor inicial: o e-mail é uma variável e o hash scrypt da senha é um segredo. A senha não sai do Hélio.
+          EMAIL_DO_GESTOR: ${{ vars.EMAIL_DO_GESTOR_INICIAL }}
+          HASH_DO_GESTOR: ${{ secrets.HASH_DA_SENHA_DO_GESTOR_INICIAL }}
         run: |
           if ! [[ "$DOMINIO" =~ ^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$ ]]; then
             echo "A variável DOMINIO tem caracteres não permitidos." >&2
@@ -84,11 +93,12 @@ jobs:
           fi
           script="https://raw.githubusercontent.com/$REPOSITORIO/$VERSAO/infraestrutura/producao/atualizar-sistema.sh"
           comandos=$(jq -cn --arg script "$script" --arg versao "$VERSAO" --arg dominio "$DOMINIO" \
+            --arg email "$EMAIL_DO_GESTOR" --arg hash "$HASH_DO_GESTOR" \
             '{commands: [
               "install -d -m 700 /opt/sigepas",
               "curl --proto =https -fsSL \($script|@sh) -o /opt/sigepas/atualizar-sistema.sh.novo",
               "mv /opt/sigepas/atualizar-sistema.sh.novo /opt/sigepas/atualizar-sistema.sh",
-              "bash /opt/sigepas/atualizar-sistema.sh \($versao|@sh) \($dominio|@sh)"
+              "bash /opt/sigepas/atualizar-sistema.sh \($versao|@sh) \($dominio|@sh) \($email|@sh) \($hash|@sh)"
             ]}')
           id_do_comando=$(aws ssm send-command --instance-ids "$ID_DA_MAQUINA" --document-name AWS-RunShellScript \
             --comment "Deploy do SIGEPAS ${VERSAO:0:7}" --parameters "$comandos" \

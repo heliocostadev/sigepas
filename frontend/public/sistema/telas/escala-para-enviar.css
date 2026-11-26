@@ -1,0 +1,187 @@
+/* =====================================================================
+     ABA ESCALA PARA ENVIAR — 100% somente leitura, com navegação por dia.
+     A barra do topo, os botões e o calendário seguem o design system desde 06/11/2026 (protótipo em
+     docs/design-system/SugestaoClaude/EscalaEnviar.prototipo.html).
+     📌 A FOLHA (env-sheet-*, mais abaixo) NÃO mudou: é a imagem que vai para o WhatsApp e copia a planilha
+     oficial, com as mesmas cores de antes (#003c64 e #e65100). O protótipo propunha as cores dos tokens; ficou
+     de fora para a imagem que o setor já conhece não mudar sem uma decisão própria.
+     ===================================================================== */
+  #escalaEnviar .env-nav-data { position: relative; display: flex; align-items: center; gap: 6px; }
+  /* A data é um botão: abre o calendário próprio. O input escondido guarda o valor (AAAA-MM-DD) que o resto
+     do módulo lê. */
+  .env-data-txt {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 220px;
+    height: var(--ds-controle-md); padding: 0 12px; cursor: pointer;
+    background: var(--ds-branco); border: 1px solid var(--ds-borda-forte); border-radius: var(--ds-raio-2);
+    font-family: var(--ds-fonte-titulo); font-size: var(--ds-texto-lg); font-weight: var(--ds-peso-forte); color: var(--ds-marca-800);
+  }
+  .env-data-txt:hover { border-color: var(--ds-marca-300); background: var(--ds-marca-50); }
+  .env-data-txt .ti { color: var(--ds-marca-600); font-size: 17px; }
+  .env-date-hidden { display: none; }
+  .env-resumo:empty { display: none; }
+
+  /* ---- Calendário próprio (popover) ---------------------------------------
+     Desenhado por nós de propósito — ver o comentário do `envCalAbrir`. */
+  .env-cal {
+    position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+    width: 272px; padding: 10px; z-index: 60; display: none;
+    background: var(--ds-superficie); border: 1px solid var(--ds-borda);
+    border-radius: var(--ds-raio-3); box-shadow: var(--ds-sombra-3);
+  }
+  .env-cal.on { display: block; }
+  .env-cal-topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .env-cal-mes { font-family: var(--ds-fonte-titulo); font-weight: var(--ds-peso-forte); font-size: var(--ds-texto-lg); color: var(--ds-texto); text-transform: capitalize; }
+  .env-cal-nav {
+    background: none; border: none; cursor: pointer; width: 28px; height: 28px; border-radius: 50%; color: var(--ds-texto-2);
+    display: flex; align-items: center; justify-content: center; transition: background var(--ds-trans-rapida), color var(--ds-trans-rapida);
+  }
+  .env-cal-nav:hover { background: var(--ds-superficie-3); color: var(--ds-texto); }
+  .env-cal-grade { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .env-cal-sem { font-size: var(--ds-texto-xs); font-weight: var(--ds-peso-forte); color: var(--ds-texto-3); text-align: center; padding: 4px 0; }
+  .env-cal-dia {
+    border: none; background: none; cursor: pointer; height: 32px; border-radius: var(--ds-raio-2);
+    font-size: var(--ds-texto-md); font-weight: var(--ds-peso-semi); color: var(--ds-texto); font-variant-numeric: tabular-nums;
+    transition: background var(--ds-trans-rapida), color var(--ds-trans-rapida);
+  }
+  .env-cal-dia:hover { background: var(--ds-marca-50); }
+  .env-cal-dia.vazio { visibility: hidden; cursor: default; }
+  .env-cal-dia.fds { color: var(--ds-texto-3); }
+  /* Hoje é um anel; o dia escolhido é preenchido. Dois papéis diferentes, e o mesmo dia
+     pode ser os dois ao mesmo tempo — por isso um é borda e o outro é fundo. */
+  .env-cal-dia.hoje { box-shadow: inset 0 0 0 1.5px var(--ds-marca-500); }
+  .env-cal-dia.sel, .env-cal-dia.sel:hover { background: var(--ds-marca-700); color: var(--ds-branco); }
+
+  /* Palco: a folha tem a largura da imagem (760 px) e fica no centro. */
+  .env-dash { display: flex; flex-direction: column; align-items: center; }
+
+  /* =====================================================================
+     FOLHA OFICIAL ESTILO PLANILHA (O QUE É ENVIADO NO WHATSAPP)
+     ===================================================================== */
+  .env-sheet-wrapper {
+    width: 760px;
+    max-width: 100%;
+    background: #FFFFFF;
+    border: 1.5px solid #000000;
+    box-shadow: var(--ds-sombra-2);
+    margin-bottom: 40px;
+  }
+
+  .env-sheet-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 12.5px;
+    color: #000000;
+  }
+
+  .env-sheet-table th, .env-sheet-table td {
+    border: 1px solid #000000;
+    padding: 5px 8px;
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  /* Faixas de Cabeçalho — agora são LINHAS da tabela (td colspan), não divs soltas (11/09).
+     ⚠️ O seletor leva `.env-sheet-table td` na frente de propósito: sem ele a regra geral de
+     célula (padding 5px 8px) venceria por especificidade.
+     📌 Não há mais border-top/border-bottom aqui. Com border-collapse a linha entre a faixa
+     e a vizinha é UMA só, compartilhada. Antes eram duas bordas de 1px encostadas — 2px em
+     toda junta de seção, contra 1px no resto da folha. */
+  .env-sheet-table td.env-bar-blue {
+    background-color: #003c64;
+    color: #FFFFFF;
+    font-weight: 700;
+    text-align: center;
+    padding: 7px 10px;
+  }
+  .env-bar-blue .title-main {
+    font-size: 15px;
+    letter-spacing: 0.02em;
+  }
+  .env-bar-blue .title-date {
+    font-size: 13.5px;
+    font-weight: 700;
+    margin-top: 3px;
+  }
+  .env-bar-blue .title-inline {
+    font-size: 14.5px;
+    letter-spacing: 0.01em;
+  }
+
+  .env-sheet-table td.env-bar-orange {
+    background-color: #e65100;
+    color: #FFFFFF;
+    font-weight: 800;
+    text-align: center;
+    padding: 5px 10px;
+    font-size: 13.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Cabeçalho de colunas (cinza claro suave) */
+  .env-sheet-table th {
+    background-color: #dbe4ee;
+    font-weight: 700;
+    font-size: 12px;
+    color: #000000;
+    padding: 4px 6px;
+  }
+
+  /* Células de dados */
+  .env-sheet-table td.col-idx {
+    font-weight: 700;
+    font-size: 12px;
+    background-color: #FFFFFF;
+  }
+  .env-sheet-table td.col-mot {
+    font-weight: 600;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .env-sheet-table td.col-hora {
+    font-weight: 500;
+  }
+  .env-sheet-table td.col-dest {
+    font-weight: 500;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .env-sheet-table td.col-veic {
+    padding: 3px 6px;
+  }
+
+  /* Linha de dado: UMA altura mínima para a folha inteira (11/09). Medido: a linha com chip
+     dava 29,4px e a linha só de texto 25px — a folha mudava de ritmo a cada seção. 30px é o
+     que o chip pede; o texto passa a morar na mesma régua. Destino longo que quebra em duas
+     linhas continua crescendo — `height` em célula de tabela é mínimo, não teto. */
+  .env-sheet-table tr.env-linha > td { height: 30px; }
+  .env-sheet-table td.env-vazio  { padding: 10px; color: #64748b; font-style: italic; }
+  .env-sheet-table td.env-alerta { padding: 10px; color: #c2410c; font-weight: 700; }
+
+  /* Chip de Veículo */
+  .env-chip {
+    display: inline-block;
+    vertical-align: middle;
+    white-space: nowrap;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    line-height: 1.25;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: 1px solid rgba(0,0,0,0.15);
+    width: 96%;
+    text-align: center;
+  }
+
+  /* Observações — prefixo `env` (antes `col-obs-*`, genérico demais num CSS global entre
+     as abas). A célula do nome NÃO leva esta classe: ela é `col-mot`, e o `col-mot` já
+     vencia a antiga `.col-obs-nome` por especificidade — medido, o nome sempre saiu em 600. */
+  .env-sheet-table td.env-obs { font-weight: 700; text-transform: uppercase; }
+  /* 🔴 O negrito do RECOMEÇAR e do CONSULTÓRIO DE RUA nunca apareceu (medido: peso 500).
+     Era `.env-destaque-bold` sozinho (0,1,0) contra `.env-sheet-table td.col-dest` (0,2,1),
+     que fixa 500 — a regra mais específica ganhava sempre. Com o mesmo peso de seletor e
+     vindo depois, esta agora vence. */
+  .env-destaque-bold,
+  .env-sheet-table td.env-destaque-bold { font-weight: 800; }
