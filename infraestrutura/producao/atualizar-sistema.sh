@@ -6,6 +6,9 @@ set -euo pipefail
 
 VERSAO="${1:-}"
 DOMINIO="${2:-}"
+# Opcionais: o e-mail e o hash scrypt da senha do gestor inicial (nunca a senha). A API cria a conta se ela não existir.
+EMAIL_DO_GESTOR="${3:-}"
+HASH_DO_GESTOR="${4:-}"
 
 # Os dois valores entram em arquivo e em comando, então só formatos esperados passam.
 if [[ ! "$VERSAO" =~ ^[0-9a-f]{40}$ ]]; then
@@ -15,6 +18,13 @@ fi
 if [[ ! "$DOMINIO" =~ ^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$ ]]; then
   echo "Domínio inválido." >&2
   exit 1
+fi
+if [[ -n "$EMAIL_DO_GESTOR$HASH_DO_GESTOR" ]]; then
+  if [[ ! "$EMAIL_DO_GESTOR" =~ ^[a-z0-9._+-]+@[a-z0-9.-]+\.[a-z]+$ ]] \
+    || [[ ! "$HASH_DO_GESTOR" =~ ^scrypt\$[0-9]+\$[0-9]+\$[0-9]+\$[A-Za-z0-9+/=]+\$[A-Za-z0-9+/=]+$ ]]; then
+    echo "E-mail ou hash do gestor inicial em formato inválido." >&2
+    exit 1
+  fi
 fi
 
 PASTA=/opt/sigepas
@@ -45,6 +55,12 @@ done
 sed -i '/^VERSAO=/d; /^DOMINIO=/d' .env
 echo "VERSAO=$VERSAO" >> .env
 echo "DOMINIO=$DOMINIO" >> .env
+# Entre aspas simples, o Compose lê o valor como está: o "$" do hash não vira variável.
+if [[ -n "$HASH_DO_GESTOR" ]]; then
+  sed -i '/^EMAIL_DO_GESTOR_INICIAL=/d; /^HASH_DA_SENHA_DO_GESTOR_INICIAL=/d' .env
+  echo "EMAIL_DO_GESTOR_INICIAL='$EMAIL_DO_GESTOR'" >> .env
+  echo "HASH_DA_SENHA_DO_GESTOR_INICIAL='$HASH_DO_GESTOR'" >> .env
+fi
 
 "${COMPOSE[@]}" pull
 "${COMPOSE[@]}" up -d --remove-orphans

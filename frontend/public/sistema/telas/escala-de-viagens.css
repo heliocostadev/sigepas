@@ -1,0 +1,401 @@
+/* =====================================================================
+     ABA ESCALA DE VIAGENS — relatório somente leitura, por intervalo, e a janela Formação da escala.
+     No padrão do design system desde 06/11/2026: a barra do topo, os botões e os campos são ds-; os
+     quadrantes, as tabelas e a Formação (montados pelo script) mantêm as classes esc-/escf- e tiram cor,
+     fonte e raio dos tokens --ds-* (as variáveis --a1-* abaixo agora apontam para eles).
+     Quadrantes com faixa lateral por cor: externas azul, internas verde, observações âmbar, terceirizados roxo.
+     TUDO escopado em #escala — o CSS do app é global.
+     ===================================================================== */
+  /* As variáveis antigas continuam (o resto do CSS as usa), mas valem o que o design system diz (MAPA.md). */
+  #escala {
+    --a1-surface: var(--ds-superficie);
+    --a1-fill: var(--ds-fundo);
+    --a1-head: var(--ds-superficie-2);
+    --a1-text: var(--ds-texto);
+    --a1-text-2: var(--ds-texto-2);
+    --a1-text-3: var(--ds-texto-3);
+    --a1-hairline: var(--ds-borda);
+    --a1-navy: var(--ds-marca-800);
+    --a1-blue: var(--ds-marca-600);
+    --a1-blue-hover: var(--ds-marca-700);
+    --a1-green: var(--ds-sucesso);
+    --a1-red: var(--ds-perigo);
+    --a1-amber: var(--ds-atencao-texto);
+    --a1-amber-soft: var(--ds-atencao-fundo);
+    --a1-roxo: #6f4cc3;
+    --a1-r-card: var(--ds-raio-3);
+    --a1-r: var(--ds-raio-2);
+    --a1-shadow: var(--ds-sombra-1);
+    --a1-font: var(--ds-fonte-texto);
+    --a1-display: var(--ds-fonte-titulo);
+  }
+  #escala.tab-content { padding: 0; background: var(--a1-fill); min-height: calc(100vh - 60px); }
+  #escala { font-family: var(--a1-font); color: var(--a1-text); -webkit-font-smoothing: antialiased; }
+  #escala *, #escala *::before, #escala *::after { box-sizing: border-box; }
+
+  /* Barra do topo: ds-cab. Os campos têm o rótulo em cima, então a linha alinha pela base. */
+  #escala .esc-filtros { align-items: flex-end; }
+
+  .esc-aviso-lacen {
+    background: var(--a1-amber-soft); color: var(--a1-amber); border: 1px solid var(--ds-atencao-borda);
+    border-radius: var(--a1-r); padding: 9px 12px; margin-bottom: 12px; font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  /* [REMOVIDO em 09/09/2026] .esc-selo-origem — o chip "só hoje" / "cadastro" que se repetia
+     em cada linha das Observações. Virou CABEÇALHO DE GRUPO: dito uma vez, e o do cadastro
+     ganhou espaço para dizer onde se resolve. */
+
+  /* ---- Quadrante Observações: lista agrupada por origem (09/09) ---- */
+  .esc-obs-lista { display: flex; flex-direction: column; }
+  /* Cabeçalho de grupo: diz UMA vez o que antes se repetia em cada linha. */
+  .esc-obs-grupo { display: flex; align-items: baseline; gap: 8px; padding: 11px 14px 7px;
+                   background: var(--a1-paper, var(--ds-marca-50)); }
+  .esc-obs-grupo-tit { font-size: 10px; font-weight: 800; letter-spacing: .08em;
+                       text-transform: uppercase; color: var(--a1-text-2); }
+  .esc-obs-grupo-sub { font-size: 10.5px; color: var(--a1-text-3); }
+  .esc-obs-grupo-risca { flex: 1; height: 1px; background: var(--a1-hairline); }
+  .esc-obs-grupo-n { font-size: 10.5px; color: var(--a1-text-3); font-variant-numeric: tabular-nums; }
+
+  .esc-obs-linha { display: flex; gap: 11px; padding: 10px 14px;
+                   border-top: 1px solid var(--a1-hairline); align-items: flex-start; }
+  /* Ícone no lugar do selo TIPO. ⚠️ Sem cor: nada nesta lista é emergência — é status. A cor
+     fica onde já significa algo, no chip da placa, que tem a cor do modelo. */
+  .esc-obs-ic { font-size: 17px; color: var(--a1-text-3); flex: none; margin-top: 1px; }
+  /* ⚠️ `align-items: flex-start` NÃO é enfeite. Na linha SÓ DE VEÍCULO o chip da placa é filho
+     direto daqui, e o padrão do flex (`stretch`) o esticava na largura inteira da coluna — o
+     fundo colorido do chip virava uma faixa. Na linha do motorista o defeito não aparecia
+     porque lá o chip mora dentro do `.esc-obs-carro`. */
+  .esc-obs-quem { flex: 1; min-width: 0; display: flex; flex-direction: column;
+                  align-items: flex-start; gap: 4px; }
+  .esc-obs-nome { font-weight: 700; font-size: 13px; color: var(--a1-text); line-height: 1.25; }
+  .esc-obs-carro { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .esc-obs-junto { font-size: 10.5px; color: var(--a1-text-3); }
+  .esc-obs-pq { width: 45%; min-width: 0; flex: none; }
+
+  /* Motivo em dois andares: a CATEGORIA em cima (escaneável, é o que se compara entre linhas)
+     e a OBSERVAÇÃO embaixo. Sem a seta que existia antes: com as duas em coluna própria e
+     alinhadas, ela virou enfeite. */
+  .esc-motivo-cat { font-weight: 700; font-size: 13px; color: var(--a1-text); }
+  .esc-motivo-obs { display: block; font-size: 11.5px; color: var(--a1-text-2);
+                    line-height: 1.45; margin-top: 2px; }
+
+  @media (max-width: 900px) {
+    .esc-obs-linha { flex-wrap: wrap; }
+    .esc-obs-pq { width: 100%; padding-left: 28px; }
+  }
+  .esc-sem-mot { color: var(--a1-text-3); font-style: italic; }
+
+  /* Selo do tipo do dia (Fase 3c) */
+  .esc-dia-tipo {
+    font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    border-radius: 99px; padding: 3px 12px; white-space: nowrap;
+    background: var(--a1-amber-soft); color: var(--a1-amber); border: 1px solid var(--ds-atencao-borda);
+  }
+  .esc-dia-tipo.fds { background: var(--ds-superficie-3); color: var(--a1-text-2); border-color: var(--a1-hairline); }
+  .esc-dia-desc { font-size: 12.5px; color: var(--a1-text-2); }
+
+  .esc-corpo { gap: 26px; }   /* o espaçamento da borda vem do .ds-corpo */
+
+  /* Bloco de um dia */
+  .esc-dia { display: flex; flex-direction: column; gap: 14px; }
+  .esc-dia-cabecalho {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding-bottom: 10px; border-bottom: 3px solid var(--a1-navy);
+  }
+  .esc-dia-data {
+    font-family: var(--a1-display); font-size: 22px; font-weight: 800; letter-spacing: -0.02em;
+    color: var(--a1-navy); font-variant-numeric: tabular-nums;
+  }
+  .esc-dia-semana {
+    font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--a1-text-2); background: var(--ds-superficie-3); border: 1px solid var(--a1-hairline);
+    border-radius: 99px; padding: 3px 12px;
+  }
+
+  /* Quadrantes com faixa lateral codificada por cor */
+  /* Duas colunas FIXAS. Era `repeat(auto-fit, minmax(420px, 1fr))`, que criava tantas
+     colunas quantas coubessem — QUATRO numa tela de 1850px. Os cards `largo` (Externas e
+     Terceirizados) ocupavam as quatro, mas Remoções Internas e Observações ficavam com uma
+     cada: metade da linha vazia à direita.
+     Com duas colunas, os `largo` continuam ocupando a linha inteira e os outros dois ficam
+     com 50% cada. ⚠️ Não voltar para auto-fit: o vazio volta junto.
+     📌 A escolha é pela DENSIDADE do conteúdo, não pela quantidade de cards — Externas e
+     Terceirizados têm 4 colunas de dados e precisam da largura; Internas tem 2 e
+     Observações 3. Uma linha de três colunas espremeria um card de 4 em ~600px. */
+  .esc-quadros { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .esc-card {
+    position: relative; overflow: hidden;
+    background: var(--a1-surface); border: 1px solid var(--a1-hairline);
+    border-radius: var(--a1-r-card); box-shadow: var(--a1-shadow); padding: 16px 18px;
+  }
+  .esc-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--a1-blue); }
+  .esc-card.esc-q-int::before { background: var(--a1-green); }
+  .esc-card.esc-q-obs::before { background: var(--ds-atencao); }
+  .esc-card.esc-q-terc::before { background: var(--a1-roxo); }
+  .esc-card.largo { grid-column: 1 / -1; }
+  .esc-card-titulo {
+    font-family: var(--a1-display); font-size: 14.5px; font-weight: 700; letter-spacing: -0.005em; color: var(--a1-navy);
+    margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--a1-hairline);
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .esc-card-titulo .ti { font-size: 17px; vertical-align: -2px; margin-right: 5px; }
+  .esc-q-int .esc-card-titulo .ti { color: var(--a1-green); }
+  .esc-q-obs .esc-card-titulo .ti { color: var(--ds-atencao-texto); }
+  .esc-q-terc .esc-card-titulo .ti { color: var(--a1-roxo); }
+  .esc-q-ext .esc-card-titulo .ti { color: var(--a1-blue); }
+  .esc-card-contagem {
+    font-family: var(--a1-display); font-size: 12px; font-weight: 800; color: var(--a1-navy);
+    background: var(--ds-marca-100); border-radius: 12px; padding: 2px 10px; font-variant-numeric: tabular-nums;
+  }
+
+  /* Tabelas */
+  .esc-tabela { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .esc-tabela th {
+    text-align: left; font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--a1-text-3); padding: 7px 10px; border-bottom: 1px solid var(--a1-hairline);
+    background: var(--a1-head); white-space: nowrap;
+  }
+  .esc-tabela td { padding: 8px 10px; border-bottom: 1px solid var(--ds-superficie-3); color: var(--a1-text); vertical-align: middle; }
+  .esc-tabela tr:last-child td { border-bottom: none; }
+  .esc-tabela tbody tr:hover { background: var(--ds-marca-50); }
+  .esc-nome { font-weight: 700; }
+  .esc-hora { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 600; }
+  .esc-mut { color: var(--a1-text-3); }
+
+  /* Placa E DESCRIÇÃO no mesmo chip. O fundo sai da coluna G da bd_veiculos; sem cor
+     cadastrada (todo o terceirizado, hoje) fica o escuro padrão daqui.
+     ⚠️ O `background` e o `color` desta regra são o PADRÃO, não a decisão: quando há cor
+     no cadastro, o escVeiculoHTML sobrescreve os dois no `style` do elemento. */
+  .esc-placa {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    background: var(--ds-veiculo-padrao); color: #fff; font-family: 'Courier New', monospace;
+    font-size: 12px; font-weight: 800; letter-spacing: .05em; padding: 3px 8px; border-radius: 5px; white-space: nowrap;
+  }
+  /* A descrição divide a tinta com a placa, um passo mais leve — a placa continua sendo o
+     que se lê primeiro. Herda a cor de propósito: a tinta muda de chip para chip, e fixar
+     uma aqui faria a descrição sumir no dia em que o fundo mudasse. */
+  .esc-placa-tipo {
+    font-family: var(--a1-font); font-size: 11px; font-weight: 600; letter-spacing: 0;
+    opacity: .8;
+  }
+  /* Fundo claro sobre a tabela branca precisa de aresta, senão o chip vaza no papel. */
+  .esc-placa.claro { box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
+  /* Viagens Externas: tinta branca e negrito em todo chip, por pedido do operador (09/09).
+     A placa já é 800; aqui a descrição sobe junto e perde a transparência — "branco" com
+     opacidade .8 não é branco. Restam separando os dois a fonte (monoespaçada x normal) e o
+     tamanho (12px x 11px), que é hierarquia suficiente. */
+  .esc-placa.tinta-branca .esc-placa-tipo { font-weight: 800; opacity: 1; }
+
+  .esc-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 99px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+  }
+  .esc-badge.interna { background: var(--ds-superficie-3); color: var(--a1-text-2); border: 1px solid var(--a1-hairline); }
+  .esc-badge.consultorio { background: var(--ds-marca-100); color: var(--a1-navy); border: 1px solid var(--ds-marca-200); }
+  /* As duas atividades fixas do fim da escala saem do cinza da remoção comum: são posto
+     definido, não "o que sobrou". Cores vizinhas de propósito — são da mesma natureza —, e
+     bem separadas entre si. Tinta a 6.7:1 sobre o fundo, acima do mínimo da WCAG. */
+  .esc-badge.recomecar { background: #ccfbf1; color: #115e59; border: 1px solid #99f6e4; }
+  /* [REMOVIDO em 09/09/2026] .esc-badge.motorista / .esc-badge.veiculo — a coluna TIPO das
+     Observações. Um chip de placa já é obviamente um veículo e um nome de pessoa já é
+     obviamente um motorista; eram sete selos gritando o que a coluna ao lado mostrava.
+     ⚠️ E o vermelho saiu junto: alguém de férias não é emergência, e a cor estava sendo gasta
+     em categoria, não em urgência. As variantes `interna` e `consultorio` acima continuam —
+     são de outro card. */
+
+  .esc-vazio {
+    padding: 16px 4px; text-align: center; font-size: 13px; color: var(--a1-text-3);
+  }
+  .esc-aviso {
+    padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 500;
+    background: var(--a1-amber-soft); border: 1px solid var(--ds-atencao-borda); color: var(--a1-amber);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .esc-aviso .ti { font-size: 16px; flex: none; }
+
+  .esc-estado { padding: 60px 20px; text-align: center; color: var(--a1-text-2); }
+
+  @media (max-width: 900px) {
+    .esc-quadros { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 760px) {
+    .esc-filtros { flex-direction: column; align-items: stretch; }
+    .esc-card { padding: 14px; }
+    .esc-tabela { font-size: 12.5px; }
+  }
+
+  /* ---- TELA ÚNICA (11/11/2026, mockups mockup-escala-unificada e mockup-escala-periodo aprovados pelo Hélio) ----
+     A Formação deixou de ser janela por cima do relatório: é a seção 1 desta tela. Seguem 2 Viagens externas (servidores),
+     3 Remoção interna (servidores), 4 Terceirizados e 5 Observações, na ordem da folha da Escala para Enviar. */
+  .esc-uni { gap:0; padding-bottom:var(--ds-esp-4); }
+  .esc-sec { padding:16px 0 10px; }
+  .esc-sec + .esc-sec { border-top:1px solid var(--ds-borda); }
+  .esc-sec-tit { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+  .esc-sec-num { width:26px; height:26px; border-radius:50%; background:var(--ds-marca-600); color:#fff; font-weight:800;
+                 font-size:13px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .esc-sec-tit h2 { margin:0; font-size:15px; font-weight:800; color:var(--ds-marca-900); }
+  .esc-sec-tit small { color:var(--ds-texto-3); font-size:12.5px; }
+  .esc-sec-recolher { margin-left:auto; background:none; border:none; font:inherit; font-size:12px; font-weight:700;
+                      color:var(--ds-marca-600); cursor:pointer; display:inline-flex; gap:4px; align-items:center; }
+  #escSec1.recolhida .escf-corpo { display:none; }
+  #escSec1.recolhida .esc-sec-recolher i { transform:rotate(180deg); }
+  .esc-folhas { display:flex; flex-direction:column; gap:14px; }
+  .esc-data { display:flex; align-items:center; gap:6px; }
+  .esc-data .ds-input { width:150px; }
+  .esc-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700; }
+  .esc-chip:empty { display:none; }
+  .esc-chip.util  { background:var(--ds-sucesso-fundo); color:var(--ds-sucesso-texto); }
+  .esc-chip.fora  { background:var(--ds-atencao-fundo); color:var(--ds-atencao-texto); }
+  .esc-chip.herda { background:var(--ds-perigo-fundo); color:var(--ds-perigo-texto); }
+  /* Observações na largura das folhas de cima (pedido do Hélio, 11/11/2026). */
+  .esc-obs-grade { display:flex; flex-direction:column; gap:12px; }
+  .esc-obs-grade > .esc-card { width:100%; }
+  /* 30 px embaixo: o rodapé de versões do Index fica por cima da última faixa da tela. */
+  .esc-barra { position:sticky; bottom:0; z-index:4; display:flex; align-items:center; gap:12px;
+               padding:12px var(--ds-esp-6) 30px; background:var(--ds-superficie); border-top:1px solid var(--ds-borda);
+               box-shadow:0 -6px 16px rgba(3,42,64,.06); }
+  .esc-barra .escf-dica { flex:1; }
+  .esc-pend { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; white-space:nowrap;
+              color:var(--ds-atencao-texto); background:var(--ds-atencao-fundo); padding:4px 10px; border-radius:999px; }
+  .escf-ord-onde { margin-left:auto; font-size:11px; color:var(--ds-texto-3); white-space:nowrap; overflow:hidden;
+                   text-overflow:ellipsis; max-width:55%; }
+  .escf-folha .esc-ativ-fixa { font-weight:800; }
+  .escf-folha td.nome-lido { font-weight:800; text-transform:uppercase; font-size:12.5px; }
+  .escf-ctx { grid-column:1/-1; border-radius:9px; padding:10px 13px; font-size:12.5px;
+              line-height:1.5; display:flex; align-items:flex-start; gap:10px; }
+  .escf-ctx.util  { background:var(--ds-superficie-2); border:1px solid var(--ds-borda-forte); color:var(--ds-texto); }
+  .escf-ctx.fora  { background:var(--ds-atencao-fundo); border:1px solid var(--ds-atencao-borda); color:var(--ds-atencao-texto); }
+  .escf-ctx.herda { background:var(--ds-perigo-fundo); border:1px solid var(--ds-perigo-borda); color:var(--ds-perigo-texto); }
+  .escf-ctx b { font-weight:800; }
+  .escf-ctx .ti { font-size:17px; flex:none; margin-top:1px; }
+  .escf-ctx-ir { background:none; border:none; color:inherit; text-decoration:underline;
+                 cursor:pointer; font-weight:700; font-size:12.5px; padding:0; }
+  /* Blocos da Formação: Motoristas servidores, Terceirizados, Veículos da prefeitura, Ordem da escala. */
+  .escf-corpo { display:grid; grid-template-columns:1.25fr 1fr 1fr 1.25fr; gap:12px; align-items:start;
+                grid-auto-rows:min-content; }
+  @media (max-width:1100px) { .escf-corpo { grid-template-columns:1fr 1fr; } }
+  /* ---- VIAGENS DO DIA (10/11/2026): largura toda, embaixo das colunas, 16:9, no visual da Escala para Enviar.
+     Motorista e veículo escolhidos por lista. Quando há muitas viagens, o card rola por dentro. ---- */
+  /* ---- VIAGENS DO DIA, visual de 11/11/2026 (mockup v4c aprovado pelo Hélio): a folha da Escala para Enviar, com
+     pílulas no lugar das listas, cadeado ao lado do nome e uma linha numerada por MOTORISTA. Sem arrastar e sem notas. ---- */
+  .escf-folha { width:100%; border-collapse:collapse; table-layout:fixed; border:1px solid #c9d3de; font-size:13px; background:#fff; }
+  .escf-folha col.c-n { width:5%; } .escf-folha col.c-mot { width:31%; } .escf-folha col.c-hora { width:12%; }
+  .escf-folha col.c-dest { width:27%; } .escf-folha col.c-vei { width:25%; }
+  .escf-folha td, .escf-folha th { border:1px solid #c9d3de; padding:6px 10px; height:42px; text-align:center; vertical-align:middle; }
+  /* Faixa e cabeçalho com as cores da folha oficial (Escala para Enviar): é a mesma escala, vista antes de gravar. */
+  .escf-folha td.escf-folha-faixa { background:#003c64; color:#fff; font-weight:800; font-size:15px; padding:8px; height:auto; }
+  .escf-folha td.escf-folha-faixa small { display:block; font-size:13px; font-weight:700; opacity:.9; }
+  .escf-folha th { background:#e9eef5; color:#14202c; font-size:12.5px; font-weight:800; height:30px; }
+  .escf-folha td.n { font-weight:800; font-size:12.5px; padding:6px 0; }
+  .escf-nums { display:flex; flex-direction:column; gap:6px; }
+  .escf-nums span { height:30px; line-height:30px; }
+  /* Hora na mesma fonte das cidades, um pouco maior (pedido do Hélio). */
+  .escf-folha td.hora { font-weight:600; font-size:14.5px; letter-spacing:.02em; }
+  .escf-folha td.dest { font-weight:600; text-transform:uppercase; font-size:13px; }
+  .escf-folha td.dest small { display:block; font-weight:500; text-transform:none; color:var(--ds-texto-3); font-size:11px; margin-top:1px; }
+  .escf-folha td.vazio { color:var(--ds-texto-3); font-style:italic; }
+  .escf-folha tr.passou td { background:var(--ds-superficie-2); color:var(--ds-texto-3); }
+  .escf-folha tr.destaque td { box-shadow:inset 0 0 0 2px var(--ds-marca-500); }
+  .escf-pilha { display:flex; flex-direction:column; gap:6px; }
+  /* Cadeado FORA da pílula: aberto = segue a ordem da escala; fechado = fixado, não muda com a ordem. */
+  .escf-lmot { display:flex; align-items:center; gap:8px; }
+  .escf-cad { flex:none; width:28px; height:28px; padding:0; border:none; border-radius:50%; display:flex;
+              align-items:center; justify-content:center; font-size:15px; cursor:pointer; }
+  .escf-cad i { display:block; line-height:1; width:1em; height:1em; }
+  .escf-cad.aberto { background:#eef2f6; color:#8593a3; }
+  .escf-cad.aberto:hover { color:var(--ds-marca-600); }
+  .escf-cad.fechado { background:var(--ds-marca-600); color:#fff; }
+  .escf-cad.fixo { background:#eef2f6; color:#4a5568; cursor:default; }
+  .escf-cad.vazio { background:#f8d4cf; color:var(--ds-perigo-texto); }
+  .escf-pmot { flex:1; min-width:0; display:flex; align-items:center; height:30px; padding:0 28px; border:1px solid #b9c5d2;
+               border-radius:999px; background:#fff; font:inherit; font-weight:800; font-size:12.5px; text-transform:uppercase;
+               color:var(--ds-texto); position:relative; cursor:pointer; }
+  .escf-pmot:hover { border-color:var(--ds-marca-400); }
+  .escf-pmot .txt { flex:1; min-width:0; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .escf-pmot .seta { position:absolute; right:10px; color:var(--ds-texto-3); font-size:14px; }
+  .escf-pmot.vazio { border-style:dashed; border-color:#e6a39d; background:var(--ds-perigo-fundo); color:var(--ds-perigo-texto); }
+  .escf-pmot.lido { cursor:default; }
+  .escf-pvei { width:100%; display:flex; align-items:center; justify-content:center; height:30px; padding:0 26px; border:none;
+               border-radius:999px; background:#4a5568; color:#fff; font:inherit; font-weight:800; font-size:12.5px;
+               position:relative; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .escf-pvei .seta { position:absolute; right:10px; font-size:14px; opacity:.85; }
+  .escf-pvei.fixo { cursor:default; }
+  .escf-pvei.vazio { background:var(--ds-atencao-fundo); color:var(--ds-atencao-texto); border:1px dashed var(--ds-atencao); }
+  /* Lista que abre na pílula: da largura da pílula, flutuando por cima do card (position:fixed). */
+  .escf-menu { position:fixed; z-index:85; background:#fff; border:1px solid #b9c5d2; border-radius:10px;
+               box-shadow:0 8px 20px rgba(3,42,64,.18); padding:4px 0; max-height:320px; overflow-y:auto;
+               font-size:12.5px; text-align:left; }
+  .escf-menu .grp { padding:8px 12px 4px; font-size:10.5px; font-weight:800; color:var(--ds-texto-3);
+                    text-transform:uppercase; letter-spacing:.05em; }
+  .escf-menu .grp.livres { color:var(--ds-sucesso-texto); }
+  .escf-menu .op { display:flex; align-items:center; gap:8px; padding:6px 12px; cursor:pointer; white-space:nowrap;
+                   overflow:hidden; text-overflow:ellipsis; }
+  .escf-menu .op:hover { background:var(--ds-marca-50); }
+  .escf-menu .op.sel { background:var(--ds-marca-50); font-weight:700; }
+  .escf-menu .op.off { opacity:.5; cursor:not-allowed; }
+  .escf-menu .op .info { color:var(--ds-texto-3); }
+  .escf-menu .op .info.nao { color:var(--ds-perigo-texto); font-weight:700; }
+  .escf-menu .tag { flex:none; font-size:9.5px; font-weight:800; letter-spacing:.04em; padding:1px 6px; border-radius:999px; }
+  .escf-menu .tag.serv { background:var(--ds-marca-100); color:var(--ds-marca-700); }
+  .escf-menu .tag.terc { background:#e5e7eb; color:#4a5568; }
+  .escf-menu .acao { border-top:1px solid #e9eef3; margin-top:4px; padding-top:8px; color:#4f46e5; font-weight:700; }
+  .escf-menu .acao.perigo { color:var(--ds-perigo-texto); }
+  .escf-vg-leg { display:flex; gap:12px; text-transform:none; letter-spacing:0; font-size:11.5px; font-weight:600; color:var(--ds-texto-3); }
+  .escf-vg-leg span { display:inline-flex; align-items:center; gap:4px; }
+  .esc-revez { font-size:11px; font-weight:700; color:var(--ds-marca-600); margin-left:4px; }
+  /* Período de vários dias (11/09): um cabeçalho por data, e o dia que já passou recolhido
+     numa linha — num período longo, o que ainda dá para mudar aparece primeiro. */
+  .escf-vg-dia { display:flex; align-items:center; gap:7px; padding:5px 2px 4px;
+                 font-size:11px; font-weight:800; letter-spacing:.04em; text-transform:uppercase;
+                 color:var(--ds-marca-800); border-bottom:1px solid var(--ds-marca-100); }
+  .escf-vg-dia .ti { font-size:14px; }
+  .escf-vg-dia-n { margin-left:auto; color:var(--ds-texto-3); font-weight:700; text-transform:none;
+                   letter-spacing:0; white-space:nowrap; }
+  .escf-vg-dia-alerta { color:var(--ds-perigo-texto); text-transform:none; letter-spacing:0; }
+  .escf-vg-dia.passou { color:var(--ds-texto-3); cursor:pointer; border-bottom-style:dashed; }
+  .escf-vg-dia.passou:hover { color:var(--ds-marca-800); }
+  /* A confirmação do design system (dsConfirmar) nasce na camada 80 e a Formação está na 81: sem isto, o
+     resumo "Confira antes de gravar" abriria POR BAIXO dela. */
+  #dsConfirma { z-index:90; }
+  .escf-carregando { grid-column:1/-1; text-align:center; color:var(--ds-texto-3); padding:40px 0; }
+  .escf-bloco { border:1px solid var(--ds-borda); border-radius:10px; overflow:hidden; }
+  .escf-bloco-tit { background:var(--ds-superficie-2); padding:8px 11px; font-size:10.5px; font-weight:800;
+                    text-transform:uppercase; letter-spacing:.06em; color:var(--ds-marca-800);
+                    border-bottom:1px solid var(--ds-borda); display:flex; justify-content:space-between;
+                    gap:8px; }
+  .escf-bloco-n { color:var(--ds-texto-3); font-weight:700; }
+  .escf-lista { padding:7px 9px; display:flex; flex-direction:column; gap:5px;
+                max-height:46vh; overflow-y:auto; }
+  .escf-item { border:1px solid var(--ds-superficie-3); border-radius:7px; padding:5px 7px; }
+  .escf-item.fora { background:var(--ds-atencao-fundo); border-color:var(--ds-atencao-borda); }
+  .escf-item label { display:flex; align-items:center; gap:7px; font-size:12.5px;
+                     color:var(--ds-texto); cursor:pointer; }
+  .escf-item .escf-sub2 { font-size:10.5px; color:var(--ds-texto-3); }
+  /* Motivo + observação numa caixa só: aparecem e somem juntos com a marcação. */
+  .escf-obs-cx { animation:escfAbre .24s cubic-bezier(.16,1,.3,1) both; }
+  @keyframes escfAbre { from { opacity:0; transform:translateY(-4px) } to { opacity:1; transform:none } }
+  .escf-item input.escf-obs { width:100%; margin-top:5px; padding:4px 6px; font-size:11.5px;
+      font-family:var(--ds-fonte-texto); color:var(--ds-texto); background:var(--ds-branco);
+      border:1px solid var(--ds-borda); border-radius:6px; outline:none; }
+  .escf-item input.escf-obs:focus { border-color:var(--ds-atencao); box-shadow:0 0 0 3px rgba(232,149,42,.16); }
+  .escf-obs-dica { font-size:9px; color:var(--ds-atencao-texto); margin-top:3px; padding:0 2px; }
+  @media (prefers-reduced-motion: reduce) { .escf-obs-cx { animation:none } }
+
+  .escf-item select { width:100%; margin-top:5px; padding:4px 6px; font-size:11.5px;
+                      border:1px solid var(--ds-borda-forte); border-radius:6px; background:var(--ds-branco); }
+  .escf-vez { padding:9px; }
+  .escf-vez label { display:block; font-size:10px; font-weight:800; text-transform:uppercase;
+                    letter-spacing:.06em; color:var(--ds-texto-3); margin-bottom:4px; }
+  .escf-vez select { width:100%; padding:6px 8px; font-size:12.5px; border:1px solid var(--ds-borda-forte);
+                     border-radius:7px; background:var(--ds-branco); }
+  .escf-ordem { padding:0 9px 9px; display:flex; flex-direction:column; gap:4px; }
+  .escf-ord-item { display:flex; align-items:center; gap:9px; border:1px solid var(--ds-marca-100);
+                   background:var(--ds-marca-50); border-radius:7px; padding:6px 9px; cursor:grab;
+                   font-size:12.5px; }
+  .escf-ord-item.arrastando { opacity:.45; }
+  .escf-ord-item.alvo { outline:2px dashed var(--ds-marca-800); outline-offset:1px; }
+  .escf-ord-pos { font-family:var(--ds-fonte-mono); font-weight:800;
+                  color:var(--ds-marca-800); min-width:24px; font-variant-numeric:tabular-nums; }
+  .escf-ord-nome { flex:1; font-weight:600; color:var(--ds-texto); }
+  .escf-vazio { font-size:11.5px; color:var(--ds-texto-3); padding:12px 9px; font-style:italic; }
+  .escf-dica { font-size:11.5px; color:var(--ds-texto-3); }

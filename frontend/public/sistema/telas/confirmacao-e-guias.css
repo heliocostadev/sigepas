@@ -1,0 +1,328 @@
+/* ===================== GUIA DOS MOTORISTAS =====================
+     Design system desde 06/11/2026: barra `ds-cab` e filtros `ds-filtros`; cartões, ficha lateral e janelas com
+     as classes de sempre e as cores dos tokens. A IMAGEM DA VIAGEM (.gimg-*) não mudou: é figura, cores fixas. */
+  #guia.tab-content { padding: 0; background: var(--ds-fundo); min-height: calc(100vh - var(--ds-nav-altura)); }
+  /* A barra e os filtros grudam JUNTOS sob o menu, como antes: o operador filtra com a lista rolada. */
+  .guia-fixo { position: sticky; top: var(--ds-nav-altura); z-index: 40; }
+  .guia-fixo .ds-cab { position: static; }
+  .guia-check-livres { height: var(--ds-controle-md); }
+
+  /* ----- contadores de status (fila de trabalho do dia): clicar filtra a confirmação ----- */
+  .guia-contadores { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+  .gcont-chip { font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-semi); border: 1px solid; border-radius: var(--ds-raio-pilula);
+                padding: 3px 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+  .gcont-chip b { font-weight: var(--ds-peso-extra); }
+  .gcont-chip.gcont-ativo { box-shadow: var(--ds-anel-foco); }
+
+  .guia-corpo { padding: 16px 20px; display: flex; flex-direction: column; gap: 18px; }
+  .guia-grupo-cidade { display: flex; align-items: center; gap: 10px; padding: 7px 12px; background: var(--ds-marca-800); border-left: 4px solid var(--ds-marca-600); border-radius: 0 6px 6px 0; margin-bottom: 8px; }
+  .guia-grupo-cidade .gc-nome { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: .3px; }
+  .guia-grupo-cidade .gc-meta { font-size: 12px; color: var(--ds-marca-100); }
+  .guia-grupo .card-veiculo { margin-bottom: 8px; }
+  /* WhatsApp, Aviso e imagem da viagem, no cabeçalho do carro: `ds-btn` desde 06/11 (as classes guia-zap,
+     guia-aviso-btn e guia-img-btn ficam só como ganchos). */
+  /* Baixar as guias de todos os carros (10/11/2026): botão no fim da barra de filtros, com um menu de duas opções. */
+  .guia-baixar { position: relative; align-self: flex-end; }
+  .guia-baixar-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 45; min-width: 230px; display: none;
+                      background: var(--ds-superficie); border: 1px solid var(--ds-borda); border-radius: var(--ds-raio-3);
+                      box-shadow: var(--ds-sombra-3); padding: 6px; }
+  .guia-baixar-menu.aberto { display: block; }
+  .guia-baixar-menu button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border: none;
+                             background: none; border-radius: var(--ds-raio-2); font: inherit; color: var(--ds-texto);
+                             cursor: pointer; text-align: left; }
+  .guia-baixar-menu button:hover:not(:disabled) { background: var(--ds-marca-50); }
+  .guia-baixar-menu button:disabled { color: var(--ds-texto-inativo); cursor: not-allowed; }
+  .guia-baixar-menu button .ti { font-size: 17px; color: var(--ds-marca-600); }
+  .guia-baixar-menu .n { margin-left: auto; font-size: var(--ds-texto-sm); color: var(--ds-texto-3); }
+  .guia-baixar-menu .dica { font-size: var(--ds-texto-xs); color: var(--ds-texto-3); padding: 6px 10px 2px; border-top: 1px solid var(--ds-borda); margin-top: 4px; }
+  /* Palco fora da tela onde a imagem é desenhada antes de virar PNG. */
+  #guiaImgPalco { position: fixed; left: -10000px; top: 0; z-index: -1; pointer-events: none; }
+  /* A imagem em si (desenho 3, 06/10/2026): mockup revisado por outra IA a pedido do Hélio. Topo azul só com o
+     que decide a viagem (saída, destino, rota); carro e motorista numa faixa clara; aviso com tarja vermelha e
+     fundo claro; cartões com rótulos (ATENDIMENTO, EMBARQUE, CONTATO, ACOMPANHANTE) e a cidade em chip.
+     Cores fixas: é uma figura, vai para o celular do motorista. Piso de 11 px para o que o motorista usa; 10 px só
+     nos rótulos em caixa alta e nos metadados (o mockup tinha 8,5 a 9,5 px; o próprio parecer pedia 11 a 12).
+     ⚠️ NADA PODE SER CORTADO (pedido do Hélio): nenhum texto tem altura fixa, overflow escondido ou reticências;
+     todo bloco quebra linha (overflow-wrap) e todo item de flex que leva texto tem min-width: 0. Só o horário, a
+     saída e cada telefone não quebram, por serem curtos e fixos. Os cantos arredondados vêm de border-radius em
+     cada parte, nunca de overflow: hidden no pai. */
+  .gimg { width: 360px; background: #fff; color: #162331; font-family: Inter, 'Segoe UI', Arial, sans-serif; font-size: 12px;
+          line-height: 1.4; overflow-wrap: anywhere; word-break: break-word; }
+  .gimg * { box-sizing: border-box; }
+  .gimg-ar { font-family: Archivo, Inter, Arial, sans-serif; }
+  .gimg-topo { background: #05466c; color: #fff; padding: 12px 14px 13px; }
+  .gimg-topo-l1 { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .gimg-marca { font-size: 10.5px; font-weight: 800; letter-spacing: .09em; color: #bfd9e8; }
+  .gimg-data { font-size: 11px; color: #d9e9f2; }
+  .gimg-data b { color: #fff; font-size: 13px; }
+  .gimg-hero { display: flex; gap: 14px; align-items: flex-end; margin-top: 10px; }
+  .gimg-saida { flex-shrink: 0; }
+  .gimg-kicker { display: block; font-size: 10px; font-weight: 800; letter-spacing: .1em; color: #bfd9e8; }
+  .gimg-saida b { display: block; font-size: 39px; line-height: .95; font-weight: 800; letter-spacing: -.03em; white-space: nowrap; }
+  .gimg-destino { min-width: 0; flex: 1; padding-bottom: 2px; }
+  .gimg-destino b { display: block; font-size: 20px; line-height: 1.1; font-weight: 800; }
+  .gimg-rota { margin-top: 9px; padding-top: 8px; border-top: 1px solid #2e6688; font-size: 11.5px; color: #d9e9f2; }
+  .gimg-rota b { color: #fff; }
+  .gimg-oper { background: #f2f7fa; padding: 10px 12px; border-bottom: 1px solid #dce7ed; }
+  .gimg-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
+  .gimg-chip { border: 1px solid #bdd3df; color: #17475f; background: #fff; border-radius: 5px; padding: 2px 7px; font-size: 11px; font-weight: 800; }
+  .gimg-chip-placa { font-family: Consolas, 'Cascadia Mono', monospace; letter-spacing: .04em; }
+  .gimg-chip-suave { font-weight: 700; color: #486373; background: #f7fafc; }
+  .gimg-mrow { display: flex; gap: 8px; align-items: flex-start; margin-top: 4px; color: #465c6a; font-size: 12px; }
+  .gimg-mrow-lab { flex: 0 0 66px; font-weight: 800; color: #244459; }
+  .gimg-mrow-val { min-width: 0; flex: 1; }
+  .gimg-mrow-val b { color: #152b38; }
+  .gimg-aviso { margin: 10px 12px 0; }
+  .gimg-aviso-tit { background: #c8102e; color: #fff; padding: 6px 10px; font-size: 11px; font-weight: 800; letter-spacing: .08em; border-radius: 9px 9px 0 0; }
+  .gimg-aviso-corpo { background: #fff4f6; border: 1px solid #f1b7c1; border-top: none; border-radius: 0 0 9px 9px; padding: 8px 10px; color: #671426; }
+  .gimg-aviso-txt { font-size: 13px; font-weight: 800; line-height: 1.35; white-space: pre-line; }
+  .gimg-aviso-meta { font-size: 10px; color: #8e5361; margin-top: 4px; }
+  .gimg-sec { padding: 12px 14px 3px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .gimg-sec b { font-size: 14px; color: #163549; }
+  .gimg-sec span { font-size: 11px; color: #61727f; }
+  .gimg-card { margin: 8px 12px; border: 1px solid #d7e2e9; border-left: 4px solid #7db0cb; border-radius: 10px; padding: 10px 10px 9px; background: #fff; }
+  /* Cor de cada cartão (06/10/2026, pedido do Hélio): um cartão diferente do outro, num ciclo de quatro (azul,
+     verde-azulado, roxo, cinza-azulado). A cor pinta a barra lateral grossa, a borda fina e o horário. Sem vermelho
+     e sem âmbar, que já querem dizer crítico e atenção. O cartão crítico (gimg-card-perigo, logo abaixo) vence a cor. */
+  .gimg-cor-1 { border-color: #cfe1ef; border-left-color: #1e70a0; }
+  .gimg-cor-1 .gimg-hora { background: #eaf3fb; color: #0b4f7a; border-color: #bcd8f0; }
+  .gimg-cor-2 { border-color: #cde8e1; border-left-color: #12806f; }
+  .gimg-cor-2 .gimg-hora { background: #e6f5f1; color: #0b5c50; border-color: #a9dccf; }
+  .gimg-cor-3 { border-color: #ded5f3; border-left-color: #6f4cc3; }
+  .gimg-cor-3 .gimg-hora { background: #f1edfb; color: #4b2f99; border-color: #cfc2f0; }
+  .gimg-cor-4 { border-color: #d9e1e8; border-left-color: #4a6178; }
+  .gimg-cor-4 .gimg-hora { background: #eef2f6; color: #33475c; border-color: #c6d1dc; }
+  .gimg-card-perigo { border-color: #f0c8c5; border-left-color: #c84a43; background: #fffdfc; }
+  .gimg-vazio { color: #61727f; text-align: center; }
+  .gimg-cab { display: flex; gap: 9px; align-items: flex-start; }
+  .gimg-hora { flex-shrink: 0; border: 1px solid #a9cee1; background: #edf7fc; color: #073c59; border-radius: 6px; padding: 2px 7px; font-size: 15px; font-weight: 800; line-height: 1.15; white-space: nowrap; }
+  .gimg-card.gimg-card-perigo .gimg-hora { background: #fdecea; color: #a3221a; border-color: #f3b9b4; }
+  .gimg-id { min-width: 0; flex: 1; }
+  .gimg-nome { font-size: 13.5px; line-height: 1.2; font-weight: 800; }
+  .gimg-meta { font-size: 11px; color: #697a86; margin-top: 2px; }
+  .gimg-serv { display: inline-block; background: #3d56d6; color: #fff; border-radius: 4px; padding: 1px 5px; font-size: 10px; font-weight: 800; letter-spacing: .06em; margin-right: 4px; vertical-align: 1px; }
+  .gimg-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 7px; }
+  .gimg-tag { border: 1px solid; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 800; min-width: 0; }
+  .gimg-tag-perigo { color: #9b281f; background: #fdecea; border-color: #f1b9b5; }
+  .gimg-tag-aviso { color: #7a5200; background: #fff6df; border-color: #eed68e; }
+  .gimg-tag-info { color: #0b5a87; background: #edf7fc; border-color: #bddcea; }
+  .gimg-tag-cidade { color: #294a5b; background: #f5f8fa; border-color: #d8e2e8; }
+  .gimg-linhas { margin-top: 7px; }
+  .gimg-linha { display: flex; gap: 8px; align-items: flex-start; padding: 4px 0; border-top: 1px solid #eef2f4; }
+  .gimg-linha:first-child { border-top: none; }
+  /* 100 px: "ACOMPANHANTE" mede 93 px em Inter; com menos, o rótulo quebrava no meio da palavra. */
+  .gimg-rot { flex: 0 0 100px; font-size: 10px; font-weight: 800; letter-spacing: .04em; color: #6a7a84; text-transform: uppercase; padding-top: 2px; }
+  .gimg-val { min-width: 0; flex: 1; color: #374c59; }
+  .gimg-val b { color: #152b38; font-weight: 700; }
+  .gimg-nw { white-space: nowrap; }
+  .gimg-faixa { margin-top: 8px; border: 1px solid; border-radius: 7px; padding: 6px 8px; font-size: 11.5px; font-weight: 800; }
+  .gimg-faixa-canc { background: #fdecea; color: #9e281e; border-color: #f0bbb7; }
+  .gimg-faixa-obs { background: #fff6df; color: #7a5200; border-color: #eed68e; }
+  .gimg-rodape { margin-top: 10px; border-top: 1px solid #dce4e9; background: #f7f9fa; padding: 8px 12px; display: flex; justify-content: space-between; gap: 10px; font-size: 10px; color: #6a7a84; }
+  .gimg-rodape b { color: #05466c; letter-spacing: .05em; }
+  .motorista-wrap { display: flex; align-items: center; gap: 5px; }
+  .guia-troca-btn { border: none; background: none; color: var(--ds-marca-600); cursor: pointer; font-size: 16px; line-height: 1; padding: 0; display: inline-flex; }
+  .guia-troca-btn:hover { color: var(--ds-marca-800); }
+  .guia-pax-cancel { border: none; background: none; color: var(--ds-perigo); cursor: pointer; font-size: 16px; line-height: 1; flex-shrink: 0; padding: 0 2px; align-self: flex-start; }
+  .guia-pax-cancel:hover { color: var(--ds-perigo-texto); }
+  /* Cancelar direto do card, embaixo do horário do passageiro (05/10/2026): `.ds-pilha` com `.ds-hora` e
+     `.ds-btn-cancelar` desde 06/11, horário e botão com a mesma largura. */
+
+  /* padding-left 38px alinha o horário do passageiro com o horário de saída do cabeçalho
+     (14px padding do cv-topo + 12px da seta + 12px do gap) */
+  .guia-pax { display: flex; gap: 12px; padding: 9px 13px 9px 38px; border-bottom: 1px solid var(--ds-superficie-3); align-items: flex-start; }
+  .guia-pax:last-child { border-bottom: none; }
+  .guia-pax .gp-corpo { flex: 1; min-width: 0; }
+  .guia-pax .gp-nome { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-weight: 700; color: var(--ds-texto); font-size: 13.5px; }
+  .guia-pax .gp-nome .gp-idade { font-weight: 400; color: var(--ds-texto-3); }
+  .guia-pax .gp-info { font-size: 12.5px; color: var(--ds-texto-2); margin-top: 2px; }
+  .guia-pax .gp-info b { color: var(--ds-texto); font-weight: 700; }
+  .guia-pax.gp-perigo { background: var(--ds-perigo-fundo); }
+  .guia-pax.gp-perigo .gp-hora { background: var(--ds-perigo-fundo); color: var(--ds-perigo-texto); border-color: var(--ds-perigo-borda); }
+  .guia-pax .gp-obs { font-size: 12px; font-weight: 600; color: var(--ds-atencao-texto); background: var(--ds-atencao-fundo); border: 1px solid var(--ds-atencao-borda); padding: 3px 8px; border-radius: 4px; margin-top: 5px; display: inline-block; }
+  /* Motivo da confirmação anulada (col AE). Azul para não competir com o alerta de
+     restrição do paciente (âmbar), que é informação clínica e tem prioridade. */
+  .guia-pax .gp-obs-lig { font-size: 12px; font-weight: 600; color: var(--ds-marca-700); background: var(--ds-marca-50); border: 1px solid var(--ds-marca-200); padding: 3px 8px; border-radius: 4px; margin-top: 5px; display: inline-block; }
+  .guia-pax .gp-cidade { font-size: 11px; font-weight: 700; background: var(--ds-superficie-3); color: var(--ds-texto-2); border: 1px solid var(--ds-borda); border-radius: 12px; padding: 2px 8px; flex-shrink: 0; white-space: nowrap; }
+  .guia-vazio { text-align: center; padding: 40px 20px; color: var(--ds-texto-inativo); font-size: 14px; }
+
+  /* ----- selo de status de confirmação no card ----- */
+  .gp-status { font-size: 10.5px; font-weight: 700; border: 1px solid; border-radius: 12px; padding: 2px 8px; flex-shrink: 0; white-space: nowrap; }
+  .guia-pax { cursor: pointer; transition: background .15s ease; }
+  .guia-pax:hover { background: var(--ds-superficie-2); }
+  .guia-pax.ativo { background: var(--ds-marca-50); border-left: 3px solid var(--ds-marca-600); }
+  .gp-seta { font-size: 15px; color: var(--ds-texto-inativo); flex-shrink: 0; align-self: center; }
+
+  /* ===================== GAVETA LATERAL (SLIDE-OVER DRAWER) ===================== */
+  .guia-drawer-overlay {
+    /* Sem desfoque (pedido do Hélio, 11/11/2026): só o fundo escurecido, a lista continua legível atrás. */
+    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.42);
+    opacity: 0; pointer-events: none; transition: opacity 0.22s ease; z-index: 900;
+  }
+  .guia-drawer-overlay.aberto { opacity: 1; pointer-events: auto; }
+
+  .guia-slide-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(540px, 94vw);
+    background: #fff; box-shadow: -8px 0 32px rgba(15, 23, 42, 0.22);
+    display: flex; flex-direction: column; transform: translateX(100%);
+    transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1); z-index: 901;
+  }
+  .guia-slide-drawer.aberto { transform: translateX(0); }
+
+  .guia-dh {
+    padding: 16px 20px; background: var(--ds-superficie-2); border-bottom: 1px solid var(--cinza-borda, var(--ds-borda));
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+  .guia-dh-info h2 { font-size: 16px; font-weight: 800; color: var(--ds-texto); line-height: 1.3; }
+  .guia-dh-meta { font-size: 12px; color: var(--ds-texto-3); margin-top: 4px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .guia-dh-badge { background: var(--ds-marca-100); color: var(--ds-marca-800); font-weight: 700; padding: 1px 6px; border-radius: 4px; }
+  /* Cabeçalho da ficha (11/11/2026): nome e idade; saída e carro; cidade e local. */
+  .guia-dh-idade { font-size: 13px; font-weight: 600; color: var(--ds-texto-3); margin-left: 6px; white-space: nowrap; }
+  .guia-dh-linha { font-size: 13px; color: var(--ds-texto-2); margin-top: 3px; }
+  .guia-dh-linha b { color: var(--ds-texto); font-weight: 700; }
+  .guia-btn-close {
+    background: none; border: none; font-size: 20px; color: var(--ds-texto-inativo); cursor: pointer; padding: 4px 8px; line-height: 1; border-radius: 6px;
+  }
+  .guia-btn-close:hover { color: var(--ds-perigo); background: var(--ds-perigo-fundo); }
+
+  /* Faixa de ações rápidas no topo (1 clique) */
+  .guia-qcb {
+    padding: 12px 20px; background: #fff; border-bottom: 1px solid var(--cinza-borda, var(--ds-borda));
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .guia-qcb-label { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--ds-texto-3); }
+  .guia-qcb-actions { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+  .guia-btn-qcb {
+    padding: 9px 8px; border-radius: 8px; border: 1px solid; font-size: 12.5px; font-weight: 700;
+    cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.15s ease;
+  }
+  .guia-btn-qcb i { font-size: 18px; }
+  .guia-btn-qcb.conf { background: var(--ds-sucesso-fundo); border-color: var(--ds-sucesso-borda); color: var(--ds-sucesso-texto); }
+  .guia-btn-qcb.conf:hover, .guia-btn-qcb.conf.ativo { background: var(--ds-sucesso); color: #fff; border-color: var(--ds-sucesso); box-shadow: 0 4px 10px rgba(22,163,74,0.3); }
+  /* Confirmou por WhatsApp (11/11/2026): verde do WhatsApp, para não confundir com o "Confirmou" por ligação. */
+  .guia-btn-qcb.zap { background: #e8f8ee; border-color: #a7e3bd; color: #0f7a3d; }
+  .guia-btn-qcb.zap:hover, .guia-btn-qcb.zap.ativo { background: #1fa855; color: #fff; border-color: #1fa855; box-shadow: 0 4px 10px rgba(31,168,85,0.3); }
+  .guia-btn-qcb.nao { background: var(--ds-atencao-fundo); border-color: var(--ds-atencao-borda); color: var(--ds-atencao-texto); }
+  .guia-btn-qcb.nao:hover, .guia-btn-qcb.nao.ativo { background: var(--ds-atencao); color: #fff; border-color: var(--ds-atencao); box-shadow: 0 4px 10px rgba(217,119,6,0.3); }
+  .guia-btn-qcb.canc { background: var(--ds-perigo-fundo); border-color: var(--ds-perigo-borda); color: var(--ds-perigo-texto); }
+  .guia-btn-qcb.canc:hover { background: var(--ds-perigo); color: #fff; border-color: var(--ds-perigo); box-shadow: 0 4px 10px rgba(220,38,38,0.3); }
+
+  /* Abas do Drawer */
+  .guia-drawer-tabs { display: flex; border-bottom: 1px solid var(--ds-borda); background: var(--ds-superficie-2); padding: 0 16px; }
+  .guia-d-tab {
+    padding: 11px 14px; border: none; background: none; font-size: 12px; font-weight: 700;
+    color: var(--ds-texto-3); cursor: pointer; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 6px;
+  }
+  .guia-d-tab i { font-size: 15px; }
+  .guia-d-tab:hover { color: var(--ds-marca-800); }
+  .guia-d-tab.ativo { color: var(--ds-marca-800); border-bottom-color: var(--ds-marca-800); background: #fff; }
+
+  /* Conteúdo do drawer */
+  .guia-drawer-corpo { flex: 1; overflow-y: auto; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px; }
+  .guia-tab-pane { display: none; flex-direction: column; gap: 14px; }
+  .guia-tab-pane.ativo { display: flex; }
+
+  /* Chips de quem atendeu */
+  .guia-atendeu-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .guia-chip-atendeu {
+    padding: 5px 11px; border-radius: 6px; background: var(--ds-superficie-3); border: 1px solid var(--ds-borda-forte);
+    font-size: 12px; font-weight: 600; color: var(--ds-texto); cursor: pointer; transition: all .15s ease;
+  }
+  .guia-chip-atendeu:hover { background: var(--ds-borda); }
+  .guia-chip-atendeu.sel { background: var(--ds-marca-800); color: #fff; border-color: var(--ds-marca-800); }
+
+  /* Cards de WhatsApp */
+  .guia-card-zap {
+    border: 1px solid var(--ds-sucesso-borda); background: var(--ds-sucesso-fundo); border-radius: 9px; padding: 10px 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .guia-cz-esq { display: flex; flex-direction: column; gap: 2px; }
+  .guia-cz-tel { font-family: var(--ds-fonte-mono); font-weight: 700; font-size: 13.5px; color: var(--ds-sucesso-texto); }
+  .guia-cz-tipo { font-size: 11px; color: var(--ds-sucesso-texto); font-weight: 600; }
+  .guia-btn-zap {
+    background: var(--ds-sucesso); color: #fff; border: none; padding: 7px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+  }
+  .guia-btn-zap:hover { background: var(--ds-sucesso-texto); }
+  /* Telefone FIXO: aparece, mas sem "Enviar" (06/11, defeito 6). */
+  .guia-card-zap.fixo { background: var(--ds-superficie-2); border-color: var(--ds-borda); }
+  .guia-card-zap.fixo .guia-cz-tel, .guia-card-zap.fixo .guia-cz-tipo { color: var(--ds-texto-2); }
+  .guia-cz-fixo { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; color: var(--ds-texto-3); white-space: nowrap; }
+
+  /* Cards de candidatos a transferência */
+  .guia-cand-card {
+    border: 1px solid var(--ds-borda); background: var(--ds-superficie-2); border-radius: 9px; padding: 10px 12px;
+    display: flex; justify-content: space-between; align-items: center; gap: 10px; transition: all .15s ease;
+  }
+  .guia-cand-card:hover { border-color: var(--ds-marca-300); background: var(--ds-marca-50); }
+  .guia-cand-esq { display: flex; flex-direction: column; gap: 2px; }
+  .guia-cand-l1 { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 12.5px; }
+  .guia-cand-l2 { font-size: 11.5px; color: var(--ds-texto-3); }
+  .guia-btn-transf {
+    background: var(--ds-marca-600); color: #fff; border: none; padding: 6px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+  }
+  .guia-btn-transf:hover { background: var(--ds-marca-700); }
+
+  .gd-campo-lbl { font-size: 11px; font-weight: 600; color: var(--ds-texto-3); display: block; }
+  .gd-select, .gd-input, .gd-txt { width: 100%; padding: 7px 9px; border: 1px solid var(--ds-borda-forte); border-radius: 7px; font-size: 13px; color: var(--ds-texto); margin-top: 3px; font-family: inherit; box-sizing: border-box; }
+  .gd-txt { resize: vertical; min-height: 50px; }
+  .gd-botoes { display: flex; gap: 8px; margin-top: 12px; }
+  .gd-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 12.5px; font-weight: 600; padding: 8px; border-radius: 7px; cursor: pointer; border: 1px solid; }
+  .gd-btn.ok { background: var(--ds-sucesso); border-color: var(--ds-sucesso); color: #fff; }
+  .gd-btn.aviso { background: #fff; border-color: var(--ds-atencao); color: var(--ds-atencao-texto); }
+  .gd-btn.perigo { background: #fff; border-color: var(--ds-perigo); color: var(--ds-perigo-texto); }
+  .gd-fone-envio { display: flex; gap: 8px; align-items: center; }
+  .gd-fone-envio .gd-input { flex: 1; }
+  /* Busca da troca de pacientes (passo 4.2b, 16/09). Prefixo guia-tpax-: guia-troca- já é da troca de motorista.
+     A lista fica NO FLUXO, logo abaixo do campo: o painel rola, e uma lista flutuante seria cortada. */
+  .guia-tpax-sug { display: none; margin-top: 4px; max-height: 240px; overflow-y: auto; background: #fff; border: 1px solid var(--ds-borda); border-radius: 8px; box-shadow: 0 6px 16px rgba(15,23,42,.10); }
+  .guia-tpax-sug.on { display: block; }
+  .guia-tpax-item { padding: 7px 10px; cursor: pointer; border-bottom: 1px solid var(--ds-superficie-3); }
+  .guia-tpax-item:last-child { border-bottom: none; }
+  .guia-tpax-item:hover, .guia-tpax-item.on { background: var(--ds-marca-50); }
+  .guia-tpax-nome { display: block; font-size: 12.5px; font-weight: 600; color: var(--ds-texto); }
+  .guia-tpax-det { display: block; font-size: 11px; color: var(--ds-texto-3); margin-top: 1px; }
+  .guia-tpax-vazio { padding: 8px 10px; font-size: 12px; color: var(--ds-texto-inativo); }
+  /* form de cancelamento dentro do modal: .gm-form-lbl/-sel/-txt moram no EstilosComuns desde 05/10/2026
+     (a janela "Cancelar paciente" também abre em Viagens Externas). */
+
+  /* ----- modal central + animações ----- */
+  .guia-modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.5); display: none; align-items: center; justify-content: center; z-index: 1100; }
+  .guia-modal-overlay.aberto { display: flex; }
+  .guia-modal-box { background: #fff; border-radius: 14px; padding: 26px 28px; width: 90%; max-width: 700px; box-shadow: 0 20px 50px rgba(0,0,0,.25); text-align: left; animation: guiaModalIn .18s ease-out; }
+  .guia-modal-box.saindo { animation: guiaModalOut .25s ease-in forwards; }
+  @keyframes guiaModalIn { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes guiaModalOut { to { transform: scale(.96); opacity: 0; } }
+  .gm-icone { font-size: 46px; line-height: 1; margin-bottom: 12px; display: inline-flex; }
+  .gm-spin { color: var(--ds-marca-600); animation: guiaSpin 1s linear infinite; }
+  @keyframes guiaSpin { to { transform: rotate(360deg); } }
+  .gm-ok { color: var(--ds-sucesso); animation: guiaPop .35s ease-out; }
+  @keyframes guiaPop { 0% { transform: scale(.3); opacity: 0; } 60% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
+  .gm-titulo { font-size: 20px; font-weight: 700; color: var(--ds-texto); margin-bottom: 15px; }
+  .gm-texto { font-size: 14px; color: var(--ds-texto-2); line-height: 1.55; }
+  .gm-texto b { color: var(--ds-texto); font-weight: 700; }
+  .gm-acoes { display: flex; gap: 10px; justify-content: center; margin-top: 22px; }
+  .gm-btn { font-size: 14px; font-weight: 600; border-radius: 8px; padding: 9px 18px; cursor: pointer; border: 1px solid var(--ds-borda-forte); background: #fff; color: var(--ds-texto); }
+  .gm-btn:hover { background: var(--ds-superficie-3); }
+  .gm-btn.primario { background: var(--ds-marca-600); border-color: var(--ds-marca-600); color: #fff; }
+  .gm-btn.primario:hover { background: var(--ds-marca-800); }
+  .gm-btn.perigo { background: var(--ds-perigo); border-color: var(--ds-perigo); color: #fff; }
+  .gm-btn.perigo:hover { background: var(--ds-perigo-texto); }
+
+  /* Layout Modal de Troca em Paineis */
+  .gm-troca-container { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 15px 0 20px; text-align: left; }
+  .gm-troca-col { flex: 1; background: var(--ds-superficie-2); border: 1px solid var(--ds-borda); border-radius: 12px; padding: 15px; }
+  .gm-troca-titulo { font-size: 14px; font-weight: 700; color: var(--ds-texto); margin-bottom: 12px; }
+  .gm-troca-card { background: #fff; border: 1px solid var(--ds-borda-forte); border-radius: 8px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+  .gm-troca-card:last-child { margin-bottom: 0; }
+  .gm-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .gm-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--ds-borda); color: var(--ds-texto); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .gm-card-nome { font-size: 15px; font-weight: 800; color: var(--ds-texto); }
+  .gm-card-linha { font-size: 12.5px; color: var(--ds-texto-2); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .gm-card-linha i { font-size: 14px; color: var(--ds-texto-3); }
+  .gm-card-linha:last-child { margin-bottom: 0; }
+  .gm-troca-meio { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--ds-texto-3); padding: 0 5px; }
+  .gm-troca-meio i { font-size: 32px; }
+  .gm-troca-meio span { font-size: 11px; font-weight: 600; text-transform: uppercase; text-align: center; line-height: 1.2; }
+  .gm-aviso-final { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--ds-texto-3); letter-spacing: 0.5px; text-align: center; margin-bottom: -5px; }

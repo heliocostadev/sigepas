@@ -1,0 +1,650 @@
+/* ===========================================================================
+     DEMANDAS DO DIA — tela nova de agendamento (Fase 1 do redesenho)
+     Substitui os cards da Aba 2 por visão de planilha, a pedido do gestor:
+     agrupada por CIDADE e por HORA, como já é a Guia dos Motoristas.
+
+     Linguagem visual ADAPTADA DA REMOÇÃO INTERNA (pedido do programador):
+       · azul marinho #1e3a8a (paleta escolhida pelo programador, no lugar do
+         verde da RI) · âmbar #e8952a/#8a5411 · cinza-neutro #8f9c97
+       · Archivo (nomes, peso 700) + Cascadia Mono (horas/datas, tabular-nums)
+       · avatar circular com iniciais e selos pequenos em caixa alta
+     Diferença proposital: lá as células são editáveis, aqui é só leitura.
+     ---------------------------------------------------------------------------
+     ⚠️ CSS e JS são GLOBAIS entre todas as abas (regra dura nº 5 do CLAUDE.md).
+     TUDO aqui usa o prefixo `dm`. Nome repetido com outra aba se sobrescreve
+     em silêncio — inclusive as funções da própria Remoção Interna (`ri*`).
+     ⚠️ Nunca usar o operador "menor que" dentro do bloco de script (regra nº 1).
+     Use a forma invertida: arr.length > i
+     =========================================================================== */
+  #demandas { font-family:'Inter','Segoe UI',system-ui,sans-serif; color:#1d2a28;
+              -webkit-font-smoothing:antialiased; font-size:13px; }
+
+  .dm-toolbar { background:#fff; border-bottom:1px solid #e7ece9; padding:10px 20px;
+                display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; }
+  .dm-campo { display:flex; flex-direction:column; gap:3px; }
+  .dm-campo label { font-size:9.5px; font-weight:800; color:#8f9c97; text-transform:uppercase; letter-spacing:.06em; }
+  .dm-campo select, .dm-campo input { border:1px solid #dce3df; border-radius:7px; padding:6px 9px;
+                                      font-size:12.5px; outline:none; background:#fff; color:#1d2a28; }
+  .dm-campo select:focus, .dm-campo input:focus { border-color:#1e3a8a; }
+  .dm-busca input { min-width:280px; }
+  /* Botão de cancelados: fica ao lado da busca, some quando não há nenhum. Cinza quando
+     desligado, âmbar quando ligado — âmbar de aviso, não vermelho de erro: o pedido estar
+     cancelado é fato normal do dia, não falha do sistema. */
+  .dm-btn-cancel { display:none; align-items:center; gap:6px; align-self:flex-end;
+                   border:1px solid #dce3df; background:#fff; color:#64748b; cursor:pointer;
+                   border-radius:7px; padding:6px 11px; font-size:12px; font-weight:700;
+                   font-family:inherit; min-height:32px; white-space:nowrap; }
+  .dm-btn-cancel.tem { display:inline-flex; }
+  .dm-btn-cancel:hover { border-color:#a07434; color:#a07434; }
+  .dm-btn-cancel.on { background:#fdf8ee; border-color:#e0b96b; color:#a07434; }
+  .dm-btn-cancel .n { font-family:'Cascadia Mono','Consolas',ui-monospace,monospace;
+                      font-size:11px; font-variant-numeric:tabular-nums;
+                      background:#f1f5f9; border-radius:9px; padding:1px 6px; }
+  .dm-btn-cancel.on .n { background:#f5e6c8; }
+  /* Botão de adicionar paciente manualmente na fila (só no modo fila) */
+  .dm-btn-novo { display:inline-flex; align-items:center; gap:6px; align-self:flex-end;
+                 border:1px solid #1e3a8a; background:#1e3a8a; color:#fff; cursor:pointer;
+                 border-radius:7px; padding:6px 12px; font-size:12px; font-weight:700;
+                 font-family:inherit; min-height:32px; white-space:nowrap; transition:all .15s ease; }
+  .dm-btn-novo:hover { background:#172e6b; border-color:#172e6b; box-shadow:0 2px 6px rgba(30,58,138,.25); }
+  /* Linha de pedido cancelado: apagada e riscada no nome. Continua legível — o operador
+     precisa saber QUEM cancelou —, mas não compete com o que ainda vai acontecer. */
+  .dm-linha.cancelada { opacity:.55; }
+  .dm-linha.cancelada .dm-nome { text-decoration:line-through; }
+  .dm-selo-cancel { display:inline-block; font-size:9px; font-weight:800; letter-spacing:.04em;
+                    text-transform:uppercase; color:#9b2c2c; background:#fdf2f2;
+                    border:1px solid #e9b4b4; border-radius:5px; padding:1px 5px;
+                    margin-left:6px; vertical-align:1px; }
+  /* Resumo do dia: fila, progresso e demanda por tipo de veículo. O "já montado" sai do
+     veiculosSalvos que o getDadosOperacao JÁ devolve — sem chamada nova ao backend. */
+  .dm-resumo { margin-left:auto; min-width:250px; border:1px solid #dce3df; border-radius:9px;
+               background:#fff; padding:7px 10px; }
+  .dm-res-l { display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:3px 0; }
+  .dm-res-l + .dm-res-l { border-top:1px solid #eef2f0; }
+  .dm-res-rot { font-size:9.5px; font-weight:800; color:#8f9c97; text-transform:uppercase; letter-spacing:.06em; }
+  .dm-res-v { font-size:11.5px; color:#586662; white-space:nowrap; }
+  .dm-res-v b { color:#1e3a8a; font-size:14px; font-family:'Archivo','Segoe UI',system-ui,sans-serif; font-weight:700; }
+  .dm-res-tags { display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; }
+  .dm-res-tag { font-size:9.5px; font-weight:800; letter-spacing:.04em; text-transform:uppercase;
+                border-radius:5px; padding:2px 6px; white-space:nowrap; }
+
+  /* ⚠️ SEM overflow-x aqui de propósito. `overflow-x:auto` faz o overflow-y virar
+     `auto` implicitamente, o que cria um contexto de rolagem e QUEBRA o position:sticky
+     do cabeçalho (ele passaria a grudar dentro da caixa, que não rola na vertical).
+     Com min-width na tabela, quem rola na horizontal é a página. */
+  .dm-corpo { padding:14px 20px 40px; transition:padding-bottom .2s; }
+  /* Com a barra flutuante no ar (~78px com o respiro), 40px de rodapé não bastavam e
+     as últimas linhas ficavam escondidas atrás dela. O respiro cresce só enquanto há
+     seleção — sem barra, não faz sentido reservar o espaço. */
+  #demandas.tem-selecao .dm-corpo { padding-bottom:112px; }
+
+  /* UMA ÚNICA tabela para a tela inteira. Antes era uma por cidade (e antes disso, uma
+     por hora) — cada uma se dimensionava sozinha e nada alinhava. Tabela única +
+     colgroup + table-layout:fixed garante alinhamento por construção, e permite UM
+     cabeçalho só, fixo no topo, em vez de repetir a cada cidade. */
+  .dm-tab { width:100%; border-collapse:separate; border-spacing:0; background:#fff;
+            table-layout:fixed; min-width:1180px; border:1px solid #e7ece9; }
+  .dm-tab th { background:#f1f5f9; text-align:left; font-size:9.5px; font-weight:800; color:#1d2a28;
+               text-transform:uppercase; letter-spacing:.06em; padding:8px 10px;
+               border-bottom:2px solid #cbd5e1; white-space:nowrap;
+               overflow:hidden; text-overflow:ellipsis;
+               /* 60px = altura da navbar sticky do Index; z-index abaixo dela (50) */
+               position:sticky; top:60px; z-index:5; }
+
+  /* Cidade vira LINHA da tabela — é o que permite a tabela única */
+  .dm-cidade-row > td { background:#1e3a8a; color:#fff; padding:9px 14px;
+                        font-family:'Archivo','Segoe UI',system-ui,sans-serif;
+                        font-weight:700; letter-spacing:.03em; }
+  .dm-tab tr.dm-cidade-row:hover > td { background:#1e3a8a; }
+  .dm-cidade-in { display:flex; align-items:center; gap:10px; }
+  .dm-cid-n { background:rgba(255,255,255,.16); border-radius:20px; padding:2px 10px;
+              font-size:11px; font-weight:600; letter-spacing:0; }
+  /* Distância de Joinville ao lado do nome da cidade (29/09) — informação, não destaque. */
+  .dm-cid-km { font-size:11.5px; font-weight:600; letter-spacing:0; opacity:.75; }
+  /* Divisória de direção (29/09): separa as cidades em Norte, Sul... a partir de Joinville.
+     Clara e baixa de propósito: a linha azul da cidade continua sendo o marco principal. */
+  .dm-direcao-row > td { background:#f8fafc; color:#475569; padding:12px 14px 5px;
+                         font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+                         border-top:1px solid #e2e8f0; }
+  .dm-tab tr.dm-direcao-row:hover > td { background:#f8fafc; }
+  /* Campo AVISO URGENTE no Editar do carro (29/09): vermelho como o selo e a faixa do card. */
+  /* Respiro (11/11/2026): o campo e a opção abaixo ficavam colados na borda do cartão do carro. */
+  .dm-aviso-campo { margin:12px 14px 6px; }
+  /* Dois motoristas (11/11/2026): chave (switch) numa faixa com tom próprio, para não passar despercebida.
+     Ligada, a faixa ganha um tom mais forte. */
+  .dm-dois-mot { display:flex; align-items:center; gap:10px; margin:14px 14px 4px; padding:10px 14px;
+                 background:#eef2ff; border:1px solid #c7d2fe; border-radius:10px; font-size:13.5px;
+                 color:#312e81; cursor:pointer; transition:background .15s, border-color .15s; }
+  .dm-dois-mot:hover { border-color:#a5b4fc; }
+  .dm-dois-mot:has(input:checked) { background:#e0e7ff; border-color:#6366f1; }
+  .dm-dois-mot i { font-size:18px; color:#4f46e5; }
+  .dm-dois-mot input { appearance:none; -webkit-appearance:none; flex:none; margin:0; position:relative;
+                       width:36px; height:20px; border-radius:999px; background:#cbd5e1; cursor:pointer;
+                       transition:background .15s; }
+  .dm-dois-mot input::before { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px;
+                               border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.25);
+                               transition:transform .15s; }
+  .dm-dois-mot input:checked { background:#4f46e5; }
+  .dm-dois-mot input:checked::before { transform:translateX(16px); }
+  .dm-dois-mot input:focus-visible { outline:2px solid #6366f1; outline-offset:2px; }
+  .dm-dois-chip { display:inline-block; margin-left:6px; padding:1px 7px; border-radius:999px; font-size:11px;
+                  font-weight:700; background:#e0e7ff; color:#3730a3; white-space:nowrap; }
+  .dm-aviso-campo label { display:block; font-size:11.5px; font-weight:800; letter-spacing:.05em;
+                          color:#b91c1c; margin-bottom:4px; }
+  .dm-aviso-campo textarea { width:100%; box-sizing:border-box; min-height:52px; resize:vertical;
+                             border:1.5px solid #fca5a5; border-radius:8px; padding:7px 9px;
+                             font:inherit; font-size:13px; }
+  .dm-aviso-campo textarea:focus { outline:none; border-color:#dc2626; }
+  /* break-word e NÃO anywhere: `anywhere` quebra em qualquer ponto e partia palavras ao
+     meio ("AMBULATÓ / RIO"). `break-word` quebra entre palavras e só parte uma palavra
+     quando ela SOZINHA não cabe na linha — cobre o mesmo risco de estouro sem picar texto. */
+  .dm-tab td { padding:8px 10px; border-bottom:1px solid #eef2f0; vertical-align:middle;
+               overflow-wrap:break-word; }
+  .dm-tab tbody tr:hover > td { background:#f7f9f7; }
+
+  /* ---- AGRUPAMENTO POR HORÁRIO -------------------------------------------------
+     BANDA DE HORA, no modelo da Remoção Interna: uma linha própria com o chip do
+     horário, o turno e a contagem de gente. Tentei antes marcar o grupo só com chip
+     na 1ª linha + zebrado + espinha lateral, e ficou confuso — a banda resolve de
+     imediato porque separa fisicamente os blocos, que é como a RI já fazia.
+     Com a banda de volta, zebrado e espinha saem: viravam ruído redundante.
+     nowrap no chip é obrigatório: a célula quebra texto livre, e sem isto o "10:00"
+     quebrava no meio ("10:0" / "0"). */
+  /* A banda GRUDA logo abaixo do cabeçalho (60px navbar + ~31px do thead). Antes ela
+     rolava para fora e o operador perdia a referência do horário — era por isso que
+     existia uma coluna "Hora" repetindo o mesmo valor em toda linha. Com a banda fixa,
+     aquela coluna virou redundante e saiu, devolvendo 84px às colunas de texto. */
+  .dm-banda > td { background:#eef2fb; border-top:1px solid #c6cef5; border-bottom:1px solid #c6cef5;
+                   padding:6px 10px; position:sticky; top:91px; z-index:4; }
+  .dm-tab tr.dm-banda:hover > td { background:#eef2fb; }
+  .dm-banda-in { display:flex; align-items:center; gap:10px; }
+
+  /* Quando a banda GRUDA, o cabeçalho da cidade já rolou para fora e a referência se
+     perde. Aí o nome da cidade se abre entre o turno e os contadores, empurrando-os
+     suavemente para a direita. Fora do estado grudado ele fica com largura zero — a
+     cidade está visível logo acima e repetir seria ruído.
+     max-width em vez de display:none para a transição ter o que animar. */
+  .dm-banda-cidade { max-width:0; opacity:0; overflow:hidden; white-space:nowrap;
+                     font-family:'Archivo','Segoe UI',system-ui,sans-serif; font-weight:700;
+                     font-size:11.5px; color:#1e3a8a; letter-spacing:.04em;
+                     transition:max-width .28s ease, opacity .18s ease; }
+  .dm-banda.grudada .dm-banda-cidade { max-width:340px; opacity:1; }
+  .dm-banda.grudada > td { box-shadow:0 2px 5px rgba(30,58,138,.10); }
+  /* Chip da hora no verde da Remoção Interna — é o mesmo papel ali */
+  .dm-hora-chip { display:inline-block; background:#17635a; color:#fff; font-weight:700;
+                  border-radius:6px; padding:3px 9px; white-space:nowrap;
+                  font-family:'Cascadia Mono','Consolas',ui-monospace,monospace;
+                  font-size:12.5px; font-variant-numeric:tabular-nums; }
+  .dm-banda-turno { font-size:12px; font-weight:700; color:#1e293b; }
+  .dm-banda-meta { font-size:11.5px; color:#64748b; }
+
+  /* Paciente: avatar + nome, igual à Remoção Interna */
+  .dm-pac { display:flex; align-items:center; gap:9px; min-width:0; }
+  .dm-av { width:28px; height:28px; border-radius:50%; display:flex; align-items:center;
+           justify-content:center; font-family:'Archivo','Segoe UI',system-ui,sans-serif;
+           font-weight:800; font-size:11px; flex:none; }
+  /* align-items:flex-start é obrigatório: sem ele o padrão `stretch` estica os selos
+     (IDOSO SEM ACOMPANHANTE, CADEIRINHA) até a largura toda da coluna, virando uma
+     faixa colorida em vez de chip. Ser inline-block não basta — como item de flex,
+     o selo obedece ao alinhamento do contêiner. */
+  .dm-pac-txt { min-width:0; flex:1; display:flex; flex-direction:column; gap:2px;
+                align-items:flex-start; }
+  .dm-nome { font-family:'Archivo','Segoe UI',system-ui,sans-serif; font-weight:700;
+             font-size:13px; line-height:1.2; }
+  .dm-mat { font-size:10px; color:#8f9c97; font-family:'Cascadia Mono','Consolas',ui-monospace,monospace; }
+  /* Selo SERVIDOR no lugar do nome (passo 6.3, 17/09): o mesmo da Remoção Interna (.ri-selo.s-serv), para o
+     operador bater o olho e saber que o pedido não é de paciente. Prefixo próprio: o CSS é global. */
+  .dm-selo-serv { display:inline-block; vertical-align:middle; font-family:'Inter','Segoe UI',system-ui,sans-serif;
+                  font-size:9px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; line-height:1.4;
+                  border-radius:5px; padding:2px 6px; white-space:nowrap; background:#3d56d6; color:#fff; }
+  /* Nome e matrícula do servidor no card da montagem/edição (S.3, 18/09). Vermelho claro enquanto falta. */
+  .dm-serv-ident { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:6px; padding:6px 8px;
+                   background:#eef1fd; border:1px solid #c9d1f5; border-radius:6px; font-size:11px; }
+  .dm-serv-ident label { font-weight:700; color:#3d56d6; margin:0; }
+  .dm-serv-ident .dm-serv-obj { font-weight:700; color:#1e293b; margin-right:6px; }
+  .dm-serv-in { font-size:12px; border:1px solid #cbd5e1; border-radius:4px; padding:3px 6px; min-width:200px;
+                background:#fff; outline:none; }
+  .dm-serv-in.mat { min-width:0; width:110px; }
+  .dm-serv-in.falta { border-color:#dc2626; background:#fff5f5; }
+
+  .dm-selo { font-size:9px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+             border-radius:5px; padding:2px 6px; white-space:nowrap; display:inline-block; margin-top:2px; }
+  .dm-selo.ctb  { background:#f9e6c9; color:#8a5411; }
+  .dm-selo.risco{ background:#f6d4d4; color:#8c2f2f; }
+
+  /* Chip do veículo solicitado. SEM nowrap de propósito: "CARRO COM MOTORISTA" não cabe
+     na coluna e estava vazando por cima de "Local". Quebra por palavras em 2 linhas —
+     mesma solução que a Remoção Interna já adotou para o mesmo texto. */
+  /* LARGURA ÚNICA para todos: "AMBULÂNCIA" é a referência de tamanho, e os demais se
+     alinham a ela. "CARRO COM MOTORISTA" quebra em 2 linhas dentro dessa largura em
+     vez de esticar o chip e desalinhar a coluna. */
+  .dm-veic { display:inline-block; width:104px; text-align:center; box-sizing:border-box;
+             font-size:9px; font-weight:800; letter-spacing:.05em;
+             text-transform:uppercase; border-radius:5px; padding:3px 5px; line-height:1.25;
+             white-space:normal; border:1px solid transparent; }
+  .dm-veic.v-amb  { background:#f6d4d4; color:#8c2f2f; border-color:#e8a9a9; } /* destaque: exige preparo */
+  .dm-veic.v-auto { background:#dbe9f4; color:#245a7a; border-color:#bcd5e6; }
+  .dm-veic.v-com  { background:#dbe4f8; color:#1e3a8a; border-color:#c6cef5; }
+  .dm-veic.v-sem  { background:#e0e5fb; color:#2c3f9e; border-color:#c6cef5; }
+  .dm-veic.v-out  { background:#eef1ee; color:#586662; border-color:#dce3df; }
+
+  /* Idade em destaque, data embaixo — invertido a pedido do gestor: na conferência
+     o que decide (cadeirinha, acompanhante de idoso) é a IDADE, não a data. */
+  .dm-idade { font-family:'Archivo','Segoe UI',system-ui,sans-serif; font-weight:700;
+              font-size:13px; color:#1d2a28; line-height:1.15; white-space:nowrap; }
+  .dm-nasc-d { font-size:10px; color:#8f9c97; font-family:'Cascadia Mono','Consolas',ui-monospace,monospace;
+               font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+  /* Restrição vira SÍMBOLO clicável (pedido do gestor). Na Remoção Interna é um
+     badge âmbar no avatar; aqui ganha coluna própria e abre o texto ao clicar,
+     porque o texto costuma ser uma frase inteira e não cabe em tooltip. */
+  .dm-restr-btn { background:#f9e6c9; color:#8a5411; border:1px solid #f0d48a; border-radius:50%;
+                  width:26px; height:26px; display:inline-flex; align-items:center; justify-content:center;
+                  cursor:pointer; font-size:14px; transition:.15s; padding:0; }
+  .dm-restr-btn:hover { background:#f0d48a; }
+
+  .dm-qtd { font-family:'Archivo','Segoe UI',system-ui,sans-serif; font-weight:700; font-size:13px; }
+  .dm-nada { color:#cbd5e1; }
+  .dm-cl { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+           overflow:hidden; line-height:1.35; }
+
+  /* Local e Objetivo em CAIXA ALTA, formando um bloco com o chip do Veículo: as três
+     primeiras colunas dizem o quê / onde / por quê da viagem, e a Restrição quebra o
+     ritmo, separando-as dos dados da pessoa (nome, idade, bairro).
+     Além do padrão visual, isso NORMALIZA o texto do dash, que vem em caixa alta,
+     baixa e mista sem critério. Maiúscula é a única normalização que não destrói
+     informação — minúscula transformaria CCR em "Ccr", SER em "Ser".
+     É `text-transform`, então o dado original continua intacto no title (tooltip).
+     Fonte 1px menor e letter-spacing porque caixa alta lê "maior" e mais apertada. */
+  .dm-cl.dm-up { text-transform:uppercase; letter-spacing:.02em; font-size:12px; }
+  /* Local + selo SERVIDOR na mesma linha (30/09): o texto encolhe e corta, o selo nunca. */
+  .dm-local-serv { display:flex; align-items:center; gap:6px; min-width:0; }
+  .dm-local-serv .dm-cl { min-width:0; }
+  .dm-local-serv .dm-selo-serv { flex:none; }
+
+  /* ---- SELEÇÃO ---------------------------------------------------------------- */
+  .dm-chk { width:16px; height:16px; cursor:pointer; accent-color:#1e3a8a; margin:0; }
+  .dm-tab tr.sel > td { background:#eef2fb; }
+  .dm-tab tr.sel:hover > td { background:#e4eafa; }
+  .dm-tab tr.dm-linha { cursor:pointer; }
+
+  /* Barra flutuante: só existe quando há seleção, para não ocupar espaço à toa. */
+  .dm-barra { position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
+              background:#1e3a8a; color:#fff; border-radius:12px; padding:10px 14px;
+              display:none; align-items:center; gap:16px; z-index:60;
+              box-shadow:0 8px 26px rgba(15,23,42,.28); }
+  .dm-barra.on { display:flex; }
+  .dm-barra-n { font-family:'Archivo','Segoe UI',system-ui,sans-serif; font-size:13px; font-weight:700; white-space:nowrap; }
+  .dm-barra-n b { font-size:17px; }
+  .dm-barra-sub { font-size:11px; color:#c6cef5; }
+  .dm-barra button { border:none; border-radius:8px; padding:8px 14px; font-size:12.5px;
+                     font-weight:700; cursor:pointer; white-space:nowrap; }
+  .dm-btn-montar { background:#fff; color:#1e3a8a; }
+  .dm-btn-montar:hover { background:#e4eafa; }
+  .dm-btn-limpar { background:transparent; color:#c6cef5; }
+  .dm-btn-limpar:hover { color:#fff; }
+
+  /* Extensão que desliza POR TRÁS da barra, no espírito de um placar de transmissão.
+     Mesma técnica da cidade na banda grudada: max-width animado com overflow:hidden,
+     mais um translateX curto para dar a sensação de sair de trás. */
+  .dm-ext { display:flex; align-items:center; gap:8px; max-width:0; opacity:0;
+            overflow:hidden; white-space:nowrap; transform:translateX(-16px);
+            transition:max-width .32s ease, opacity .22s ease, transform .32s ease; }
+  .dm-barra.tem-ext .dm-ext { max-width:640px; opacity:1; transform:translateX(0); }
+  .dm-ext-sep { width:1px; height:30px; background:rgba(255,255,255,.22); flex:none; }
+
+  /* Card do veículo. O realce dispara na TROCA de modelo — é o que dá o efeito de placar. */
+  .dm-veic-card { display:flex; align-items:center; gap:9px; background:#fff; color:#1e3a8a;
+                  border-radius:9px; padding:6px 11px; }
+  .dm-veic-card.trocou { animation:dmFlip .34s ease; }
+  @keyframes dmFlip { 0% { transform:scale(.94); } 55% { transform:scale(1.05); } 100% { transform:scale(1); } }
+  .dm-vc-tipo { font-family:'Archivo','Segoe UI',system-ui,sans-serif; font-weight:700;
+                font-size:12.5px; letter-spacing:.04em; }
+  .dm-vc-lug { font-family:'Cascadia Mono','Consolas',ui-monospace,monospace; font-size:15px;
+               font-weight:700; font-variant-numeric:tabular-nums; }
+  .dm-vc-sub { font-size:10px; color:#64748b; }
+  .dm-veic-card.amb   { background:#f6d4d4; color:#8c2f2f; }
+  .dm-veic-card.alerta{ background:#8c2f2f; color:#fff; }
+  .dm-veic-card.alerta .dm-vc-sub { color:#f6d4d4; }
+  .dm-veic-card.vazio { background:rgba(255,255,255,.14); color:#fff; }
+  .dm-veic-card.vazio .dm-vc-sub { color:#c6cef5; }
+
+  .dm-ext-saida { display:flex; flex-direction:column; line-height:1.15; }
+  .dm-ext-saida i { font-size:9.5px; font-style:normal; color:#c6cef5; letter-spacing:.05em;
+                    text-transform:uppercase; font-weight:700; }
+  .dm-ext-saida b { font-family:'Cascadia Mono','Consolas',ui-monospace,monospace; font-size:14px;
+                    font-variant-numeric:tabular-nums; }
+
+  .dm-cid-chip { background:rgba(255,255,255,.16); border-radius:7px; padding:4px 9px;
+                 font-size:10.5px; font-weight:700; letter-spacing:.04em; }
+
+  /* ---- PAINEL LATERAL ---------------------------------------------------------- */
+  /* ⚠️ Acima do modal (80/81) de propósito: no passo 2 o chip do passageiro abre este
+     painel, e com z-index menor ele abriria ATRÁS do modal — invisível. */
+  .dm-drawer-fundo { position:fixed; inset:0; background:rgba(15,23,42,.35); z-index:90;
+                     opacity:0; pointer-events:none; transition:opacity .2s; }
+  .dm-drawer-fundo.on { opacity:1; pointer-events:auto; }
+  .dm-drawer { position:fixed; top:0; right:0; height:100%; width:430px; max-width:92vw;
+               background:#fff; z-index:91; transform:translateX(100%); transition:transform .25s;
+               display:flex; flex-direction:column; box-shadow:-8px 0 26px rgba(15,23,42,.18); }
+  .dm-drawer.on { transform:translateX(0); }
+  .dm-dr-topo { background:#1e3a8a; color:#fff; padding:14px 16px; display:flex;
+                align-items:flex-start; gap:10px; }
+  .dm-dr-nome { font-family:'Archivo','Segoe UI',system-ui,sans-serif; font-weight:700; font-size:15px; line-height:1.25; }
+  .dm-dr-sub { font-size:11px; color:#c6cef5; font-family:'Cascadia Mono','Consolas',ui-monospace,monospace; }
+  .dm-dr-x { margin-left:auto; background:none; border:none; color:#fff; font-size:20px; cursor:pointer; line-height:1; padding:0 2px; }
+  .dm-dr-corpo { padding:14px 16px; overflow-y:auto; flex:1; }
+  .dm-dr-lbl { font-size:9.5px; font-weight:800; color:#8f9c97; text-transform:uppercase;
+               letter-spacing:.06em; margin-bottom:2px; }
+  .dm-dr-val { font-size:13px; color:#1d2a28; margin-bottom:12px; line-height:1.4; }
+  .dm-dr-obs { background:#fbeed6; border:1px solid #f0d48a; border-radius:9px; padding:10px 12px;
+               font-size:12.5px; color:#8a5411; line-height:1.45; margin-bottom:12px; }
+  .dm-dr-obs textarea { width:100%; box-sizing:border-box; min-height:64px; resize:vertical;
+                        border:1px solid #e0be7a; border-radius:7px; padding:7px 9px; margin-top:6px;
+                        font-family:'Inter','Segoe UI',system-ui,sans-serif; font-size:12.5px;
+                        color:#5c3a0b; background:#fffaf0; outline:none; line-height:1.45; }
+  .dm-dr-obs textarea:focus { border-color:#8a5411; box-shadow:0 0 0 3px rgba(138,84,17,.14); }
+  .dm-dr-obs-acoes { display:flex; align-items:center; gap:9px; margin-top:7px; }
+  .dm-dr-salvar { background:#8a5411; color:#fff; border:none; border-radius:7px; padding:6px 14px;
+                  font-size:12px; font-weight:700; cursor:pointer; }
+  .dm-dr-salvar:hover { background:#6d420d; }
+  .dm-dr-salvar:disabled { opacity:.55; cursor:progress; }
+  .dm-dr-obs-dica { font-size:11px; color:#a07434; }
+  /* Bloco de apagar a demanda digitada à mão. Fica no FIM do painel, longe do "Salvar" da
+     restrição, e o botão é discreto até o mouse chegar nele: apagar é raro e irreversível,
+     não pode competir de igual para igual com a ação que o operador faz o tempo todo. */
+  /* Cancelar pedido na fila (05/10/2026): botão embaixo do chip do veículo, na largura do chip, e bloco na
+     ficha. Discretos até passar o mouse: cancelar é a saída rara, montar carro é o trabalho do dia. */
+  .dm-cancelar-linha { display:flex; align-items:center; justify-content:center; gap:3px; width:104px;
+                       box-sizing:border-box; margin-top:4px; background:#fff; color:#9b2c2c;
+                       border:1px solid #f0caca; border-radius:5px; padding:1px 5px; font-size:10.5px;
+                       font-weight:700; cursor:pointer; }
+  .dm-cancelar-linha:hover { background:#8c2f2f; border-color:#8c2f2f; color:#fff; }
+  .dm-cancelar-linha .ti { font-size:12px; }
+  .dm-dr-cancelar { margin-top:14px; padding:10px 12px; border:1px solid #f0caca; background:#fdf6f6;
+                    border-radius:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .dm-dr-cancelar-txt { flex:1; min-width:170px; font-size:12px; color:#8c2f2f; line-height:1.45; }
+  .dm-dr-cancelar-txt b { color:#5c1d1d; }
+  .dm-dr-apagar { margin-top:14px; padding-top:12px; border-top:1px dashed #e2e8f0; }
+  .dm-dr-apagar-cab { font-size:11px; color:#8f9c97; line-height:1.5; margin-bottom:8px; }
+  .dm-dr-apagar-cab b { color:#1d2a28; }
+  .dm-dr-btn-apagar { background:#fff; color:#8c2f2f; border:1px solid #f0caca; border-radius:7px;
+                      padding:6px 13px; font-size:12px; font-weight:700; cursor:pointer;
+                      display:inline-flex; align-items:center; gap:6px; }
+  .dm-dr-btn-apagar:hover:not(:disabled) { background:#8c2f2f; border-color:#8c2f2f; color:#fff; }
+  .dm-dr-btn-apagar:disabled { opacity:.55; cursor:progress; }
+  .dm-dr-apagar-acoes { display:flex; gap:8px; flex-wrap:wrap; }
+  /* Editar vem ANTES de apagar e na cor da tela, não em vermelho: corrigir é o que o
+     operador vai querer quase sempre; apagar é a saída rara. */
+  .dm-dr-btn-editar { background:#fff; color:#1e3a8a; border:1px solid #c7d2e8; border-radius:7px;
+                      padding:6px 13px; font-size:12px; font-weight:700; cursor:pointer;
+                      display:inline-flex; align-items:center; gap:6px; }
+  .dm-dr-btn-editar:hover { background:#1e3a8a; border-color:#1e3a8a; color:#fff; }
+  /* Stepper de quantidade. Mora no PAINEL, não na linha da tabela, para não abrir
+     exceção na regra "clicar em qualquer ponto da linha abre o painel" (14/08). */
+  .dm-dr-qtd { display:inline-flex; align-items:center; border:1px solid #c7d2e8;
+               border-radius:9px; overflow:hidden; background:#fff; }
+  .dm-dr-qtd button { width:31px; height:28px; border:none; background:#fff; color:#1e3a8a;
+                      font-size:15px; font-weight:800; line-height:1; cursor:pointer; }
+  .dm-dr-qtd button:hover:not(:disabled) { background:#eef2fb; }
+  .dm-dr-qtd button:disabled { color:#c7cedb; cursor:not-allowed; }
+  .dm-dr-qtd span { min-width:36px; text-align:center; font-size:13px; font-weight:800;
+                    color:#1d2a28; padding:4px 0; font-variant-numeric:tabular-nums;
+                    border-left:1px solid #e6ebf4; border-right:1px solid #e6ebf4; }
+  .dm-dr-qtd-dica { font-size:10.5px; color:#8f9c97; margin:3px 0 12px; min-height:13px; }
+  .dm-dr-grade { display:grid; grid-template-columns:1fr 1fr; gap:0 14px; }
+
+  /* ---- MODAL DE MONTAGEM (entrega 3) --------------------------------------------
+     z-index acima de tudo: navbar 50, barra flutuante 60, painel lateral 70/71. */
+  .dm-mo-fundo { position:fixed; inset:0; background:rgba(15,23,42,.46); z-index:80;
+                 opacity:0; pointer-events:none; transition:opacity .18s ease; }
+  .dm-mo-fundo.on { opacity:1; pointer-events:auto; }
+  .dm-modal { position:fixed; z-index:81; left:50%; top:50%; max-height:82vh;
+              width:min(660px, calc(100vw - 40px)); display:flex; flex-direction:column;
+              background:#fff; border-radius:12px; box-shadow:0 18px 48px rgba(15,23,42,.28);
+              opacity:0; pointer-events:none; transform:translate(-50%,-46%) scale(.98);
+              transition:opacity .18s ease, transform .18s ease; }
+  .dm-modal.on { opacity:1; pointer-events:auto; transform:translate(-50%,-50%) scale(1); }
+  /* Passo 2 usa o card da Aba 2, desenhado para coluna larga — 660px espremia tudo. */
+  .dm-modal.largo { width:min(880px, calc(100vw - 40px)); }
+  .dm-mo-topo { display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+                padding:14px 16px; border-bottom:1px solid #e8edf4; }
+  .dm-mo-tit { font-family:'Archivo','Segoe UI',system-ui,sans-serif; font-size:15px;
+               font-weight:800; color:#1e3a8a; }
+  .dm-mo-sub { font-size:11.5px; color:#64748b; margin-top:3px; }
+  .dm-mo-x { border:none; background:none; font-size:22px; line-height:1; color:#94a3b8;
+             cursor:pointer; padding:0 2px; }
+  .dm-mo-tabs { display:flex; border-bottom:1px solid #e8edf4; }
+  .dm-mo-tabs button { flex:1; border:none; background:none; padding:10px 8px; cursor:pointer;
+                       font-size:10.5px; font-weight:800; letter-spacing:.06em;
+                       text-transform:uppercase; color:#8f9c97;
+                       border-bottom:2px solid transparent; }
+  .dm-mo-tabs button.on { color:#1e3a8a; border-bottom-color:#1e3a8a; }
+  .dm-mo-corpo { padding:12px 16px; overflow-y:auto; flex:1; }
+  /* Recusa da gravação: o operador está olhando o modal, então o aviso nasce DENTRO dele,
+     no centro, e não num toast de canto que ele pode nem ver. Curto de propósito — o
+     detalhe está na tela, o que falta é o fato. */
+  .dm-mo-alerta { display:none; margin:0 16px 10px; padding:12px 14px; border-radius:9px;
+                  background:#fdf2f2; border:1px solid #e9b4b4; text-align:center; }
+  .dm-mo-alerta.on { display:block; }
+  .dm-mo-alerta b { display:block; font-size:13.5px; color:#9b2c2c; margin-bottom:2px; }
+  .dm-mo-alerta span { font-size:12px; color:#7a4a4a; }
+
+  /* ---- ENCAIXE: reusa dm-mo-topo / -tabs / -corpo / -pe / -alerta; so o que muda ---- */
+  .dm-en-fundo { position:fixed; inset:0; background:rgba(15,23,42,.42); opacity:0;
+                 pointer-events:none; transition:opacity .18s; z-index:60; }
+  .dm-en-fundo.on { opacity:1; pointer-events:auto; }
+  .dm-en { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.97);
+           width:min(880px, calc(100vw - 40px)); max-height:calc(100vh - 64px);
+           display:flex; flex-direction:column; background:#fff; border-radius:13px;
+           box-shadow:0 18px 48px rgba(15,23,42,.26); opacity:0; pointer-events:none;
+           transition:opacity .18s, transform .18s; z-index:61; }
+  .dm-en.on { opacity:1; pointer-events:auto; transform:translate(-50%,-50%) scale(1); }
+  .dm-en-barra { display:flex; gap:9px; align-items:flex-end; flex-wrap:wrap;
+                 padding:11px 16px 0; }
+  .dm-en-barra label { display:block; font-size:9.5px; font-weight:800; letter-spacing:.05em;
+                       text-transform:uppercase; color:#8f9c97; margin-bottom:3px; }
+  .dm-en-barra input[type=text], .dm-en-barra select {
+      border:1px solid #d6dfee; border-radius:7px; padding:6px 9px; font-size:12.5px;
+      font-family:inherit; color:#1d2a28; background:#fff; min-height:32px; }
+  .dm-en-barra .cresce { flex:1; min-width:190px; }
+  .dm-en-rota { display:flex; align-items:center; gap:6px; font-size:11.5px; color:#475569;
+                padding-bottom:7px; cursor:pointer; white-space:nowrap; }
+  .dm-en-tab { width:100%; border-collapse:collapse; font-size:12.5px; }
+  .dm-en-tab th { text-align:left; font-size:9.5px; font-weight:800; letter-spacing:.05em;
+                  text-transform:uppercase; color:#8f9c97; padding:6px 8px;
+                  border-bottom:1px solid #e8edf4; position:sticky; top:0; background:#fff; }
+  .dm-en-tab td { padding:7px 8px; border-bottom:1px solid #f1f5f9; vertical-align:middle; }
+  .dm-en-tab tr.sel td { background:#eef2fb; }
+  .dm-en-nome { font-weight:700; color:#1d2a28; }
+  .dm-en-mat { font-size:10.5px; color:#8f9c97; }
+  /* Hora do compromisso do paciente, em destaque: encaixar alguem de 07:00 num carro que
+     sai as 10:00 e o erro que so a vista pega, porque nenhuma regra o impede. */
+  .dm-en-hora { font-family:'Cascadia Mono','Consolas',ui-monospace,monospace;
+                font-weight:700; color:#1e3a8a; }
+  .dm-en-hora.tarde { color:#9b2c2c; }
+  .dm-en-vazio { font-size:12.5px; color:#8f9c97; text-align:center; padding:26px 10px;
+                 line-height:1.6; }
+  .dm-en-campos { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px 12px; }
+  .dm-en-campos .col2 { grid-column:span 2; }
+  .dm-en-campos .col3 { grid-column:span 3; }
+  .dm-en-campos label { display:block; font-size:9.5px; font-weight:800; letter-spacing:.05em;
+                        text-transform:uppercase; color:#8f9c97; margin-bottom:3px; }
+  .dm-en-campos input, .dm-en-campos select {
+      width:100%; border:1px solid #d6dfee; border-radius:7px; padding:7px 9px;
+      font-size:12.5px; font-family:inherit; color:#1d2a28; background:#fff; min-height:34px; }
+  /* O container e o ancoradouro do dropdown: sem `position:relative` aqui, o absolute
+     abaixo se penduraria no modal e a lista apareceria longe do campo. */
+  .dm-en-auto { position:relative; }
+  .dm-en-sug { display:none; position:absolute; left:0; right:0; top:100%; z-index:5;
+               margin-top:3px; max-height:210px; overflow-y:auto; background:#fff;
+               border:1px solid #d6dfee; border-radius:8px;
+               box-shadow:0 8px 22px rgba(15,23,42,.14); }
+  .dm-en-sug.on { display:block; }
+  .dm-en-sug-item { padding:7px 10px; cursor:pointer; border-bottom:1px solid #f1f5f9; }
+  .dm-en-sug-item:last-child { border-bottom:none; }
+  .dm-en-sug-item:hover, .dm-en-sug-item.on { background:#eef2fb; }
+  /* Nome em cima, cidade EMBAIXO — no datalist nativo a cidade saia AO LADO do nome, e o
+     navegador nao deixa mudar isso. Foi o que motivou a troca. */
+  .dm-en-sug-nome { display:block; font-size:12.5px; color:#1d2a28; }
+  .dm-en-sug-cid { display:block; font-size:10.5px; color:#8f9c97; margin-top:1px; }
+  .dm-en-grupo { grid-column:1/-1; font-size:10px; font-weight:800; letter-spacing:.05em;
+                 text-transform:uppercase; color:#1e3a8a; margin-top:6px;
+                 padding-top:9px; border-top:1px solid #eef2f7; }
+  .dm-mo-nota { font-size:10.5px; color:#a07434; background:#fbeed6; border:1px solid #f0d48a;
+                border-radius:7px; padding:6px 9px; margin-bottom:11px; line-height:1.4; }
+  .dm-mo-grupo { margin-bottom:13px; }
+  .dm-mo-gtit { display:flex; align-items:center; gap:7px; margin-bottom:6px; flex-wrap:wrap; }
+  .dm-mo-gnome { font-size:11.5px; font-weight:800; color:#1d2a28; text-transform:uppercase;
+                 letter-spacing:.04em; }
+  .dm-mo-gcap { font-family:'Cascadia Mono','Consolas',ui-monospace,monospace; font-size:11px;
+                color:#64748b; font-variant-numeric:tabular-nums; }
+  .dm-mo-selo { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.06em;
+                border-radius:4px; padding:2px 6px; }
+  .dm-mo-selo.sug { background:#dcfce7; color:#166534; }
+  .dm-mo-selo.nao { background:#fee2e2; color:#8c2f2f; }
+  .dm-mo-placas { display:flex; flex-wrap:wrap; gap:6px; }
+  .dm-mo-placa { display:inline-flex; flex-direction:column; align-items:flex-start; gap:1px;
+                 color:#1e3a8a; background:#f4f7fc; border:1px solid #d6dfee; text-align:left;
+                 border-radius:7px; padding:6px 11px; cursor:pointer; }
+  .dm-mo-placa:hover { background:#eef2fb; border-color:#1e3a8a; }
+  .dm-mo-placa.on { background:#1e3a8a; color:#fff; border-color:#1e3a8a; }
+  .dm-mo-pl { font-family:'Cascadia Mono','Consolas',ui-monospace,monospace; font-size:13px;
+              font-weight:700; letter-spacing:.02em; }
+  /* Nome do motorista vinculado (só terceirizado). max-width para nome comprido não
+     esticar o chip até quebrar a fileira; nowrap porque nome cortado no meio é pior. */
+  .dm-mo-mot { font-size:9.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;
+               color:#64748b; max-width:132px; white-space:nowrap; overflow:hidden;
+               text-overflow:ellipsis; }
+  .dm-mo-mot.sem { color:#a07434; }
+  .dm-mo-placa.on .dm-mo-mot { color:#c6cef5; }
+  .dm-mo-placa.on .dm-mo-mot.sem { color:#fbeed6; }
+  /* Bate-volta: a placa que ja saiu hoje continua clicavel — repetir e legitimo. O selo
+     existe para o operador NOTAR que esta repetindo, nunca para impedir. Ambar (aviso),
+     nao vermelho (erro), porque nao ha nada de errado em mandar o carro de novo. */
+  /* ⚠️ `:not(.on)` NÃO é decoração: `.dm-mo-placa.bv` e `.dm-mo-placa.on` têm a MESMA
+     especificidade, então a que vier depois no arquivo vence. Sem o `:not`, o fundo âmbar
+     do selo derrubava o fundo azul do selecionado, mas o `color:#fff` do `.on` ficava —
+     e o chip inteiro sumia: letra branca sobre creme. */
+  .dm-mo-placa.bv:not(.on) { border-color:#e0b96b; background:#fdf8ee; }
+  .dm-mo-bv { font-size:9.5px; font-weight:800; letter-spacing:.03em; text-transform:uppercase;
+              color:#a07434; white-space:nowrap; }
+  .dm-mo-placa.on .dm-mo-bv { color:#fde9bf; }
+  .dm-mo-vazio { font-size:12.5px; color:#8f9c97; text-align:center; padding:22px 10px;
+                 line-height:1.5; }
+  .dm-mo-pe { display:flex; align-items:center; justify-content:space-between; gap:12px;
+              padding:11px 16px; border-top:1px solid #e8edf4; }
+  .dm-mo-dica { font-size:11px; color:#8f9c97; }
+  .dm-mo-acoes { display:flex; gap:8px; flex:none; }
+  .dm-mo-cancelar { background:#fff; color:#64748b; border:1px solid #d6dfee; border-radius:7px;
+                    padding:7px 13px; font-size:12px; font-weight:700; cursor:pointer; }
+  .dm-mo-next { background:#1e3a8a; color:#fff; border:none; border-radius:7px; padding:7px 15px;
+                font-size:12px; font-weight:700; cursor:pointer; }
+  .dm-mo-next:disabled { opacity:.45; cursor:not-allowed; }
+
+  /* ---- foco visível (navegação por Tab) ----
+     `:focus-visible` acende no TECLADO e não no clique de mouse — é o que evita o anel
+     pipocando à toa quando o operador só clicou. Tudo escopado em .dm-modal para não
+     vazar para a Aba 2, que divide o mesmo CSS global. */
+  .dm-modal input:focus-visible,
+  .dm-modal select:focus-visible,
+  .dm-modal button:focus-visible {
+    /* outline, e não border: o select de embarque do passageiro tem `border` em estilo
+       inline (herdado do card da Aba 2), e estilo inline vence qualquer seletor. */
+    outline:3px solid rgba(30,58,138,.55);
+    outline-offset:1px;
+    border-radius:6px;
+  }
+  /* A linha inteira do paciente acende, não só o selectzinho: no meio de 6 chips iguais,
+     saber QUEM está em foco vale mais do que saber qual campo. */
+  .dm-modal .chip-passageiro-novo:focus-within {
+    border-color:#1e3a8a;
+    box-shadow:0 0 0 3px rgba(30,58,138,.15);
+  }
+  .dm-modal .cv-logistica-input:focus-within label { color:#1e3a8a; }
+  .dm-modal .dm-mo-next:focus-visible { outline-color:rgba(30,58,138,.85); }
+
+  /* ---- passo 2: confirmar o carro ----
+     O card usa as classes GLOBAIS da Aba 2 (card-veiculo, cv-topo, cv-corpo, medidor,
+     chip-passageiro-novo, alerta-pill...). Foi decisão: reusar o CSS dá a identidade
+     visual pedida sem acoplar os estados, que são independentes até a Fase 4.
+     ⚠️ Preço a saber: redesenhar a Aba 2 muda esta tela em silêncio. */
+  .dm-cf-ref { font-size:10.5px; color:#8f9c97; line-height:1.45; margin-bottom:12px; }
+  .dm-cf-rota { font-size:12px; color:#1d2a28; background:#eef2fb; border-radius:7px;
+                padding:7px 10px; margin-bottom:12px; line-height:1.4; }
+  .dm-cf-rota b { color:#166534; }
+  .dm-cf-tab { width:100%; border-collapse:collapse; }
+  .dm-cf-tab th { font-size:9px; font-weight:800; color:#8f9c97; text-transform:uppercase;
+                  letter-spacing:.06em; text-align:left; padding:0 6px 4px; }
+  .dm-cf-tab td { font-size:12px; color:#1d2a28; padding:5px 6px; border-top:1px solid #eef2f0;
+                  vertical-align:top; }
+  .dm-cf-tab .mono { font-family:'Cascadia Mono','Consolas',ui-monospace,monospace;
+                     font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+  /* ---- seletor Fila | Carros do dia (Parte 2) ---- */
+  .dm-modos { display:flex; gap:0; margin:0 0 12px; border:1px solid #d6dfee; border-radius:9px;
+              overflow:hidden; width:fit-content; background:#fff; }
+  .dm-modos button { border:none; background:#fff; cursor:pointer; padding:8px 16px;
+                     font-size:11.5px; font-weight:800; letter-spacing:.04em;
+                     text-transform:uppercase; color:#8f9c97;
+                     display:flex; align-items:center; gap:7px; }
+  .dm-modos button + button { border-left:1px solid #d6dfee; }
+  .dm-modos button:hover:not(.on) { background:#f4f7fc; color:#1e3a8a; }
+  .dm-modos button.on { background:#1e3a8a; color:#fff; }
+  .dm-modos .dm-modo-n { font-family:'Cascadia Mono','Consolas',ui-monospace,monospace;
+                         font-size:11px; font-variant-numeric:tabular-nums;
+                         background:#eef2fb; color:#1e3a8a; border-radius:10px; padding:1px 7px; }
+  .dm-modos button.on .dm-modo-n { background:rgba(255,255,255,.22); color:#fff; }
+
+  /* ---- diálogo de confirmação (Parte 4) — acima de tudo, inclusive do modal ---- */
+  .dm-cfm-fundo { position:fixed; inset:0; background:rgba(15,23,42,.5); z-index:100;
+                  opacity:0; pointer-events:none; transition:opacity .16s ease; }
+  .dm-cfm-fundo.on { opacity:1; pointer-events:auto; }
+  .dm-cfm { position:fixed; z-index:101; left:50%; top:50%; width:min(520px, calc(100vw - 40px));
+            background:#fff; border-radius:12px; box-shadow:0 18px 48px rgba(15,23,42,.3);
+            opacity:0; pointer-events:none; transform:translate(-50%,-46%) scale(.98);
+            transition:opacity .16s ease, transform .16s ease; }
+  .dm-cfm.on { opacity:1; pointer-events:auto; transform:translate(-50%,-50%) scale(1); }
+  .dm-cfm-tit { font-family:'Archivo','Segoe UI',system-ui,sans-serif; font-size:15px;
+                font-weight:800; color:#1e3a8a; padding:14px 16px 0; }
+  .dm-cfm-corpo { padding:10px 16px 4px; font-size:12.5px; color:#1d2a28; line-height:1.5; }
+  .dm-cfm-corpo p { margin:0 0 9px; }
+  .dm-cfm-carro { display:flex; align-items:center; gap:9px; flex-wrap:wrap; background:#f4f7fc;
+                  border:1px solid #d6dfee; border-radius:9px; padding:8px 11px; margin-bottom:11px;
+                  font-size:12px; color:#1d2a28; }
+  .dm-cfm-pe { display:flex; justify-content:flex-end; gap:8px; padding:11px 16px;
+               border-top:1px solid #e8edf4; }
+  .dm-mo-next.perigo { background:#8c2f2f; }
+  .dm-mo-next.perigo:hover:not(:disabled) { background:#6f2424; }
+
+  /* Sobrou UM controle exclusivo da fila: o botão "Cancelados". Os selects e a busca valem
+     nos dois modos (ver dmCarroCasa). O botão não: em "Carros do dia" os pedidos cancelados
+     JÁ aparecem sempre, na tarja vermelha dentro do chip do passageiro, e é assim que tem de
+     ser — um botão capaz de esconder esse aviso seria um jeito de sair com o carro sem saber
+     que alguém desmarcou. Aqui não há o que revelar, então ele some. */
+  #demandas.modo-carros .dm-so-fila { display:none; }
+  .dm-lacen { display:flex; align-items:center; gap:11px; background:#fbeed6;
+              border:1px solid #f0d48a; border-radius:9px; padding:10px 13px; margin-bottom:10px;
+              font-size:12.5px; color:#8a5411; line-height:1.45; }
+  .dm-lacen b { color:#6d420d; }
+  .dm-lacen button { margin-left:auto; flex:none; background:#8a5411; color:#fff; border:none;
+                     border-radius:7px; padding:7px 14px; font-size:12px; font-weight:700;
+                     cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+  .dm-lacen button:hover:not(:disabled) { background:#6d420d; }
+  .dm-lacen button:disabled { opacity:.55; cursor:progress; }
+  .dm-carros { display:flex; flex-direction:column; gap:10px; }
+  .dm-cs-acoes { display:flex; justify-content:flex-end; gap:8px; padding:8px 13px 11px;
+                 border-top:1px solid #eef2f0; }
+  .dm-cs-btn { border:1px solid #d6dfee; background:#fff; color:#1e3a8a; border-radius:7px;
+               padding:6px 13px; font-size:12px; font-weight:700; cursor:pointer;
+               display:inline-flex; align-items:center; gap:6px; }
+  .dm-cs-btn:hover { background:#eef2fb; border-color:#1e3a8a; }
+  .dm-cs-btn.perigo { color:#8c2f2f; border-color:#f0caca; }
+  .dm-cs-btn.perigo:hover { background:#fdeded; border-color:#8c2f2f; }
+  .dm-cs-conf { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.05em;
+                border-radius:4px; padding:2px 7px; flex-shrink:0; }
+  .dm-cs-conf.ok { background:#dcfce7; color:#166534; }
+  .dm-cs-conf.pend { background:#f1f5f9; color:#64748b; }
+
+  .dm-vazio { text-align:center; padding:50px 20px; color:#8f9c97; }
+  .dm-vazio .dm-ico { font-size:38px; display:block; margin-bottom:8px; opacity:.45; }

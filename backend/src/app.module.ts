@@ -7,6 +7,10 @@ import { VARIAVEIS_DE_AMBIENTE, type VariaveisDeAmbiente } from './configuracao/
 import { MetricasModule } from './metricas/metricas.module';
 import { deveFicarForaDoLog, formatarRequisicaoParaLog, formatarRespostaParaLog } from './registro/formatadores-de-log';
 import { SaudeModule } from './saude/saude.module';
+import { AutenticacaoModule } from './autenticacao/autenticacao.module';
+import { GuardaDeSessao } from './autenticacao/guarda-de-sessao.guard';
+import { FluxosModule } from './fluxos.module';
+import { TempoRealModule } from './tempo-real/tempo-real.module';
 
 const UM_MINUTO_EM_MILISSEGUNDOS = 60_000;
 
@@ -32,7 +36,14 @@ const UM_MINUTO_EM_MILISSEGUNDOS = 60_000;
     }),
     SaudeModule,
     MetricasModule,
+    AutenticacaoModule,
+    TempoRealModule,
+    FluxosModule,
   ],
-  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
+  // Primeiro o limite de requisições, depois a sessão: quem passa do limite nem chega a consultar o banco.
+  providers: [
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    { provide: APP_GUARD, useClass: GuardaDeSessao },
+  ],
 })
 export class AppModule {}

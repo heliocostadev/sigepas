@@ -6,7 +6,9 @@
 }
 
 {$DOMINIO} {
-	encode zstd gzip
+	# O canal do tempo real (Server-Sent Events) fica sem compressão: comprimir guardaria os avisos até juntar um bloco.
+	@semTempoReal not path /api/eventos
+	encode @semTempoReal zstd gzip
 
 	# O navegador passa a usar só HTTPS neste domínio durante um ano. O sinal > substitui o valor que a API já envia,
 	# para o cabeçalho não sair duplicado.

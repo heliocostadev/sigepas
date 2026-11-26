@@ -26,6 +26,18 @@ services:
     mem_limit: 384m
     networks: [interna]
 
+  # Aplica as migrações do banco (prisma migrate deploy) e termina. A API só sobe depois que ela termina bem.
+  migracao:
+    image: ghcr.io/heliocostadev/sigepas-api:${VERSAO:?a versão é o SHA do commit}-migracao
+    restart: 'no'
+    environment:
+      DATABASE_URL: postgresql://sigepas:${SENHA_DO_BANCO}@banco:5432/sigepas
+    depends_on:
+      banco:
+        condition: service_healthy
+    mem_limit: 384m
+    networks: [interna]
+
   api:
     image: ghcr.io/heliocostadev/sigepas-api:${VERSAO:?a versão é o SHA do commit}
     restart: unless-stopped
@@ -33,9 +45,18 @@ services:
       DATABASE_URL: postgresql://sigepas:${SENHA_DO_BANCO}@banco:5432/sigepas
       ORIGENS_PERMITIDAS: https://${DOMINIO:?o domínio fica em /opt/sigepas/.env}
       PORTA_DAS_METRICAS: '9464'
+      # O setor inteiro sai pelo mesmo IP da Prefeitura, e o limite por minuto é por IP. Por isso ele é maior aqui.
+      LIMITE_DE_REQUISICOES_POR_MINUTO: '1200'
+      # Gestor criado na primeira subida. Só o hash scrypt da senha chega à máquina (docs/deploy/README.md).
+      EMAIL_DO_GESTOR_INICIAL: ${EMAIL_DO_GESTOR_INICIAL:-}
+      HASH_DA_SENHA_DO_GESTOR_INICIAL: ${HASH_DA_SENHA_DO_GESTOR_INICIAL:-}
+      # Demonstração acadêmica: motoristas, carros e locais fictícios quando o cadastro está vazio.
+      SEMEAR_DADOS_FICTICIOS: 'sim'
     depends_on:
       banco:
         condition: service_healthy
+      migracao:
+        condition: service_completed_successfully
     mem_limit: 384m
     networks: [interna]
 

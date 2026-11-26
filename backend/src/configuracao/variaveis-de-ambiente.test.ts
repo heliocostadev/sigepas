@@ -11,7 +11,24 @@ describe('lerVariaveisDeAmbiente', () => {
       origensPermitidas: [],
       limiteDeRequisicoesPorMinuto: 100,
       nivelDeLog: 'info',
+      gestorInicial: undefined,
+      semearDadosFicticios: false,
     });
+  });
+
+  it('lê o gestor inicial pelo hash da senha e recusa o hash em formato errado', () => {
+    const hash = 'scrypt$1$8$1$c2Fs$aGFzaA==';
+    const variaveis = lerVariaveisDeAmbiente({
+      DATABASE_URL: ENDERECO_FICTICIO,
+      EMAIL_DO_GESTOR_INICIAL: ' Gestor@Exemplo.org ',
+      HASH_DA_SENHA_DO_GESTOR_INICIAL: hash,
+      SEMEAR_DADOS_FICTICIOS: 'sim',
+    });
+    expect(variaveis.gestorInicial).toEqual({ email: 'gestor@exemplo.org', nome: 'Gestor', hashDaSenha: hash });
+    expect(variaveis.semearDadosFicticios).toBe(true);
+    expect(() =>
+      lerVariaveisDeAmbiente({ DATABASE_URL: ENDERECO_FICTICIO, EMAIL_DO_GESTOR_INICIAL: 'a@b.c', HASH_DA_SENHA_DO_GESTOR_INICIAL: 'x' }),
+    ).toThrow('scrypt');
   });
 
   it('recusa iniciar sem o endereço do banco e diz qual variável falta', () => {

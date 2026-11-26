@@ -1,0 +1,89 @@
+/* =====================================================================
+     ABA CONFIGURAÇÕES (Aba3) — no padrão do design system desde 06/11/2026 (protótipo em
+     docs/design-system/SugestaoClaude/Aba3.prototipo.html). Os componentes ds- moram no EstilosComuns;
+     aqui fica só o que é desta tela, com o prefixo aba3- e as cores dos tokens --ds-*.
+     Os id, os nomes de função e o funcionamento não mudaram: situação escolhida na própria linha,
+     "Tirar de operação" com observação, baixa reversível e o aviso do terceirizado sem carro.
+     ===================================================================== */
+  #aba3 .aba3-abas { margin-left: auto; }
+  .aba3-section { display: none; }
+  .aba3-section.ativo { display: block; }
+  .aba3-secao-cab { display: flex; align-items: center; gap: var(--ds-esp-3); margin-bottom: var(--ds-esp-3); flex-wrap: wrap; }
+  .aba3-secao-cab h2 { font-size: var(--ds-texto-xl); color: var(--ds-texto); }
+  .aba3-secao-cab .ds-cab-acoes { margin-left: auto; }
+  .aba3-sub { font-size: var(--ds-texto-md); color: var(--ds-texto-2); margin: 0 0 var(--ds-esp-3); line-height: 1.5; }
+  .aba3-loading { text-align: center; padding: 32px 16px; color: var(--ds-texto-3); }
+
+  /* Situação editável direto na tabela — economiza abrir o modal só para marcar que um carro foi para a
+     oficina. Verde quando ativo, vermelho quando indisponível. */
+  .aba3-situacao { height: 28px; padding: 0 8px; border: 1px solid; border-radius: var(--ds-raio-pilula);
+                   font: inherit; font-size: var(--ds-texto-sm); font-weight: var(--ds-peso-semi);
+                   cursor: pointer; outline: none; max-width: 190px; }
+  .aba3-situacao.ok  { background: var(--ds-sucesso-fundo); color: var(--ds-sucesso-texto); border-color: var(--ds-sucesso-borda); }
+  .aba3-situacao.nao { background: var(--ds-perigo-fundo); color: var(--ds-perigo-texto); border-color: var(--ds-perigo-borda); }
+  .aba3-situacao:focus-visible { box-shadow: var(--ds-anel-foco); }
+  .aba3-situacao:disabled { opacity: .6; cursor: progress; }
+
+  /* Ações da linha (ds-btn fantasma); a cor no hover diz o que o botão faz. */
+  .btn-acao.acao-baixa:hover   { background: var(--ds-perigo-fundo); color: var(--ds-perigo-texto); }
+  .btn-acao.acao-voltar:hover  { background: var(--ds-sucesso-fundo); color: var(--ds-sucesso-texto); }
+  .btn-acao.acao-estrela:hover { background: var(--ds-atencao-fundo); color: var(--ds-atencao-texto); }
+
+  /* Linha de item com baixa: some da operação, então não pode competir visualmente com a frota ativa —
+     fundo listrado, texto apagado e placa/nome riscados. */
+  .aba3-tabela tr.linha-baixada > td {
+    background: repeating-linear-gradient(45deg, var(--ds-superficie-2), var(--ds-superficie-2) 6px, var(--ds-superficie-3) 6px, var(--ds-superficie-3) 12px);
+    color: var(--ds-texto-3);
+  }
+  .aba3-tabela tr.linha-baixada > td:first-child { text-decoration: line-through; }
+  .aba3-tabela tr.linha-baixada:hover > td { background: var(--ds-superficie-3); }
+
+  /* Motorista terceirizado a pé: a contratada é obrigada a repor o veículo, então a linha tem de gritar
+     até alguém resolver — não basta o aviso do momento do clique. */
+  .aba3-tabela tr.linha-alerta > td { background: var(--ds-atencao-fundo); }
+  .aba3-tabela tr.linha-alerta:hover > td { background: #fbecc5; }
+  .aba3-tabela tr.linha-alerta > td:first-child { box-shadow: inset 3px 0 0 var(--ds-laranja); }
+  .aba3-chip-linha { margin-top: 4px; }
+
+  /* Locais de Embarque (11/09): a estrela marca o local que já vem escolhido ao montar um carro; o cadeado
+     marca a opção do sistema que não é um lugar (Endereço do paciente). */
+  .aba3-chip-sistema { margin-left: 8px; cursor: help; }
+  .aba3-sit-fixa { cursor: help; }
+
+  /* Janelas */
+  .aba3-titulo-perigo { color: var(--ds-perigo-texto); }
+  .aba3-form { display: flex; flex-direction: column; gap: var(--ds-esp-3); }
+  .aba3-linha-busca { display: flex; gap: var(--ds-esp-3); align-items: flex-end; flex-wrap: wrap; }
+  .aba3-previa { max-height: 46vh; overflow: auto; }
+  /* Janelas de vínculo e reposição (10/11): três botões com texto longo não cabiam na largura padrão
+     e o último era cortado. Mais largas e, em tela estreita, os botões descem de linha. */
+  #modalVinculoAba3 .ds-modal, #modalReporAba3 .ds-modal { width: min(680px, 100%); }
+  #modalVinculoAba3 .ds-modal-pe, #modalReporAba3 .ds-modal-pe { flex-wrap: wrap; justify-content: flex-end; }
+  #modalVinculoAba3 .ds-modal-pe .ds-btn, #modalReporAba3 .ds-modal-pe .ds-btn { white-space: nowrap; }
+  .aba3-previa .ds-tabela tr.aba3-conflito td { background: var(--ds-perigo-fundo); }
+  /* ---- Padronização de locais (11/11/2026, mockup aprovado pelo Hélio) ---- */
+  .aba3-pad-filtros { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; padding: 12px; background: var(--ds-superficie-2);
+                      border: 1px solid var(--ds-borda); border-radius: 10px; margin-bottom: 12px; }
+  .aba3-pad-filtros .ds-check { height: 34px; }
+  .aba3-pad-filtros .aba3-pad-limpar { margin-left: auto; }
+  .aba3-pad td { vertical-align: middle; }
+  .aba3-pad .pad-c { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; }
+  .aba3-pad .pad-orig { color: var(--ds-texto-2); }
+  .aba3-pad .pad-orig .pad-c { color: var(--ds-texto-3); }
+  .aba3-pad .pad-novo .pad-c { color: var(--ds-marca-600); }
+  .aba3-pad .pad-novo .pad-l { font-weight: 700; }
+  .aba3-pad .pad-muda { background: #fff7d6; padding: 0 3px; border-radius: 3px; }
+  .aba3-pad .pad-seta { color: var(--ds-texto-inativo, #9aa6b2); text-align: center; width: 34px; }
+  .aba3-pad .pad-quem { font-size: 11.5px; color: var(--ds-texto-3); line-height: 1.35; white-space: nowrap; }
+  .aba3-pad-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .aba3-pad-chip.dic { background: var(--ds-marca-50); color: var(--ds-marca-600); }
+  .aba3-pad-chip.goo { background: #eef2ff; color: #3730a3; }
+  .aba3-pad-chip.man { background: var(--ds-atencao-fundo); color: var(--ds-atencao-texto); }
+  .aba3-pad-chip.igual { background: var(--ds-superficie-3); color: var(--ds-texto-3); }
+  .aba3-pad-pe { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; font-size: 12.5px; color: var(--ds-texto-3); }
+  .aba3-pad-pag { display: flex; gap: 6px; flex-wrap: wrap; }
+  .aba3-pad-pag button { min-width: 32px; height: 28px; border: 1px solid var(--ds-borda); border-radius: 6px; background: #fff; font: inherit; font-size: 12.5px; cursor: pointer; }
+  .aba3-pad-pag button.on { background: var(--ds-marca-600); border-color: var(--ds-marca-600); color: #fff; }
+  .aba3-pad-travado { background: var(--ds-superficie-2); border: 1px dashed var(--ds-borda-forte); border-radius: 8px; padding: 9px 11px;
+                      font-size: 13px; color: var(--ds-texto-2); }
+  .aba3-pad-travado b { color: var(--ds-texto); }
