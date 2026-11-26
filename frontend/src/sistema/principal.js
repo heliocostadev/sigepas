@@ -161,7 +161,7 @@ function carregarUsuario() {
 function sairDoSistema() {
   fetch('/api/autenticacao/sair', {
     method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: '{}'
-  }).finally(function () { window.location.href = '/'; });
+  }).catch(function () { /* sem resposta: a sessão vence sozinha no servidor */ }).finally(function () { window.location.href = '/'; });
 }
 
 window.addEventListener('load', function () {

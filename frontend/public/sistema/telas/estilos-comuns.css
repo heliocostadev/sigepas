@@ -787,7 +787,7 @@
   .ds-grupo-titulo .ds-risca { flex: 1; height: 1px; background: var(--ds-borda); }
 
   /* ---------- Link de texto (ação discreta dentro de uma frase) ---------- */
-  .ds-link { color: var(--ds-marca-600); font-weight: var(--ds-peso-semi); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font: inherit; }
+  .ds-link { color: var(--ds-marca-600); text-decoration: underline; cursor: pointer; background: none; border: none; padding: 0; font: inherit; font-weight: var(--ds-peso-semi); }
   .ds-link:hover { color: var(--ds-marca-800); }
 
   /* ---------- Rodapé de versões e faixa de arquivo incompleto (Index) ---------- */

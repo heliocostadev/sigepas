@@ -1028,7 +1028,7 @@
           direcaoAnterior = direcao;
         }
       }
-      const horas = Object.keys(porCidade[cid]).sort();
+      const horas = Object.keys(porCidade[cid]).sort(function (a, b) { return a.localeCompare(b); });
       let nPac = 0, nPass = 0;
       horas.forEach(function (h) {
         porCidade[cid][h].forEach(function (p) { nPac++; nPass += dmQtd(p); });
@@ -2040,6 +2040,7 @@
   // que desapareciam por causa da chave: ninguém percebe até o paciente ficar em terra.
   function dmMontagemPacientes() {
     const m = estadoDm.montagem;
+    if (!m) return [];
     // Editando carro gravado: os passageiros vêm do CARRO, não da fila — eles já saíram
     // dela quando o carro foi montado, então procurá-los em estadoDm.pacientes não acha
     // ninguém e o card apareceria vazio.
@@ -2211,6 +2212,7 @@
 
   function dmRenderRoteiro(pac) {
     const m = estadoDm.montagem;
+    if (!m) return '';
     const rot = m.roteiro || [];
     const horaFmt = function (h) { return (h && h !== '99:99') ? h : ''; };
 
@@ -2281,7 +2283,7 @@
     if (!rota.length) return 'sem cidade nos pacientes';
     return ['Joinville'].concat(rota.slice(0, rota.length - 1)).join(' › ')
       + ' › <span class="cv-rota-destino">' + dmEsc(rota[rota.length - 1]) + '</span>'
-      + (m.localEmbarque
+      + (m && m.localEmbarque
           ? ' <span class="cv-rota-local">· Saída ' + dmEsc(m.localEmbarque) + '</span>' : '');
   }
 
@@ -2971,7 +2973,7 @@
     (estadoDm.pacientes || []).forEach(function (p) { if (p.cidade) cids[p.cidade] = true; });
     document.getElementById('dmEnCidade').innerHTML =
       '<option value="">Todas</option>' +
-      Object.keys(cids).sort().map(function (c) {
+      Object.keys(cids).sort(function (a, b) { return a.localeCompare(b, 'pt-BR'); }).map(function (c) {
         return '<option value="' + dmEsc(c) + '">' + dmEsc(c) + '</option>';
       }).join('');
 
@@ -3702,7 +3704,7 @@
     if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
       ev.preventDefault();
       const passo = (ev.key === 'ArrowDown') ? 1 : -1;
-      dmNovoSugIdx = (dmNovoSugIdx === undefined ? -1 : dmNovoSugIdx) + passo;
+      dmNovoSugIdx = dmNovoSugIdx + passo;
       if (dmNovoSugIdx > itens.length - 1) dmNovoSugIdx = 0;
       if (0 > dmNovoSugIdx) dmNovoSugIdx = itens.length - 1;
       itens.forEach(function (el, i) { el.classList.toggle('on', i === dmNovoSugIdx); });

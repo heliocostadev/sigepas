@@ -7,7 +7,7 @@ const estadoGuia = {
     motoristasServidores: [],
     quemAtendeuOpcoes: [],
     expandidos: [],
-    confAberto: null
+    confAberto: ''
   };
 
   // Entrar na aba ou trocar a data (13/11/2026): mostra na hora a última carga daquele dia, a mesma que Viagens
@@ -54,7 +54,7 @@ const estadoGuia = {
     // locais de atendimento distintos (dos passageiros salvos)
     const locaisSet = new Set();
     estadoGuia.veiculosSalvos.forEach(v => v.passageiros.forEach(p => { if (p.local) locaisSet.add(p.local); }));
-    estadoGuia.locais = [...locaisSet].sort();
+    estadoGuia.locais = [...locaisSet].sort(function (a, b) { return a.localeCompare(b, 'pt-BR'); });
 
     // cidades de destino para o filtro: históricas + destinos salvos.
     // 🔑 Uma cidade, uma opção (defeito 3, 05/10): o CSV grava "FLORIANOPOLIS" e o LACEN "Florianópolis". O valor da
@@ -414,7 +414,7 @@ const estadoGuia = {
       'Confirmar transferência', 'primario',
       function () {
         guiaModalLoading('Transferindo...');
-        chamarServidor('moverPacienteAlocado', [data, c.v.placa, c.mat, vd.placa, getOperador(), vd.idViagem || ''], function (dados) { estadoGuia.confAberto = null; fecharPainelPax(); carregarGuia(dados, true); guiaModalSucesso('Paciente transferido!'); if (typeof atualizarBadgeKanban === 'function') atualizarBadgeKanban(); }, function (e) { guiaModalFechar(); toast('Erro: ' + e, 'erro'); resetSel(); });
+        chamarServidor('moverPacienteAlocado', [data, c.v.placa, c.mat, vd.placa, getOperador(), vd.idViagem || ''], function (dados) { estadoGuia.confAberto = ''; fecharPainelPax(); carregarGuia(dados, true); guiaModalSucesso('Paciente transferido!'); if (typeof atualizarBadgeKanban === 'function') atualizarBadgeKanban(); }, function (e) { guiaModalFechar(); toast('Erro: ' + e, 'erro'); resetSel(); });
       },
       resetSel
     );
@@ -460,7 +460,7 @@ const estadoGuia = {
     guiaModalConfirmar('Trocar pacientes de carro', msg, 'Confirmar Troca', 'primario',
       function () {
         guiaModalLoading('Trocando pacientes...');
-        chamarServidor('trocarPacienteAlocado', [data, c.v.placa, c.mat, vOutro.placa, matOutro, getOperador()], function (dados) { estadoGuia.confAberto = null; fecharPainelPax(); carregarGuia(dados, true); guiaModalSucesso('Troca concluída!'); if (typeof atualizarBadgeKanban === 'function') atualizarBadgeKanban(); }, function (e) { guiaModalFechar(); toast('Erro: ' + e, 'erro'); resetSel(); });
+        chamarServidor('trocarPacienteAlocado', [data, c.v.placa, c.mat, vOutro.placa, matOutro, getOperador()], function (dados) { estadoGuia.confAberto = ''; fecharPainelPax(); carregarGuia(dados, true); guiaModalSucesso('Troca concluída!'); if (typeof atualizarBadgeKanban === 'function') atualizarBadgeKanban(); }, function (e) { guiaModalFechar(); toast('Erro: ' + e, 'erro'); resetSel(); });
       },
       resetSel
     );
@@ -591,7 +591,7 @@ const estadoGuia = {
   }
 
   function fecharPainelPax() {
-    estadoGuia.confAberto = null;
+    estadoGuia.confAberto = '';
     const d = document.getElementById('guiaSlideDrawer');
     const o = document.getElementById('guiaDrawerOverlay');
     if (d) d.classList.remove('aberto');
@@ -957,7 +957,7 @@ const estadoGuia = {
       if (!canc) return false;   // sem justificativa: a janela fica aberta e o botão continua armado
       guiaModalLoading('Cancelando...');
       chamarServidor('salvarConfirmacao', [data, c.v.placa, c.mat, 'Cancelado', quem, obs, getOperador(), canc.texto], function (dados) {
-          estadoGuia.confAberto = null;
+          estadoGuia.confAberto = '';
           fecharPainelPax();
           carregarGuia(dados, true);
           guiaModalSucesso('Paciente cancelado!');
@@ -1404,7 +1404,7 @@ const estadoGuia = {
         destravar();
         if (guiaDoisMotoristas(v)) guiaJanelaDoisMotoristas(chave, 'imagem', copiou);
         else guiaAbrirConversaImagem(chave, copiou);
-      });
+      }).catch(function () { destravar(); });
     }).catch(function () {
       destravar();
       toast('Não deu para gerar a imagem. Tente de novo.', 'erro');

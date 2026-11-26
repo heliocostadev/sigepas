@@ -24,7 +24,7 @@ export interface EstadoGuia {
   veiculosSalvos: Carro[];
   locais: string[];
   expandidos: string[];
-  confAberto: string | null;
+  confAberto: string;
   tpaxOpcoes?: { valor: string; nome: string; detalhe: string }[];
   tpaxVisiveis?: number[];
   tpaxIdx?: number;

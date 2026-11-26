@@ -83,7 +83,8 @@
       let tr = [];
       tr.push('<tr class="' + (baixado ? 'linha-baixada' : (semCarro ? 'linha-alerta' : '')) + '">');
 
-      const keyEscapada = (item._key || '').toString().replace(/'/g, "\\'");
+      // A barra invertida é escapada antes da aspa: senão um nome terminado em barra fecharia a string do onclick.
+      const keyEscapada = (item._key || '').toString().replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 
       // Situação editável na própria linha. O botão 🔄 saiu: com motivo no lugar de um
       // "Inativo" mudo, alternar às cegas não faz mais sentido.

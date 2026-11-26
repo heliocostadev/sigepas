@@ -97,7 +97,7 @@
           <div class="ds-upload-sub">ou clique para escolher no computador</div>
           <div id="impNomeArquivo" class="imp-arquivo ds-oculto"></div>
         </div>
-        <input type="file" id="impArquivo" accept=".csv" onchange="aoEscolherArquivoImp()" style="display:none;">
+        <input type="file" id="impArquivo" aria-label="Arquivo CSV do OLOSTECH" accept=".csv" onchange="aoEscolherArquivoImp()" style="display:none;">
         <div class="imp-acoes">
           <span id="impStatus" class="imp-status"><i class="ti ti-info-circle"></i>Aguardando arquivo...</span>
           <button id="impBtnProcessar" onclick="importarCSV()" class="ds-btn ds-btn--primario" disabled><i class="ti ti-database-import"></i>Processar arquivo</button>
@@ -136,23 +136,23 @@
   <div class="dm-toolbar">
     <div class="dm-campo">
       <label>Data da operação</label>
-      <input type="date" id="dmData" onchange="iniciarDemandas(true)">
+      <input type="date" id="dmData" aria-label="Data da operação" onchange="iniciarDemandas(true)">
     </div>
     <div class="dm-campo">
       <label>Cidade de destino</label>
-      <select id="dmFCidade" onchange="dmRender()"><option value="">Todas</option></select>
+      <select id="dmFCidade" aria-label="Cidade de destino" onchange="dmRender()"><option value="">Todas</option></select>
     </div>
     <div class="dm-campo">
       <label>Local de atendimento</label>
-      <select id="dmFLocal" onchange="dmRender()"><option value="">Todos</option></select>
+      <select id="dmFLocal" aria-label="Local de atendimento" onchange="dmRender()"><option value="">Todos</option></select>
     </div>
     <div class="dm-campo">
       <label>Veículo solicitado</label>
-      <select id="dmFVeic" onchange="dmRender()"><option value="">Todos</option></select>
+      <select id="dmFVeic" aria-label="Veículo solicitado" onchange="dmRender()"><option value="">Todos</option></select>
     </div>
     <div class="dm-campo dm-busca">
       <label>Buscar</label>
-      <input type="text" id="dmBusca" placeholder="nome, matrícula, bairro, placa, motorista..." oninput="dmRender()">
+      <input type="text" id="dmBusca" aria-label="Buscar na fila" placeholder="nome, matrícula, bairro, placa, motorista..." oninput="dmRender()">
     </div>
     <button class="dm-btn-cancel dm-so-fila" id="dmBtnCancel" onclick="dmAlternarCancelados()"
             title="Pedidos cancelados pelo posto">
@@ -476,7 +476,7 @@
     <div class="env-nav-data" id="envDataWrap">
       <button class="ds-btn ds-btn--secundario ds-btn--icone env-date-btn" onclick="envNavegar(-1)" title="Dia anterior"><i class="ti ti-chevron-left"></i></button>
       <button type="button" class="env-data-txt" onclick="envCalAbrir()" title="Escolher a data"><i class="ti ti-calendar-event"></i><span id="envDataVisual">Carregando...</span></button>
-      <input type="date" id="envData" class="env-date-hidden">
+      <input type="date" id="envData" aria-label="Data da escala" class="env-date-hidden">
       <button class="ds-btn ds-btn--secundario ds-btn--icone env-date-btn" onclick="envNavegar(1)" title="Próximo dia"><i class="ti ti-chevron-right"></i></button>
       <button class="ds-btn ds-btn--fantasma env-today-btn" onclick="envIrParaHoje()">Hoje</button>
       <div class="env-cal" id="envCal"></div>

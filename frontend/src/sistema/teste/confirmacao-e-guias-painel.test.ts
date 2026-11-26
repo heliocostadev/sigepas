@@ -150,7 +150,7 @@ describe('Confirmação e Guias: ficha do passageiro', () => {
     await abrirFichaDe(ELISA);
     clicar('#guiaSlideDrawer .guia-btn-close');
     expect(painelAberto()).toBe(false);
-    expect(estado().confAberto).toBeNull();
+    expect(estado().confAberto).toBe('');
     expect(document.querySelectorAll('#guiaCorpo .guia-pax.ativo')).toHaveLength(0);
 
     clicar(linhaDoPassageiro(ELISA));
@@ -175,7 +175,7 @@ describe('Confirmação e Guias: ficha do passageiro', () => {
     expect(avisos()).toContain('Passageiro não encontrado. Recarregue a tela.');
     tela.abrirPainelPax(VIAGEM_CURITIBA, 'MATRICULA-QUE-NAO-EXISTE');
     expect(painelAberto()).toBe(false);
-    expect(estado().confAberto).toBeNull();
+    expect(estado().confAberto).toBe('');
     tela.renderDrawerConteudoGuia('ligacao');
     tela.registrarConfirmacaoPanel('Confirmado');
     tela.confirmarCancelarPax();
@@ -192,7 +192,7 @@ describe('Confirmação e Guias: ficha do passageiro', () => {
     carroDoDia(semElisa, VIAGEM_FLORIANOPOLIS).passageiros.pop();
     tela.carregarGuia(semElisa, true);
     expect(painelAberto()).toBe(false);
-    expect(estado().confAberto).toBeNull();
+    expect(estado().confAberto).toBe('');
   });
 });
 

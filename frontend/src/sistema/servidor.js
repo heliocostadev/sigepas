@@ -51,9 +51,9 @@
 
   // Identifica esta aba do navegador. A API devolve o identificador em cada aviso de mudança, e a aba que gravou não
   // recarrega o que ela mesma acabou de desenhar (tempo-real.js).
-  var ID_DA_TELA = (window.crypto && window.crypto.randomUUID)
+  var ID_DA_TELA = window.crypto.randomUUID
     ? window.crypto.randomUUID()
-    : String(Date.now()) + String(Math.random()).slice(2);
+    : Array.from(window.crypto.getRandomValues(new Uint32Array(4))).join('-');
   window.ID_DA_TELA = ID_DA_TELA;
 
   function erroComMensagem(texto) {
