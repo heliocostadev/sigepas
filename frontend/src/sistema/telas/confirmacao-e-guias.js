@@ -1248,12 +1248,13 @@ const estadoGuia = {
     const e = escGuia;
     const ri = !!(opc && opc.interna);
     const p2 = function (n) { return ('0' + n).slice(-2); };
-    // A data vem do campo da tela e entra no HTML da imagem: só passa no formato AAAA-MM-DD (alerta do CodeQL).
-    const d = (/^\d{4}-\d{2}-\d{2}$/.test(dataOp || '') ? dataOp : '').split('-');
+    // A data vem do campo da tela e entra no HTML da imagem. Ela é remontada a partir de números, então nenhum texto
+    // digitado chega ao HTML (alerta do CodeQL).
+    const d = (/^\d{4}-\d{2}-\d{2}$/.test(dataOp || '') ? dataOp : '').split('-').map(Number);
     let dataBR = '', diaSem = '';
     if (d.length === 3) {
-      dataBR = d[2] + '/' + d[1] + '/' + d[0];
-      diaSem = GUIA_IMG_DIAS[new Date(Number(d[0]), Number(d[1]) - 1, Number(d[2])).getDay()] || '';
+      dataBR = p2(d[2]) + '/' + p2(d[1]) + '/' + d[0];
+      diaSem = GUIA_IMG_DIAS[new Date(d[0], d[1] - 1, d[2]).getDay()] || '';
     }
     const paradas = (v.roteiro && v.roteiro.length ? v.roteiro : (v.destino ? [v.destino] : [])).filter(Boolean);
     const destino = ri ? (opc.destino || 'Sem destino') : (paradas.length ? paradas[paradas.length - 1] : 'Sem destino');

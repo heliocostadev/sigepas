@@ -30,13 +30,15 @@
   }
 
   // Formata YYYY-MM-DD para o padrão oficial da planilha: "11/09/2026 - Sexta-Feira"
+  // A data vem do campo da tela e entra no HTML da folha. Ela é remontada a partir de números, então nenhum texto
+  // digitado chega ao HTML (alerta do CodeQL). Fora do formato AAAA-MM-DD, não mostra nada.
   function envFormataDataOficial(iso) {
-    if (!iso) return '';
-    var p = iso.split('-');
-    if (p.length !== 3) return iso;
-    var d = new Date(p[0], parseInt(p[1])-1, p[2]);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return '';
+    var p = iso.split('-').map(Number);
+    var d = new Date(p[0], p[1] - 1, p[2]);
+    var dois = function (n) { return ('0' + n).slice(-2); };
     var dias = ['Domingo', 'Segunda-Feira', 'Terça-Feira', 'Quarta-Feira', 'Quinta-Feira', 'Sexta-Feira', 'Sábado'];
-    return p[2] + '/' + p[1] + '/' + p[0] + ' - ' + dias[d.getDay()];
+    return dois(p[2]) + '/' + dois(p[1]) + '/' + p[0] + ' - ' + dias[d.getDay()];
   }
 
   function iniciarEscalaEnviar() {

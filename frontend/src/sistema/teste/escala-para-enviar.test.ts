@@ -137,7 +137,7 @@ describe('Escala para Enviar', () => {
     expect(tela.envFormataData('')).toBe('');
     expect(tela.envFormataData('27/11')).toBe('27/11');
     expect(tela.envFormataDataOficial('')).toBe('');
-    expect(tela.envFormataDataOficial('x')).toBe('x');
+    expect(tela.envFormataDataOficial('x')).toBe('');
     expect(tela.envEsc(null)).toBe('');
   });
 
