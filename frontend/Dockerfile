@@ -1,7 +1,7 @@
 # Imagem das telas: o Vite gera os arquivos e o Nginx os serve. Rode a partir da raiz do repositório:
 # docker build -f frontend/Dockerfile .
 
-FROM node:24-alpine AS construcao
+FROM node:26-alpine AS construcao
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY backend/package.json backend/package.json
