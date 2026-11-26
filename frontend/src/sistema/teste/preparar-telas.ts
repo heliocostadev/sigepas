@@ -101,7 +101,9 @@ export async function carregarTelas(): Promise<void> {
 }
 
 // Acesso às funções que as telas põem no window, como no Apps Script.
-export const tela = window as unknown as Record<string, (...argumentos: unknown[]) => unknown> & Record<string, unknown>;
+// As telas trazidas põem no window centenas de funções sem tipo. Nos testes, o acesso a elas fica sem checagem de tipo.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const tela = window as any;
 
 export function clicar(seletor: string | Element): void {
   const elemento = typeof seletor === 'string' ? document.querySelector(seletor) : seletor;

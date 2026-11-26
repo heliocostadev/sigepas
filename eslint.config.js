@@ -26,4 +26,11 @@ export default tseslint.config(
       },
     },
   },
+  {
+    // Testes das telas trazidas, em JavaScript (os testes do estágio convertidos): globais do Vitest.
+    files: ['frontend/src/sistema/teste/**/*.js'],
+    languageOptions: {
+      globals: { ...globals.node, describe: 'readonly', it: 'readonly', expect: 'readonly', beforeAll: 'readonly', beforeEach: 'readonly', afterEach: 'readonly', vi: 'readonly' },
+    },
+  },
 );

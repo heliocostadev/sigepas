@@ -17,11 +17,11 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['src/preparar-testes.ts'],
-    include: ['src/**/*.test.tsx', 'src/**/*.test.ts'],
+    include: ['src/**/*.test.tsx', 'src/**/*.test.ts', 'src/**/*.test.js'],
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx,js}'],
-      exclude: ['src/**/*.test.{ts,tsx}', 'src/main.tsx', 'src/preparar-testes.ts', 'src/sistema/iniciar-sistema.js'],
+      exclude: ['src/**/*.test.{ts,tsx,js}', 'src/sistema/teste/**', 'src/main.tsx', 'src/preparar-testes.ts', 'src/sistema/iniciar-sistema.js'],
       reporter: ['text', 'lcov'],
       // Piso da linha Web Apps para o front-end.
       thresholds: { lines: 25, functions: 25, branches: 25, statements: 25 },

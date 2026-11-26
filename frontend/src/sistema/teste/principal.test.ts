@@ -32,7 +32,7 @@ describe('página das telas: ponte com a API, abas e avisos', () => {
 
   it('a chamada montada antes escolhe a função depois', async () => {
     const sucesso = vi.fn();
-    (tela.criarChamadaAoServidor(sucesso, vi.fn()) as Record<string, (...a: unknown[]) => void>).salvarEdicaoPaciente('P1', 'Local', '', 2);
+    tela.criarChamadaAoServidor(sucesso, vi.fn()).salvarEdicaoPaciente('P1', 'Local', '', 2);
     await esperar();
     expect(chamadasA('/api/operacao/editar-pedido')).toEqual([['P1', 'Local', '', 2]]);
     expect(sucesso).toHaveBeenCalled();
