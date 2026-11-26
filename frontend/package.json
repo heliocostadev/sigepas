@@ -18,17 +18,17 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
-    "@tabler/icons-webfont": "3.50.0",
+    "@tabler/icons-webfont": "3.52.0",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.3.0",
-    "@vitest/coverage-v8": "5.1.0",
+    "@vitest/coverage-v8": "5.1.1",
     "jsdom": "31.0.1",
     "typescript": "5.9.3",
     "vite": "8.3.8",
-    "vitest": "5.1.0"
+    "vitest": "5.1.1"
   },
   "license": "MIT"
 }
