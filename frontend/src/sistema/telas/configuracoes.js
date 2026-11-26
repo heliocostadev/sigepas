@@ -223,7 +223,7 @@
         if (res.texto) {
           const ta = document.getElementById('cal_imp_texto');
           if (!ta.value.trim()) ta.value = res.texto.replace(/<[^>]+>/g, ' ')
-                                                    .replace(/[ 	]+/g, ' ').trim();
+                                                    .replace(/[ \t]+/g, ' ').trim();
         }
         calImportados = res.itens || [];
         renderPreviaImportacao();
@@ -330,11 +330,6 @@
     })[0] || {};
     const editando = acao === 'editar';
 
-    // 'DD/MM/AAAA' -> 'AAAA-MM-DD' para o input type=date
-    const iso = function (d) {
-      const p = (d || '').split('/');
-      return p.length === 3 ? (p[2] + '-' + p[1] + '-' + p[0]) : '';
-    };
 
     const html = [];
     if (editando) {
@@ -1166,7 +1161,7 @@
     const retorno = (estadoModal.tipo === 'veiculos') ? aba3Retorno : null;
     const placaSalva = (payload.placa || '').toString().trim();
 
-    chamarServidor('salvarConfig', [estadoModal.tipo, estadoModal.acao, payload, estadoModal.oldKey], function(res) {
+    chamarServidor('salvarConfig', [estadoModal.tipo, estadoModal.acao, payload, estadoModal.oldKey], function() {
         toast("Salvo com sucesso!", "sucesso");
         aba3Retorno = null;
         fecharModalConfig();
@@ -1375,3 +1370,27 @@
 
   // Selo de versão
   window.__VERSOES = window.__VERSOES || {}; window.__VERSOES.aba3 = '11/11a';
+
+// ---- Exposição para o HTML e as outras telas (as telas vieram do Apps Script, onde tudo era global; ADR 0016).
+Object.assign(window, { mudarSubAba3, iniciarAba3, carregarAba3, renderizarTabela, aba3DiaSemana, renderCalendario, abrirModalImportar, fecharModalImportar, analisarImportacao, renderPreviaImportacao, atualizarDicaImportacao, confirmarImportacao, abrirModalCal, salvarCalForm, excluirCal, excluirCalConfirmado, aba3RenderTudo, aba3ToggleBaixados, aba3SituacaoDe, aba3VeiculosTerceirizados, aba3MotoristaSemCarro, aba3DonoDaPlaca, aba3CampoPlacaVinculada, aba3AtualizarVinculo, aba3NovoVeiculoTerceirizado, aba3VoltarAoMotorista, aba3ConfigAoFechar, aba3TiposVeiculo, aba3ToggleTipoOutro, aba3SelectSituacao, aba3Baixa, fecharModalBaixa, escAba3, aba3GravarBaixa, aba3AplicarSituacao, aba3MudarSituacao, aba3FecharSituacao, aba3ParVinculado, aba3AbrirVinculo, aba3VinculoAoFechar, aba3FecharVinculo, aba3VinculoAcao, aba3CarrosLivres, aba3AbrirRepor, aba3ReporEscolheu, aba3FecharRepor, aba3ReporVincular, aba3ReporCadastrar, aba3ConfirmarVinculo, aba3SituacaoEsc, abrirModalConfig, fecharModalConfig, gerarInput, gerarSelect, salvarConfigForm, aba3DefinirPadraoLocal, aba3PadNorm, aba3PadMuda, aba3PadCarregar, aba3PadReceber, aba3PadFiltrar, aba3PadLimpar, aba3PadIrPagina, aba3PadRender, aba3PadEditar, aba3PadSalvar, aba3PadExcluir });
+Object.defineProperty(window, 'dbConfig', { configurable: true, get: () => dbConfig, set: (valor) => { dbConfig = valor; } });
+Object.defineProperty(window, 'estadoModal', { configurable: true, get: () => estadoModal, set: (valor) => { estadoModal = valor; } });
+Object.defineProperty(window, 'configCarregada', { configurable: true, get: () => configCarregada, set: (valor) => { configCarregada = valor; } });
+Object.defineProperty(window, 'ABA3_TIPOS_DIA', { configurable: true, get: () => ABA3_TIPOS_DIA });
+Object.defineProperty(window, 'ABA3_SEMANA', { configurable: true, get: () => ABA3_SEMANA });
+Object.defineProperty(window, 'calImportados', { configurable: true, get: () => calImportados, set: (valor) => { calImportados = valor; } });
+Object.defineProperty(window, 'estadoCal', { configurable: true, get: () => estadoCal, set: (valor) => { estadoCal = valor; } });
+Object.defineProperty(window, 'ABA3_MOTIVOS_MOTORISTA', { configurable: true, get: () => ABA3_MOTIVOS_MOTORISTA });
+Object.defineProperty(window, 'ABA3_MOTIVOS_VEICULO', { configurable: true, get: () => ABA3_MOTIVOS_VEICULO });
+Object.defineProperty(window, 'ABA3_INATIVO', { configurable: true, get: () => ABA3_INATIVO });
+Object.defineProperty(window, 'ABA3_INATIVO_ANTIGO', { configurable: true, get: () => ABA3_INATIVO_ANTIGO });
+Object.defineProperty(window, 'ABA3_MOTIVOS_LOCAL', { configurable: true, get: () => ABA3_MOTIVOS_LOCAL });
+Object.defineProperty(window, 'ABA3_BAIXA', { configurable: true, get: () => ABA3_BAIXA });
+Object.defineProperty(window, 'aba3MostrarBaixados', { configurable: true, get: () => aba3MostrarBaixados, set: (valor) => { aba3MostrarBaixados = valor; } });
+Object.defineProperty(window, 'aba3Retorno', { configurable: true, get: () => aba3Retorno, set: (valor) => { aba3Retorno = valor; } });
+Object.defineProperty(window, 'aba3SitAlvo', { configurable: true, get: () => aba3SitAlvo, set: (valor) => { aba3SitAlvo = valor; } });
+Object.defineProperty(window, 'aba3VincAlvo', { configurable: true, get: () => aba3VincAlvo, set: (valor) => { aba3VincAlvo = valor; } });
+Object.defineProperty(window, 'aba3ReporAlvo', { configurable: true, get: () => aba3ReporAlvo, set: (valor) => { aba3ReporAlvo = valor; } });
+Object.defineProperty(window, 'aba3Pad', { configurable: true, get: () => aba3Pad, set: (valor) => { aba3Pad = valor; } });
+Object.defineProperty(window, 'ABA3_PAD_POR_PAGINA', { configurable: true, get: () => ABA3_PAD_POR_PAGINA });
+Object.defineProperty(window, 'ABA3_PAD_ORIGEM', { configurable: true, get: () => ABA3_PAD_ORIGEM });

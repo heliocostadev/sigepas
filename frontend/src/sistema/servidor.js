@@ -78,7 +78,7 @@
     }).then(function (resposta) {
       return resposta.text().then(function (texto) {
         var corpo = null;
-        try { corpo = texto ? JSON.parse(texto) : null; } catch (e) { corpo = texto; }
+        try { corpo = texto ? JSON.parse(texto) : null; } catch { corpo = texto; }
         if (resposta.status === 401) {
           window.location.href = '/?sessao=terminou';
           throw erroComMensagem('Sua sessão terminou. Entre de novo.');

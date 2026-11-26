@@ -375,3 +375,10 @@
 
   // Selo de versão (SEMPRE a última linha do script — o Index acusa se faltar = colagem truncada)
   window.__VERSOES = window.__VERSOES || {}; window.__VERSOES.importacao = '06/11b';
+
+// ---- Exposição para o HTML e as outras telas (as telas vieram do Apps Script, onde tudo era global; ADR 0016).
+Object.assign(window, { iniciarImportacao, atualizarBadgePendentes, aoEscolherArquivoImp, impStatus, definirArquivoImp, importarCSV, mostrarResumoImportacao, chipImpHTML, escaparHtmlLocais, fecharModalLocais, estadoModalLocais, abrirRevisaoLocais, abrirModalLocais, receberSugestoesLocais, renderizarPendenciasLocais, datalistsPadroesHTML, cardPendenciaLocalHTML, sugestaoLocalHTML, edicaoManualLocalHTML, aoEscolherLocalPadrao, resumoDecisaoLocalHTML, decidirLocal, confirmarManualLocal, salvarDecisoesLocaisFront });
+Object.defineProperty(window, 'arquivoImp', { configurable: true, get: () => arquivoImp, set: (valor) => { arquivoImp = valor; } });
+Object.defineProperty(window, 'pendenciasLocais', { configurable: true, get: () => pendenciasLocais, set: (valor) => { pendenciasLocais = valor; } });
+Object.defineProperty(window, 'padroesLocais', { configurable: true, get: () => padroesLocais, set: (valor) => { padroesLocais = valor; } });
+Object.defineProperty(window, 'mapaLocalParaCidades', { configurable: true, get: () => mapaLocalParaCidades, set: (valor) => { mapaLocalParaCidades = valor; } });

@@ -1287,7 +1287,7 @@
   function escFDragStart(ev, i) {
     escFIdx = i;
     ev.dataTransfer.effectAllowed = 'move';
-    try { ev.dataTransfer.setData('text/plain', String(i)); } catch (e) {}
+    try { ev.dataTransfer.setData('text/plain', String(i)); } catch { /* navegador sem arrastar: segue sem a marca */ }
     ev.currentTarget.classList.add('arrastando');
   }
   function escFDragOver(ev) {
@@ -1510,3 +1510,17 @@
   }
 
   window.__VERSOES = window.__VERSOES || {}; window.__VERSOES.escala = '11/11g';
+
+// ---- Exposição para o HTML e as outras telas (as telas vieram do Apps Script, onde tudo era global; ADR 0016).
+Object.assign(window, { escEsc, escHojeISO, iniciarEscala, escCarregarTudo, escPendencias, escFAssinatura, escTrocarData, escMudarDia, escDesfazer, escRecolherFormacao, escIrParaEnviar, escAtualizarChip, escBuscarRelatorio, escFInternasDoDia, escInternasHTML, escRenderObservacoes, escFAtualizarOndeCaiu, escCabecalhoCard, escCorHex, escLum, escContraste, escTintaPara, escVeiculoHTML, escLinhaObsHTML, escCardObservacoesHTML, escFAusente, escFOpcoes, escFAbrirEm, escFBuscar, escFCarregar, escFEncaixarAusentes, escFIsoDe, escFRotuloDia, escFFila, escFSalvoMot, escFSalvoVei, escFItemHTML, escFRender, escFCtxHTML, escFIrPara, escFToggle, escFAusentes, escFAtualizarVez, escFGerar, escFRenderOrdem, escFDistribuir, escFDistribuirPuro, escFRenderViagens, escFFolhaHTML, escFTercFora, escFVeiculosFora, escFOpcoesMotorista, escFOpcoesVeiculo, escFCorPlaca, escFMotoristaHTML, escFLinhaHTML, escFCadeado, escFMenuFechar, escFMenuEscolher, escFMenuAbrir, escFMenuOp, escFMenuMotorista, escFMenuVeiculo, escFDois, escFProximoLivre, escFLiberarNome, escFEscolherMotorista2, escFEscolherMotorista, escFEscolherVeiculo, escFDragStart, escFDragOver, escFDragLeave, escFDrop, escFDragEnd, escFDica, escFResumoHTML, escFGravar, escFGravarAgora });
+Object.defineProperty(window, 'escalaViagensCarregada', { configurable: true, get: () => escalaViagensCarregada, set: (valor) => { escalaViagensCarregada = valor; } });
+Object.defineProperty(window, 'escCarregadaPara', { configurable: true, get: () => escCarregadaPara, set: (valor) => { escCarregadaPara = valor; } });
+Object.defineProperty(window, 'estadoEscRel', { configurable: true, get: () => estadoEscRel });
+Object.defineProperty(window, 'escSaindo', { configurable: true, get: () => escSaindo, set: (valor) => { escSaindo = valor; } });
+Object.defineProperty(window, 'escVeiculos', { configurable: true, get: () => escVeiculos, set: (valor) => { escVeiculos = valor; } });
+Object.defineProperty(window, 'ESC_TINTA_ESCURA', { configurable: true, get: () => ESC_TINTA_ESCURA, set: (valor) => { ESC_TINTA_ESCURA = valor; } });
+Object.defineProperty(window, 'estadoEscF', { configurable: true, get: () => estadoEscF });
+Object.defineProperty(window, 'ESCF_MOTIVOS_RH', { configurable: true, get: () => ESCF_MOTIVOS_RH });
+Object.defineProperty(window, 'ESCF_MOTIVOS_VEI', { configurable: true, get: () => ESCF_MOTIVOS_VEI });
+Object.defineProperty(window, 'escFMenuAcoes', { configurable: true, get: () => escFMenuAcoes, set: (valor) => { escFMenuAcoes = valor; } });
+Object.defineProperty(window, 'escFIdx', { configurable: true, get: () => escFIdx, set: (valor) => { escFIdx = valor; } });

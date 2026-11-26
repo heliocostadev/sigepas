@@ -117,7 +117,7 @@ const CARGA_DIA = {};
 const CARGA_DIA_VALIDADE = 10 * 60 * 1000;
 function cargaDiaGuardar(dados) {
   if (!dados || !dados._dataISO || dados._lembrada) return;
-  try { CARGA_DIA[dados._dataISO] = { texto: JSON.stringify(dados), versao: dados._versao || '', em: Date.now() }; } catch (e) {}
+  try { CARGA_DIA[dados._dataISO] = { texto: JSON.stringify(dados), versao: dados._versao || '', em: Date.now() }; } catch { /* sem espaço para guardar: a tela pede de novo */ }
 }
 function cargaDiaTem(dataISO) { return !!CARGA_DIA[dataISO]; }
 function cargaDiaEsquecer(datas) { (datas || []).forEach(function (d) { delete CARGA_DIA[d]; }); }
@@ -168,3 +168,12 @@ window.addEventListener('load', function () {
   carregarUsuario();
   if (typeof iniciarImportacao === 'function') iniciarImportacao();
 });
+
+// ---- Exposição para o HTML e as outras telas (as telas vieram do Apps Script, onde tudo era global; ADR 0016).
+Object.assign(window, { abaAtiva, mudarAba, getOperador, toast, dsEsc, dataPadraoISO, dsAbrir, dsFechar, dsConfirmar, atualizarBadgeKanban, cargaDiaGuardar, cargaDiaTem, cargaDiaEsquecer, cargaDiaPedir, carregarUsuario, sairDoSistema });
+Object.defineProperty(window, 'OPERADOR_DA_SESSAO', { configurable: true, get: () => OPERADOR_DA_SESSAO, set: (valor) => { OPERADOR_DA_SESSAO = valor; } });
+Object.defineProperty(window, 'TOAST_APELIDO', { configurable: true, get: () => TOAST_APELIDO });
+Object.defineProperty(window, 'TOAST_ICONE', { configurable: true, get: () => TOAST_ICONE });
+Object.defineProperty(window, 'dsPilha', { configurable: true, get: () => dsPilha });
+Object.defineProperty(window, 'CARGA_DIA', { configurable: true, get: () => CARGA_DIA });
+Object.defineProperty(window, 'CARGA_DIA_VALIDADE', { configurable: true, get: () => CARGA_DIA_VALIDADE });

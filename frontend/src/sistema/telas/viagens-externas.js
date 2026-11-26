@@ -1065,7 +1065,6 @@
     const semAcomp = alertas.filter(function (a) { return a.label.indexOf('SEM ACOMPANHANTE') > -1; })[0];
     const ctb = alertas.filter(function (a) { return a.label.indexOf('ACOMPANHANTE') === -1; })[0];
     const restr = dmRestricao(p);
-    const hora = dmHora(p);
     const cor = dmCorAvatar(dmNomeExib(p));
 
     let selos = '';
@@ -2171,7 +2170,7 @@
   function dmRtDragStart(ev, idx) {
     dmRtIdx = idx;
     ev.dataTransfer.effectAllowed = 'move';
-    try { ev.dataTransfer.setData('text/plain', String(idx)); } catch (e) {}
+    try { ev.dataTransfer.setData('text/plain', String(idx)); } catch { /* navegador sem arrastar: segue sem a marca */ }
     ev.currentTarget.classList.add('rt-dragging');
   }
   function dmRtDragOver(ev) {
@@ -2543,7 +2542,6 @@
     if (!m) return;
     const pac = dmMontagemPacientes();
     dmSincronizarRoteiro(pac);
-    const rota = m.roteiro || [];
     const o = dmOcupacao(pac, m);
 
     const rotaHTML = dmRotaHTML();   // mesma fonte que dmPintarCabecalhoCarro usa
@@ -3811,3 +3809,18 @@
 
   // Selo de versão (SEMPRE a última linha do script — o Index acusa se faltar)
   window.__VERSOES = window.__VERSOES || {}; window.__VERSOES.demandas = '13/11a';
+
+// ---- Exposição para o HTML e as outras telas (as telas vieram do Apps Script, onde tudo era global; ADR 0016).
+Object.assign(window, { iniciarDemandas, dmCarregar, dmAvisarRemocaoInterna, dmTravarBotaoNovo, dmPopularFiltros, dmAlternarCancelados, dmCasaFiltro, dmFiltrados, dmCarroCasa, dmCarrosFiltrados, dmOcupacaoSalvo, dmConfirmadas, dmAlternarCarro, dmRotaSalvoHTML, dmChipSalvoHTML, dmCardSalvoHTML, dmVeiculoLacen, dmLacenMontado, dmChamadoLacenHTML, dmMontarLacen, dmRenderCarros, dmMarcadorNulo, dmChaveP, dmNomeExib, dmNomeHTML, dmMatExib, dmEditarCarro, dmSalvarEdicao, dmConfirmar, dmFecharConfirma, dmAvisoOk, dmAvisoTecla, dmSemEmbarque, dmNomeAviso, dmAvisarSemEmbarque, dmEhServidor, dmIdentServidor, dmSemIdentServidor, dmAvisarSemIdentServidor, dmCamposServidorHTML, dmServidorCampo, dmConfirmaOcupado, dmEstornarCarro, dmEstornarConfirmado, dmTrocarModo, dmPintarBotaoCancel, dmPintarModos, dmPintarResumo, dmRender, dmLinha, dmAbrirDrawer, dmBlocoApagarHTML, dmMarcaCancelado, dmBlocoCancelarHTML, dmCancelarPedido, dmDesfazerCancelamento, dmApagarDemandaManual, dmSalvarRestricao, dmQtdMin, dmQtdDicaBase, dmQtdControleHTML, dmPintarQtd, dmDicaQtd, dmAjustarQtd, dmGravarQtd, dmFecharDrawer, dmSelecionar, dmMarcarTodos, dmLimparSelecao, dmSelecionados, dmNorm, dmMontarEscada, dmVeiculoPara, dmBaseSaida, dmAtualizarExtensao, dmAtualizarBarra, dmAtualizarChkTodos, dmMontarCarro, dmModalCabeca, dmModalPasso, dmFrotaDisponivel, dmModalAba, dmModalRenderFrota, dmEscolherPlaca, dmEncaixeTexto, dmModalPe, dmMontagemFalta, dmHoraOrd, dmMontagemPacientes, dmHoraMinCidade, dmDesembarques, dmSincronizarRoteiro, dmCidadesParaRoteiro, dmAddParada, dmRemoverParada, dmMoverParada, dmRoteiroAuto, dmRtDragStart, dmRtDragOver, dmRtDragLeave, dmRtDrop, dmRtDragEnd, dmMoverParadaPara, dmRenderRoteiro, dmRotaHTML, dmPintarCabecalhoCarro, dmMontagemHora, dmHoraFoco, dmHoraTecla, dmHoraSaiu, dmMontagemAviso, dmMontagemLocal, dmOcupacao, dmMontagemDois, dmAjustarBloqueio, dmEmbarquePaciente, dmTirarPaciente, dmMontagemRecontar, dmEmbarquePadrao, dmOpcoesEmbarque, dmChipPassageiroHTML, dmModalRenderConfirma, dmGravarCarro, dmAlerta, dmAlertaLimpar, dmFecharModal, dmMarcarBandaGrudada, dmPedirAtualizacao, dmQtd, dmHora, dmVazio, dmResumoDia, dmIdadeTexto, dmTurno, dmClasseVeiculo, dmRestricao, dmIniciais, dmCorAvatar, dmTexto, dmDataBR, dmAspas, dmEsc, dmCarroDaChave, dmCidadesDoCarro, dmAbrirEncaixe, dmFecharEncaixe, dmEncaixeAba, dmEncaixeBuscar, dmEncaixeCandidatos, dmEncaixeRender, dmEncaixeSel, dmEncaixeMarcados, dmEncaixePe, dmEncaixeContinuar, dmAcrescentarNaEdicao, dmEnAlerta, dmEnAlertaLimpar, dmEncaixeRenderMao, dmEnLocaisOrdenados, dmEnLocalDigitou, dmEnLocEscolher, dmEnLocFechar, dmEnLocTecla, dmEncaixePeMao, dmEnderecoMontado, dmEncaixeGravarMao, dmAbrirModalNovoPaciente, dmFecharModalNovoPaciente, dmNovoOpcoes, dmNovoAlerta, dmNovoAlertaLimpar, dmCidadesDestinoOpcoes, dmNovoCidMudou, dmNovoRenderCorpo, dmNovoLocalDigitou, dmNovoLocEscolher, dmNovoLocFechar, dmNovoLocTecla, dmSalvarNovoPaciente });
+Object.defineProperty(window, 'estadoDm', { configurable: true, get: () => estadoDm });
+Object.defineProperty(window, 'DM_COLGROUP', { configurable: true, get: () => DM_COLGROUP });
+Object.defineProperty(window, 'DM_AV_CORES', { configurable: true, get: () => DM_AV_CORES });
+Object.defineProperty(window, 'dmVerCancelados', { configurable: true, get: () => dmVerCancelados, set: (valor) => { dmVerCancelados = valor; } });
+Object.defineProperty(window, 'dmCfmAcao', { configurable: true, get: () => dmCfmAcao, set: (valor) => { dmCfmAcao = valor; } });
+Object.defineProperty(window, 'DM_QTD_MAX', { configurable: true, get: () => DM_QTD_MAX });
+Object.defineProperty(window, 'dmQtdPend', { configurable: true, get: () => dmQtdPend });
+Object.defineProperty(window, 'dmRtIdx', { configurable: true, get: () => dmRtIdx, set: (valor) => { dmRtIdx = valor; } });
+Object.defineProperty(window, 'dmHoraDigitos', { configurable: true, get: () => dmHoraDigitos });
+Object.defineProperty(window, 'DM_TOPO_STICKY', { configurable: true, get: () => DM_TOPO_STICKY });
+Object.defineProperty(window, 'dmAgendado', { configurable: true, get: () => dmAgendado, set: (valor) => { dmAgendado = valor; } });
+Object.defineProperty(window, 'dmNovoSugIdx', { configurable: true, get: () => dmNovoSugIdx, set: (valor) => { dmNovoSugIdx = valor; } });

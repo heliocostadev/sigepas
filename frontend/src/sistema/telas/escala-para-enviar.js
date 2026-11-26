@@ -491,3 +491,12 @@
   }
 
   window.__VERSOES = window.__VERSOES || {}; window.__VERSOES.escalaEnviar = '11/11b';
+
+// ---- Exposição para o HTML e as outras telas (as telas vieram do Apps Script, onde tudo era global; ADR 0016).
+Object.assign(window, { envEsc, envHojeISO, envFormataData, envFormataDataOficial, iniciarEscalaEnviar, envCalAbrir, envCalFechar, envCalAndarMes, envCalEscolher, envCalRender, envCalLigarFechamento, envNavegar, envIrParaHoje, envBuscar, envCarregarHtml2Canvas, envBaixarPNG, envCorHex, envLum, envContraste, envTintaPara, envVeiculoHTML, envColgroup, envFaixa, envAviso, envCabecalho, envRender });
+Object.defineProperty(window, 'envVeiculos', { configurable: true, get: () => envVeiculos, set: (valor) => { envVeiculos = valor; } });
+Object.defineProperty(window, 'envCalAno', { configurable: true, get: () => envCalAno, set: (valor) => { envCalAno = valor; } });
+Object.defineProperty(window, 'envCalMesAtual', { configurable: true, get: () => envCalMesAtual, set: (valor) => { envCalMesAtual = valor; } });
+Object.defineProperty(window, 'envCalLigado', { configurable: true, get: () => envCalLigado, set: (valor) => { envCalLigado = valor; } });
+Object.defineProperty(window, 'ENV_TINTA_ESCURA', { configurable: true, get: () => ENV_TINTA_ESCURA, set: (valor) => { ENV_TINTA_ESCURA = valor; } });
+Object.defineProperty(window, 'ENV_GRADE', { configurable: true, get: () => ENV_GRADE, set: (valor) => { ENV_GRADE = valor; } });

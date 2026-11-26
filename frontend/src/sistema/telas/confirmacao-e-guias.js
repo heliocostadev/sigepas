@@ -661,7 +661,6 @@ const estadoGuia = {
     if (!c || !c.p || !c.v) return;
     const p = c.p;
     const v = c.v;
-    const placa = c.placa;
     const cont = document.getElementById('guiaDrawerContent');
     if (!cont) return;
 
@@ -1206,7 +1205,7 @@ const estadoGuia = {
     const motorista = (v.motoristaAtribuido || '').toString().trim().toUpperCase() || 'SEM MOTORISTA';
     const carro = [v.placa, v.tipo].filter(Boolean).join(' ').toUpperCase();
     return [diaMes, motorista, hora, carro, destinoDe(v).toUpperCase()].map(function (s) {
-      return (s || '').toString().replace(/[\\\/:*?\x22\u003c>|\r\n\t]/g, ' ').split(' ').filter(Boolean).join(' ');
+      return (s || '').toString().replace(/[\\/:*?\x22\u003c>|\r\n\t]/g, ' ').split(' ').filter(Boolean).join(' ');
     }).filter(Boolean).join(' - ') + '.png';
   }
 
@@ -1388,7 +1387,7 @@ const estadoGuia = {
       try {
         copia = navigator.clipboard.write([new ClipboardItem({ 'image/png': promessaBlob })])
           .then(function () { return true; }, function () { return false; });
-      } catch (err) { copia = Promise.resolve(false); }
+      } catch { copia = Promise.resolve(false); }
     }
 
     promessaCanvas.then(function (canvas) {
@@ -1574,3 +1573,13 @@ const estadoGuia = {
 
   // Selo de versão (SEMPRE a última linha do script — o Index acusa se faltar = colagem truncada)
   window.__VERSOES = window.__VERSOES || {}; window.__VERSOES.guia = '13/11a';
+
+// ---- Exposição para o HTML e as outras telas (as telas vieram do Apps Script, onde tudo era global; ADR 0016).
+Object.assign(window, { iniciarGuia, carregarGuia, guiaNormCid, guiaTemAcento, destinoDe, chaveCarroGuia, carroDaChave, alternarGuiaCard, renderGuia, cardVeiculoGuiaHTML, cardPassageiroGuiaHTML, renderContadoresGuia, guiaStatusCasa, filtrarStatusGuia, statusConfInfo, motoristaGuiaHTML, guiaAbrirFormacao, transferirPaciente, trocarPaciente, guiaNormBusca, guiaTpaxAchar, guiaTpaxFiltrar, guiaTpaxEscolher, guiaTpaxFechar, guiaTpaxTecla, soDigitos, _confAtual, abrirPainelPaxPos, abrirPainelPax, fecharPainelPax, atualizarHeaderDrawerGuia, guiaMarcarBotoesStatus, trocarAbaDrawerGuia, selecionarQuemAtendeuChip, dispararWhatsappGuia, renderDrawerConteudoGuia, getQuemAtendeuPanel, guiaGravarStatusContato, registrarConfirmacaoPanel, statusConfTexto, confirmarCancelarPax, guiaCancelarDoCard, selecionarTelefoneConf, enviarWhatsappPaciente, escGuia, guiaMarcadorNulo, guiaIdPax, guiaNomePax, guiaAcharPax, guiaModalAbrir, guiaModalFechar, guiaModalConfirmar, guiaModalResponder, guiaModalLoading, guiaModalSucesso, formatarTelefonesWpp, guiaDoisMotoristas, guiaTemZap, guiaNomesMotoristas, guiaMotoristaN, guiaJanelaDoisMotoristas, abrirWhatsappGuia, guiaMarcarAvisoEnviado, guiaNomeArquivoImagem, guiaFoneImagem, guiaTituloImagem, guiaIdadeImagem, guiaImagemHTML, guiaCarregarHtml2Canvas, guiaPalcoImagem, guiaImagemViagem, guiaCarrosParaBaixar, guiaBaixarMenu, guiaFecharMenuBaixar, guiaBaixarTodas, guiaAbrirConversaImagem, abrirAvisoGuia, salvarAvisoGuia });
+Object.defineProperty(window, 'estadoGuia', { configurable: true, get: () => estadoGuia });
+Object.defineProperty(window, 'abaAtivaDrawerGuia', { configurable: true, get: () => abaAtivaDrawerGuia, set: (valor) => { abaAtivaDrawerGuia = valor; } });
+Object.defineProperty(window, 'guiaGravacoesContato', { configurable: true, get: () => guiaGravacoesContato, set: (valor) => { guiaGravacoesContato = valor; } });
+Object.defineProperty(window, '_guiaModalSim', { configurable: true, get: () => _guiaModalSim, set: (valor) => { _guiaModalSim = valor; } });
+Object.defineProperty(window, '_guiaModalNao', { configurable: true, get: () => _guiaModalNao, set: (valor) => { _guiaModalNao = valor; } });
+Object.defineProperty(window, 'GUIA_IMG_DIAS', { configurable: true, get: () => GUIA_IMG_DIAS });
+Object.defineProperty(window, 'guiaBaixando', { configurable: true, get: () => guiaBaixando, set: (valor) => { guiaBaixando = valor; } });

@@ -73,7 +73,7 @@
     if (!window.EventSource) return;
     var fonte = new EventSource('/api/eventos', { withCredentials: true });
     fonte.addEventListener('mudanca', function (evento) {
-      try { aoMudar(JSON.parse(evento.data)); } catch (e) { /* aviso malformado: ignora */ }
+      try { aoMudar(JSON.parse(evento.data)); } catch { /* aviso malformado: ignora */ }
     });
     fonte.onerror = function () {
       // Sessão vencida ou API reiniciando: tenta de novo depois de alguns segundos.

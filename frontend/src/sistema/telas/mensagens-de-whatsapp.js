@@ -350,3 +350,7 @@
 
   // Selo de versão (SEMPRE a última linha do script — o Index acusa se faltar = colagem truncada)
   window.__VERSOES = window.__VERSOES || {}; window.__VERSOES.wpp = '11/11c';
+
+// ---- Exposição para o HTML e as outras telas (as telas vieram do Apps Script, onde tudo era global; ADR 0016).
+Object.assign(window, { wppNomePax, formatarCaminhoRoteiroHTML, calcularIdade, regrasIdade, nivelMaisAlto, temRestricaoReal, relogioEmoji, tituloMsg, cvAvisoEsc, cvAvisoSeloHTML, cvAvisoFaixaHTML, cancelamentoCamposHTML, cancelamentoLer, cancelamentoMarca, gerarMensagemWhatsapp, wppPeriodoDoDia, wppEmbarqueSecretaria, gerarMensagemPacienteWhatsapp, gerarMensagemRecusaInterna, gerarMensagemInternaWhatsapp });
+Object.defineProperty(window, 'CANCEL_MOTIVOS', { configurable: true, get: () => CANCEL_MOTIVOS });
