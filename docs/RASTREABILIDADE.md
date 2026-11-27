@@ -2,7 +2,7 @@
 
 Este arquivo é o registro que **só cresce**: cada decisão, teste importante e deploy, com a prova ao lado. Nada é
 apagado nem reescrito. A correção é uma entrada nova que cita a anterior. A ideia vem do Maestro (GHDaru, MIT), no
-mesmo formato que o Hélio usa no projeto de estágio.
+mesmo formato usado no projeto de estágio.
 
 Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, issue, ADR, saída de comando).
 
@@ -22,7 +22,7 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 
 ## R-0002 · 08/11/2026 · Stack, hospedagem e testes decididos
 
-- Decisões do Hélio: NestJS, PostgreSQL com Prisma, React com Vite, AWS EC2 com Terraform e deploy pelo Systems
+- Decisões: NestJS, PostgreSQL com Prisma, React com Vite, AWS EC2 com Terraform e deploy pelo Systems
   Manager, sem SSH. O Vitest está no plano de construção e aguarda a aprovação da ADR 0005.
 - Prova: ADRs [0002](adr/0002-back-end-em-nestjs.md), [0003](adr/0003-postgresql-com-prisma.md),
   [0004](adr/0004-front-end-em-react-com-vite.md), [0005](adr/0005-testes-com-vitest.md) e
@@ -30,14 +30,14 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 
 ## R-0003 · 08/11/2026 · Papéis, fluxos e retorno decididos
 
-- Decisões do Hélio: papéis gestor e operador, e três fluxos (do arquivo à fila, do pedido ao carro escalado, remoção
-  interna). Outra decisão do Hélio: a volta segue a ida.
+- Decisões: papéis gestor e operador, e três fluxos (do arquivo à fila, do pedido ao carro escalado, remoção
+  interna). Outra decisão: a volta segue a ida.
 - Prova: ADRs [0007](adr/0007-dois-papeis-gestor-e-operador.md), [0008](adr/0008-tres-fluxos-de-negocio.md) e
   [0009](adr/0009-retorno-segue-a-ida.md).
 
 ## R-0004 · 08/11/2026 · Regras da importação decididas
 
-- Decisões do Hélio na triagem das regras da Importação: a chave natural de oito colunas com contador de ocorrência e
+- Decisões na triagem das regras da Importação: a chave natural de oito colunas com contador de ocorrência e
   o dicionário inicial. O dicionário inicial é carregado do sistema atual, sem dado pessoal. As demais regras seguem a
   recomendação da triagem até a aprovação do `spec.md` do fluxo 1.
 - Prova: ADRs [0010](adr/0010-chave-natural-do-pedido.md) e [0011](adr/0011-dicionario-inicial-de-locais.md), e
@@ -45,9 +45,9 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 
 ## R-0005 · 08/11/2026 · Ambiente de trabalho da IA montado no repositório
 
-- Decisão do Hélio: Maestro enxuto, cinco subagentes, skills dentro do repositório, regra de idioma e ordem de
-  precedência. O Hélio também aprovou seis ferramentas externas depois da avaliação de 24 IAs do GitHub e de três
-  repositórios indicados por ele.
+- Decisão: Maestro enxuto, cinco subagentes, skills dentro do repositório, regra de idioma e ordem de
+  precedência. Também foram aprovadas seis ferramentas externas depois da avaliação de 24 IAs do GitHub e de
+  três repositórios indicados pelo autor do projeto.
 - O ambiente foi montado na branch `claude/ambiente-de-trabalho-da-ia-a1cf0a`, sem código de aplicação. Entraram o
   `CLAUDE.md`, os cinco subagentes e 23 skills (5 nossas e 18 de terceiros, com autor e licença). Entraram também
   dois hooks, modelos de issue e de PR, CI com verificação única, gitleaks, CodeQL e Dependabot. Entraram ainda a
@@ -65,7 +65,7 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 
 ## R-0006 · 16/11/2026 · Spec do fluxo 1 aprovada
 
-- O Hélio leu a spec do fluxo 1 e a aprovou: "eu li o fluxo 1 gostei, aprovo".
+- A spec do fluxo 1 foi lida e aprovada.
 - A aprovação inclui os quatro pontos propostos pela spec:
   - o pedido ausente na importação seguinte fica marcado e não é apagado.
   - os limites são de 5 MB por arquivo e de 5 segundos por importação.
@@ -76,7 +76,7 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 
 ## R-0007 · 16/11/2026 · Prova de conceito: NestJS com Vitest
 
-- O Hélio pediu um teste antes de decidir entre o Vitest e o Jest (ADR 0005).
+- Um teste foi pedido antes da decisão entre o Vitest e o Jest (ADR 0005).
 - A prova de conceito ficou fora do repositório, na pasta de rascunho da conversa. Ela tem dois serviços do NestJS
   ligados por injeção de dependência, uma rota HTTP e três testes. Os testes cobrem a injeção, a troca do serviço por
   um falso e a rota pelo Supertest.
@@ -90,7 +90,7 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 
 ## R-0008 · 16/11/2026 · Vitest com o plugin SWC decidido
 
-- Depois da prova de conceito (R-0007), o Hélio decidiu: Vitest nos dois lados, com o plugin SWC no NestJS. O
+- Depois da prova de conceito (R-0007), ficou decidido: Vitest nos dois lados, com o plugin SWC no NestJS. O
   back-end também terá um teste de guarda que lê os metadados do construtor.
 - Prova: ADR [0005](adr/0005-testes-com-vitest.md), agora aceita. A entrada R-0002 registrava o Vitest como pendente.
 
@@ -104,9 +104,10 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
   `{/*splat}`. O middleware de métricas foi corrigido.
 - Resultado: `npm run verificar` passou com 7 testes do domínio, 19 do back-end e 3 do front-end. A cobertura do
   back-end ficou em 96,8%. Os 2 testes do banco passaram com o PostgreSQL real no Docker.
-- O ambiente completo foi testado na máquina do Hélio. A rota `/saude` respondeu 200 com o banco disponível. O Nginx
+- O ambiente completo foi testado no computador do autor. A rota `/saude` respondeu 200 com o banco disponível. O Nginx
   devolveu 404 em `/api/metrics`. O Prometheus leu a API (situação "up"), e o Grafana respondeu.
-- Prova: ADR [0013](adr/0013-estrutura-e-versoes-do-esqueleto.md), proposta e aguardando a aprovação do Hélio.
+- Prova: ADR [0013](adr/0013-estrutura-e-versoes-do-esqueleto.md), proposta e aguardando a aprovação do autor do
+  projeto.
 
 ## R-0010 · 17/11/2026 · Correções do esqueleto depois das conferências
 
@@ -174,7 +175,7 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 
 ## R-0013 · 23/11/2026 · Instalação sem scripts dos pacotes, SonarQube Cloud e proteção da `dev`
 
-- O SonarQube Cloud foi ligado pelo Hélio no plano gratuito, com o projeto `heliocostadev_sigepas`. A análise
+- O SonarQube Cloud foi ligado no plano gratuito, com o projeto `heliocostadev_sigepas`. A análise
   automática rodou uma vez na `main` e apontou uma vulnerabilidade: `npm ci` sem `--ignore-scripts` (regra S6505).
   Sem essa opção, um pacote pode rodar um script próprio durante a instalação, o que é um caminho conhecido de ataque
   pela cadeia de dependências.
@@ -218,7 +219,7 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 
 ## R-0016 · 24/11/2026 · Infraestrutura do deploy em Terraform
 
-- O Hélio escolheu a máquina `t3.small` e o subdomínio gratuito `sigepas.duckdns.org`, até o domínio próprio ficar
+- Foram escolhidos a máquina `t3.small` e o subdomínio gratuito `sigepas.duckdns.org`, até o domínio próprio ficar
   pronto. A organização da conta da AWS só libera `us-east-2`. As decisões estão na ADR 0014, proposta.
 - Entrou o Terraform em `infraestrutura/terraform/`. Ele cria o grupo de segurança só com 80 e 443 e a EC2 `t3.small`
   com IMDSv2 e disco criptografado. Cria também o IP fixo e o papel da máquina só com o Systems Manager. O OIDC do
@@ -233,25 +234,25 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 - O `verificador` reprovou a primeira versão por três pontos: a espera do deploy, a volta de versão e a escrita. O
   `revisor-de-seguranca` não achou risco que impeça o `apply`. Ele apontou três bloqueios para o primeiro deploy: o
   formato do `sub` do OIDC, a `main` sem proteção e o ambiente `producao` inexistente. O primeiro foi corrigido no
-  código. Os outros dois ficaram como passos do Hélio no `docs/deploy/README.md`.
+  código. Os outros dois ficaram como passos manuais no `docs/deploy/README.md`.
 - No workflow, entraram aspas seguras no comando do Systems Manager, actions fixas por SHA e espera de até 10
   minutos. Na máquina, entraram a rotação de logs do Docker e as senhas geradas no início do boot. No Compose, o Caddy
   ganhou uma faixa de IP só dele, e o HSTS deixou de sair duplicado.
-- Prova: `terraform validate` passou. O `terraform plan` com o login temporário do Hélio mostrou 12 recursos a criar,
+- Prova: `terraform validate` passou. O `terraform plan` com um login temporário mostrou 12 recursos a criar,
   nenhum a mudar e nenhum a apagar. Nada foi criado na AWS. O plugin da AWS ficou fixo na 6.73.0, com os códigos de
   conferência do Windows e do Linux no `.terraform.lock.hcl`.
 
 ## R-0017 · 24/11/2026 · Infraestrutura criada na AWS
 
-- O Hélio aprovou a ADR 0014 e autorizou o `terraform apply`. O PR 14 entrou na `dev` antes, com as 12 verificações
+- A ADR 0014 foi aceita e o `terraform apply` foi autorizado. O PR 14 entrou na `dev` antes, com as 12 verificações
   verdes, inclusive o SonarQube Cloud.
 - Antes do `apply`, foram criadas duas regras no GitHub. O ambiente `producao` aceita só a `main`. A `main` exige PR e
   a verificação "CI aprovado", também para o administrador, e bloqueia push forçado e exclusão.
 - O `terraform apply` criou os 12 recursos em `us-east-2`, sem erro. A máquina ficou com o IP fixo e com o IMDSv2
   obrigatório.
-- O estado do Terraform tem cópia fora do repositório, na pasta do Hélio. A cópia não tem senha: as únicas ocorrências
-  de "password" e "senha" são campos vazios e o texto do script de preparação.
-- O desligamento não é automático. O Hélio decide se mantém ou desliga, depois de um aviso perto do Demo Day.
+- O estado do Terraform tem cópia fora do repositório, na pasta de trabalho do autor. A cópia não tem senha: as únicas
+  ocorrências de "password" e "senha" são campos vazios e o texto do script de preparação.
+- O desligamento não é automático. O autor do projeto decide se mantém ou desliga, depois de um aviso perto do Demo Day.
 - O deploy continua desligado até o IP entrar no DuckDNS e as variáveis do repositório existirem.
 
 ## R-0018 · 24/11/2026 · Portão do SonarQube Cloud na primeira publicação

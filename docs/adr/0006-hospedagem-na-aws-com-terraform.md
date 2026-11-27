@@ -1,14 +1,14 @@
 # 0006. Hospedagem na AWS EC2, com Terraform e deploy sem SSH
 
-- **Situação:** aceita em 08/11/2026, por decisão do Hélio.
-- **Redação:** proposta pela IA em 08/11/2026, a partir do registro de trabalho e dos planos da pasta TCC. O Hélio
-  revisa o texto e o ajusta com as palavras dele.
+- **Situação:** aceita em 08/11/2026.
+- **Redação:** proposta pela IA em 08/11/2026, a partir do registro de trabalho e dos planos da pasta TCC.
+  O autor do projeto revisa o texto e o ajusta com as próprias palavras.
 - **Fontes:** registro de trabalho de 08/11/2026, plano de construção (seção 2) e quadro do ambiente de IA
   (seção 8.4).
 
 ## Contexto
 
-A linha exige deploy público e proíbe Vercel, Netlify, Firebase, Render e deploy manual por SSH. O Hélio não tinha
+A linha exige deploy público e proíbe Vercel, Netlify, Firebase, Render e deploy manual por SSH. O projeto não tinha
 conta na AWS em 08/11/2026.
 
 ## Decisão
@@ -25,11 +25,11 @@ conta na AWS em 08/11/2026.
 - **Plataformas que publicam sozinhas:** a linha proíbe as plataformas citadas acima.
 - **Deploy por SSH a partir do GitHub Actions:** a permissão depende de como se interpreta a proibição. O Systems
   Manager evita a dúvida. A pergunta vai para o professor na orientação de 12/11/2026.
-- **Terraform só depois do release:** o Hélio descartou esta alternativa em 08/11/2026, pela regra da caixa de
+- **Terraform só depois do release:** esta alternativa foi descartada em 08/11/2026, pela regra da caixa de
   ferramentas completa.
 
 ## Consequências
 
-- O Hélio precisa criar a conta na AWS, com alerta de orçamento, antes do deploy.
+- A conta na AWS precisa ser criada, com alerta de orçamento, antes do deploy.
 - O sistema faz cópia de segurança diária do PostgreSQL para o S3, com teste de restauração.
-- O `terraform apply` só roda com a autorização do Hélio.
+- O `terraform apply` só roda com a autorização do autor do projeto.

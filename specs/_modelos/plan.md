@@ -1,7 +1,7 @@
 # Plano de implementação: [NOME DO FLUXO]
 
 - **Spec:** [`spec.md`](spec.md), aprovada em DD/MM/AAAA
-- **Situação:** proposto | aprovado pelo Hélio em DD/MM/AAAA
+- **Situação:** proposto | aprovado em DD/MM/AAAA
 
 ## 1. Resumo
 

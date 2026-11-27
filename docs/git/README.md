@@ -26,7 +26,7 @@ O formato é `tipo(escopo): o que mudou`, em português. O CI confere o formato 
 O script também aceita os outros tipos do Conventional Commits, menos usados aqui. São eles: `build` (empacotamento),
 `perf` (desempenho), `style` (formatação, sem mudar código) e `revert` (desfazer um commit).
 
-Os commits não levam a linha `Co-Authored-By` (decisão do Hélio em 16/11/2026). O uso de IA no projeto está descrito
+Os commits não levam a linha `Co-Authored-By` (decisão de 16/11/2026). O uso de IA no projeto está descrito
 no `README.md` e no `CLAUDE.md` do repositório.
 
 ## Pull requests
@@ -35,7 +35,7 @@ no `README.md` e no `CLAUDE.md` do repositório.
   **onde você quer a opinião de quem revisa**. Perguntas na descrição renderam as melhores reviews da N1.
 - Correção de defeito apontado por colega cita o link completo da issue e responde a ela com o commit.
 - O merge só acontece com o "CI aprovado" verde e pelo menos uma revisão.
-- Nada é publicado (PR, comentário, issue) sem o Hélio ler o texto antes.
+- Nada é publicado (PR, comentário, issue) sem o autor do projeto ler o texto antes.
 
 ## Textos publicados
 

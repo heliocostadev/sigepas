@@ -83,7 +83,8 @@ jobs:
           DOMINIO: ${{ vars.DOMINIO }}
           ID_DA_MAQUINA: ${{ vars.AWS_ID_DA_MAQUINA }}
           REPOSITORIO: ${{ github.repository }}
-          # Gestor inicial: o e-mail é uma variável e o hash scrypt da senha é um segredo. A senha não sai do Hélio.
+          # Gestor inicial: o e-mail é uma variável e o hash scrypt da senha é um segredo.
+          # A senha não entra no repositório nem no GitHub.
           EMAIL_DO_GESTOR: ${{ vars.EMAIL_DO_GESTOR_INICIAL }}
           HASH_DO_GESTOR: ${{ secrets.HASH_DA_SENHA_DO_GESTOR_INICIAL }}
         run: |

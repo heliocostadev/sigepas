@@ -1,8 +1,8 @@
 # 0015. Login com sessão no servidor, senha com scrypt e dois papéis
 
 - **Situação:** proposta em 26/11/2026.
-- **Redação:** IA (Claude Code), em 26/11/2026, a partir da decisão do Hélio.
-- **Fontes:** decisão do Hélio em 26/11/2026 (registro de trabalho, entrada de 26/11): "login simples com sessão no
+- **Redação:** IA (Claude Code), em 26/11/2026, a partir da decisão de 26/11/2026.
+- **Fontes:** decisão de 26/11/2026 (registro de trabalho, entrada de 26/11): "login simples com sessão no
   servidor (cookie HttpOnly, senha com scrypt do node:crypto, papéis gestor e operador), contas criadas por comando".
   ADR 0007 (dois papéis). OWASP Password Storage Cheat Sheet e OWASP ASVS 4.0.3, capítulos 2 e 3.
 

@@ -1,8 +1,8 @@
 # 0014. Deploy em us-east-2, numa t3.small, com HTTPS pelo Caddy
 
-- **Situação:** aceita em 24/11/2026, por decisão do Hélio.
+- **Situação:** aceita em 24/11/2026.
 - **Redação:** IA, em 24/11/2026, durante a escrita do Terraform.
-- **Fontes:** decisões do Hélio na conversa de 24/11/2026 e consulta à conta da AWS no mesmo dia. Ele escolheu a
+- **Fontes:** decisões da conversa de 24/11/2026 e consulta à conta da AWS no mesmo dia. Foram escolhidos a
   máquina `t3.small`, o subdomínio gratuito no começo e o domínio próprio depois. Também a ADR 0006.
 
 ## Contexto
@@ -12,7 +12,8 @@ o tamanho da máquina nem o programa do HTTPS.
 
 Em 24/11/2026, a consulta `ec2:DescribeInstanceTypes` em `sa-east-1` (São Paulo) foi negada. A negação veio de uma
 política de controle de serviço (SCP) da organização da AWS da qual a conta faz parte. A mesma consulta funcionou em
-`us-east-2` (Ohio). O login do AWS CLI também só é aceito em `us-east-2`. A política não é controlada pelo Hélio.
+`us-east-2` (Ohio). O login do AWS CLI também só é aceito em `us-east-2`. A política não é controlada pelo autor do
+projeto.
 
 O plano gratuito cobre, em `us-east-2`, máquinas de 1 GB e de 2 GB das famílias `t3`, `t4g`, `t8i` e `t9g`. Ele cobre
 também a `c7i-flex.large`, de 4 GB, e a `m7i-flex.large`, de 8 GB. O crédito da conta é de 100 dólares, até
@@ -28,7 +29,7 @@ O sistema roda seis contêineres: banco, API, Nginx, Caddy, Prometheus e Grafana
 - **HTTPS pelo Caddy**, num contêiner na frente do Nginx. O Caddy pede e renova o certificado do Let's Encrypt
   sozinho. O Nginx confia no IP real do cliente só quando ele vem do IP fixo do Caddy na rede interna
   (`set_real_ip_from`). Assim, a API continua confiando em um salto de proxy (`trust proxy` igual a 1).
-- **Domínio:** `sigepas.duckdns.org`, gratuito, até o domínio próprio do Hélio ficar pronto. A troca de domínio é só
+- **Domínio:** `sigepas.duckdns.org`, gratuito, até o domínio próprio ficar pronto. A troca de domínio é só
   uma variável do repositório (`DOMINIO`) e o registro no DNS.
 - **Senhas geradas na própria máquina**, no primeiro boot, em `/opt/sigepas/.env`, legível só pelo root. Elas não
   passam pelo Terraform, pelo GitHub nem pela conversa.
@@ -54,10 +55,12 @@ O sistema roda seis contêineres: banco, API, Nginx, Caddy, Prometheus e Grafana
 
 - O custo estimado é de cerca de 20 dólares por mês (máquina, disco e IP fixo), descontados do crédito. O orçamento
   "My Zero-Spend Budget" pode mandar alerta quando o crédito começar a ser usado.
-- O estado do Terraform fica na máquina do Hélio, fora do git. Se o arquivo se perder, o Terraform não reconhece mais
+- O estado do Terraform fica no computador do autor, fora do git. Se o arquivo se perder, o Terraform não reconhece mais
   os recursos. Guardar o estado num bucket S3 fica como melhoria.
-- Antes do primeiro deploy, o Hélio cria no GitHub o ambiente `producao`, só para a `main`, e a proteção da `main`.
-  Ele cria também as variáveis `DEPLOY_HABILITADO`, `DOMINIO`, `AWS_ID_DA_MAQUINA` e `AWS_PAPEL_DE_DEPLOY`. Depois do
-  primeiro deploy, ele torna públicas as duas imagens do GitHub Container Registry, para a máquina baixá-las sem senha.
-- O desligamento não é automático. Perto do Demo Day e quando o crédito ficar baixo, a IA avisa o Hélio com o
-  custo acumulado. Ele decide se mantém o sistema no ar ou se roda `terraform destroy` (pedido dele em 24/11/2026).
+- Antes do primeiro deploy, o autor do projeto cria no GitHub o ambiente `producao`, só para a `main`, e a proteção da
+  `main`. Ele cria também as variáveis `DEPLOY_HABILITADO`, `DOMINIO`, `AWS_ID_DA_MAQUINA` e `AWS_PAPEL_DE_DEPLOY`.
+  Depois do primeiro deploy, ele torna públicas as duas imagens do GitHub Container Registry, para a máquina baixá-las
+  sem senha.
+- O desligamento não é automático. Perto do Demo Day e quando o crédito ficar baixo, a IA avisa o autor do
+  projeto com o custo acumulado. O autor decide se mantém o sistema no ar ou se roda `terraform destroy` (pedido de
+  24/11/2026).

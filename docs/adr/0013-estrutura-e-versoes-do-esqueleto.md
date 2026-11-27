@@ -1,9 +1,9 @@
 # 0013. Estrutura do repositório e versões do esqueleto
 
-- **Situação:** proposta em 16/11/2026. Aguarda a aprovação do Hélio.
+- **Situação:** proposta em 16/11/2026. Aguarda a aprovação do autor do projeto.
 - **Redação:** IA, em 16/11/2026, durante a montagem do esqueleto.
 - **Fontes:** plano de construção de 08/11/2026 (seção 1) e ADRs 0002 a 0006. Também a consulta ao npm e os testes
-  na máquina do Hélio, ambos em 16/11/2026.
+  no computador do autor, ambos em 16/11/2026.
 
 ## Contexto
 
@@ -16,7 +16,7 @@ substituta na data da montagem.
 - **Estrutura:** um repositório com workspaces do npm. O back-end fica em `backend/` e o front-end em `frontend/`, com
   um `package-lock.json` só, na raiz. O `src/dominio/` continua na raiz até o merge dos PRs 1 a 3, para não criar
   conflito com eles.
-- **Node 24** ("Krypton"), versão de suporte longo (LTS) e a mesma da máquina do Hélio. A LTS mais nova é a 26
+- **Node 24** ("Krypton"), versão de suporte longo (LTS) e a mesma do computador do autor. A LTS mais nova é a 26
   ("Lithium"). A 24 continua com suporte e foi a versão testada no esqueleto.
 - **TypeScript 5.9.3.** O `typescript-eslint` aceita só versões menores que 6.1, então a 7.0 está fora. O lint também
   aceita a 6.0.3. A 5.9.3 foi mantida porque é a linha usada desde o início do projeto. A troca para a 6.0 fica
@@ -36,7 +36,7 @@ substituta na data da montagem.
   quem chega pelo Nginx, o limite de requisições conta cada cliente separado, e o cliente não consegue inventar o
   próprio endereço. Essa garantia depende de a porta 3000 da API ficar só na rede interna. Na máquina de
   desenvolvimento, ela é publicada em 127.0.0.1. Na produção, ela não é publicada.
-- **Versões exatas** nos `package.json` do back-end e do front-end, sem `^`. Assim a máquina do Hélio, o CI e a
+- **Versões exatas** nos `package.json` do back-end e do front-end, sem `^`. Assim o computador do autor, o CI e a
   imagem Docker usam as mesmas versões.
 - **Portas do Docker Compose ligadas a `127.0.0.1`.** Só a própria máquina acessa o banco, a API e os painéis.
 - **Métricas numa porta interna própria (9464).** A porta pública da API (3000) não tem a rota `/metrics`. O Nginx
@@ -60,5 +60,5 @@ substituta na data da montagem.
 ## Consequências
 
 - O `npm run verificar` da raiz roda o domínio, o back-end e o front-end.
-- O teste com banco real roda no CI e, na máquina do Hélio, com `docker compose up -d banco`.
+- O teste com banco real roda no CI e, no computador do autor, com `docker compose up -d banco`.
 - Depois do merge dos PRs 1 a 3, uma ADR nova decide se o domínio vai para dentro do `backend/`.

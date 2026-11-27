@@ -2,9 +2,10 @@
 
 As decisões estão na [ADR 0006](../adr/0006-hospedagem-na-aws-com-terraform.md) (AWS, Terraform, Systems Manager e
 OIDC) e na [ADR 0014](../adr/0014-regiao-maquina-e-https-do-deploy.md) (região `us-east-2`, máquina `t3.small` e
-HTTPS pelo Caddy). **Situação em 24/11/2026: os 12 recursos foram criados na AWS com `terraform apply`, com o ok
-do Hélio. O deploy ainda está desligado.** O `revisor-de-seguranca` revisou o Terraform, o Compose e o workflow antes
-do primeiro `apply`. O `terraform apply` só roda com o ok do Hélio.
+HTTPS pelo Caddy). **Situação em 27/11/2026:** os 12 recursos da AWS foram criados com `terraform apply` em 24/11/2026,
+e o deploy automático está ligado desde então. Antes do primeiro `apply`, o Terraform, o Compose e o workflow passaram
+por revisão de segurança. Toda mudança na infraestrutura passa primeiro por `terraform plan` e só é aplicada depois da
+aprovação do autor do projeto.
 
 ## Como funciona
 
@@ -54,7 +55,7 @@ segurança de 24/11/2026.
 
 ## Primeira publicação, passo a passo
 
-Na máquina do Hélio, faça o login do AWS CLI:
+No computador do autor, faça o login do AWS CLI:
 
 ```bash
 aws login --profile sigepas --region us-east-2
@@ -72,7 +73,7 @@ aws login --profile sigepas --region us-east-2
    ```bash
    terraform plan -out=plano.tfplan
    ```
-4. Com o ok do Hélio, aplique o plano:
+4. Depois da aprovação do autor do projeto, aplique o plano:
    ```bash
    terraform apply plano.tfplan
    ```
@@ -99,7 +100,7 @@ aws login --profile sigepas --region us-east-2
 - **Voltar uma versão:** na aba Actions, abra a execução do `Deploy` da versão anterior e clique em "Re-run all
   jobs". O GitHub repete o deploy com o commit daquela execução. O GitHub só aceita repetir uma execução até 30 dias
   depois dela. Para uma volta definitiva, faça um `git revert` por PR.
-- **Comandos do Systems Manager na máquina do Hélio:** eles exigem o plugin do Session Manager instalado.
+- **Comandos do Systems Manager no computador do autor:** eles exigem o plugin do Session Manager instalado.
   ```bash
   winget install Amazon.SessionManagerPlugin
   ```
@@ -122,10 +123,11 @@ aws login --profile sigepas --region us-east-2
   `sigepas-api:<sha>-migracao` e termina. A API só sobe depois que ele termina bem. Uma migração que falha deixa a
   versão anterior da API no ar, e o workflow `Deploy` reprova.
 - **Gestor inicial (conta para entrar no site):** nenhuma senha fica no repositório. O script
-  `SIGEPAS/criar-gestor-do-sigepas-no-ar.ps1`, na pasta do Hélio, gera a senha, calcula o hash scrypt no contêiner da
-  API local e grava só o hash no segredo `HASH_DA_SENHA_DO_GESTOR_INICIAL` do GitHub, com o e-mail na variável
-  `EMAIL_DO_GESTOR_INICIAL`. O deploy leva os dois para o `/opt/sigepas/.env`, e a API cria a conta na subida se ela
-  ainda não existir. A senha fica em `ACESSO_AO_SIGEPAS_NO_AR.md`, fora do repositório.
+  `SIGEPAS/criar-gestor-do-sigepas-no-ar.ps1` fica na pasta de trabalho do autor, fora do repositório. Ele gera a senha
+  e calcula o hash scrypt no contêiner da API local. Depois, grava só o hash no segredo
+  `HASH_DA_SENHA_DO_GESTOR_INICIAL` do GitHub, com o e-mail na variável `EMAIL_DO_GESTOR_INICIAL`. O deploy leva os dois
+  para o `/opt/sigepas/.env`, e a API cria a conta na subida se ela ainda não existir. A senha fica em
+  `ACESSO_AO_SIGEPAS_NO_AR.md`, fora do repositório.
 - **Outras contas:** na máquina, pela sessão do Session Manager, rode o comando de criar conta dentro do contêiner da
   API. Sem `SENHA_DA_CONTA`, o comando gera uma senha forte e a mostra uma vez só.
   ```bash
@@ -136,16 +138,17 @@ aws login --profile sigepas --region us-east-2
   própria tela Importar CSV.
 - **Trocar o domínio:** mude a variável `DOMINIO` no GitHub e aponte o DNS do domínio novo para o `ip_publico`.
   Depois, rode o workflow `Deploy`. O Caddy pede o certificado novo sozinho.
-- **Desligar tudo:** só com a decisão do Hélio. Perto do Demo Day, a IA avisa com o custo acumulado, e ele decide se
-  mantém ou desliga. Para desligar, rode `terraform destroy` na pasta do Terraform. O volume do banco é apagado junto
-  com a máquina.
+- **Desligar tudo:** só com a decisão do autor do projeto. Perto do Demo Day, a IA avisa com o custo acumulado, e o
+  autor decide se mantém ou desliga. Para desligar, rode `terraform destroy` na pasta do Terraform. O volume do banco é
+  apagado junto com a máquina.
 - **Cópia do estado do Terraform:** depois de cada `apply` ou `destroy`, copie o `terraform.tfstate` para a pasta
-  `ESTADO_DO_TERRAFORM` do Hélio, fora do repositório. Sem esse arquivo, o Terraform não reconhece os recursos.
+  `ESTADO_DO_TERRAFORM`. Essa pasta fica no computador do autor, fora do repositório. Sem esse arquivo, o Terraform não
+  reconhece os recursos.
 
 ## O que ainda falta
 
 - **Cópia de segurança do banco** para o S3, com teste de restauração (ADR 0006). Entra antes do release.
-- **Estado do Terraform num bucket S3.** Hoje, o arquivo `terraform.tfstate` fica só na máquina do Hélio, fora do
+- **Estado do Terraform num bucket S3.** Hoje, o arquivo `terraform.tfstate` fica só no computador do autor, fora do
   git. Se ele se perder, o Terraform não reconhece mais os recursos.
 - **Monitor externo de disponibilidade**, com alerta quando `/api/saude` parar de responder.
 - **Documento próprio do Systems Manager**, que aceite só um SHA da `main`, no lugar do `AWS-RunShellScript`.
