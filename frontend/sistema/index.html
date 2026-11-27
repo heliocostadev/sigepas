@@ -155,7 +155,7 @@
       <input type="text" id="dmBusca" aria-label="Buscar na fila" placeholder="nome, matrícula, bairro, placa, motorista..." oninput="dmRender()">
     </div>
     <button class="dm-btn-cancel dm-so-fila" id="dmBtnCancel" onclick="dmAlternarCancelados()"
-            title="Pedidos cancelados pelo posto">
+            title="Pedidos cancelados pela UBSF">
       <i class="ti ti-ban"></i> Cancelados <span class="n" id="dmNCancel">0</span>
     </button>
     <button class="dm-btn-novo dm-so-fila" id="dmBtnNovoPac" onclick="dmAbrirModalNovoPaciente()"
@@ -317,7 +317,6 @@
           <option value="Pendente">Pendentes</option>
           <option value="Confirmado">Confirmado</option>
           <option value="Não atende">Não atende</option>
-          <option value="Enviada por WhatsApp">Enviada</option>
         </select>
       </div>
       <label class="ds-check guia-check-livres">
@@ -558,7 +557,7 @@
         <h2>Padronização de locais</h2><span class="ds-chip" id="padN"></span>
         <div class="ds-cab-acoes"><button class="ds-btn ds-btn--secundario" onclick="aba3PadCarregar(true)"><i class="ti ti-refresh"></i>Atualizar</button></div>
       </div>
-      <p class="aba3-sub">Como cada cidade e local chega no CSV dos postos, e como o sistema passa a escrever. A lista se forma na revisão do
+      <p class="aba3-sub">Como cada cidade e local chega no CSV do OLOSTECH, e como o sistema passa a escrever. A lista se forma na revisão do
         <b>Importar CSV</b>; aqui dá para conferir e corrigir. A mudança vale da próxima importação em diante.</p>
       <div class="aba3-pad-filtros">
         <div class="ds-campo ds-campo--cresce">
@@ -572,7 +571,7 @@
         <div class="ds-campo">
           <label class="ds-rotulo" for="padOrigem">Como foi decidido</label>
           <select class="ds-select" id="padOrigem" onchange="aba3PadFiltrar()">
-            <option value="">Todos</option><option value="sugestao_dicionario">Sugestão</option><option value="sugestao_google">Google</option>
+            <option value="">Todos</option><option value="sugestao_dicionario">Sugestão</option>
             <option value="manual">Digitado</option><option value="mantido_original">Mantido como veio</option>
           </select>
         </div>
@@ -597,7 +596,8 @@
       <div class="aba3-secao-cab">
         <h2>Calendário — dias que não são dia útil</h2>
         <div class="ds-cab-acoes">
-          <button class="ds-btn ds-btn--secundario" onclick="abrirModalImportar()"><i class="ti ti-cloud-download"></i>Importar do site</button>
+          <!-- "Importar do site" saiu da tela (27/11/2026): a importação pelo site da Prefeitura não existe nesta versão
+               (servidor.js, FORA_DESTA_ENTREGA). A janela modalImportarCal continua na página, sem botão que a abra. -->
           <button class="ds-btn ds-btn--primario" onclick="abrirModalCal('novo')"><i class="ti ti-plus"></i>Novo dia</button>
         </div>
       </div>

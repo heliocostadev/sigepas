@@ -271,7 +271,7 @@ const estadoGuia = {
     // 🔑 A Guia é o último ponto antes de o carro sair, e é aqui que as ligações do dia
     // acontecem — se o aviso de cancelamento vale em algum lugar, vale mais neste.
     if (p.pedidoCancelado) {
-      linhas += `<div class="gp-obs" style="background:var(--ds-perigo-fundo);border-color:var(--ds-perigo-borda);color:var(--ds-perigo-texto);font-weight:700;">🚫 PEDIDO CANCELADO NO POSTO — confira antes de sair</div>`;
+      linhas += `<div class="gp-obs" style="background:var(--ds-perigo-fundo);border-color:var(--ds-perigo-borda);color:var(--ds-perigo-texto);font-weight:700;">🚫 PEDIDO CANCELADO NA UBSF · confira antes de sair</div>`;
     }
     if (temObs) linhas += `<div class="gp-obs">⚠️ ${esc(p.observacao)}</div>`;
 
@@ -327,7 +327,7 @@ const estadoGuia = {
   function renderContadoresGuia() {
     const el = document.getElementById('guiaContadores');
     if (!el) return;
-    const cont = { 'Pendente': 0, 'Confirmado': 0, 'Não atende': 0, 'Enviada por WhatsApp': 0 };
+    const cont = { 'Pendente': 0, 'Confirmado': 0, 'Não atende': 0 };
     let total = 0;
     estadoGuia.veiculosSalvos.forEach(v => v.passageiros.forEach(p => {
       const s = p.statusConfirmacao || 'Pendente';
@@ -339,7 +339,6 @@ const estadoGuia = {
       { val: '', rot: 'Todos', n: total, bg: '#fff', cor: 'var(--ds-texto)', bd: 'var(--ds-borda-forte)' },
       { val: 'Pendente', rot: '<i class="ti ti-phone" style="font-size:11px;" aria-hidden="true"></i> Ligar', n: cont['Pendente'], bg: 'var(--ds-superficie-3)', cor: 'var(--ds-texto-2)', bd: 'var(--ds-borda)' },
       { val: 'Confirmado', rot: 'Confirmados', n: cont['Confirmado'] + (cont['Confirmado por WhatsApp'] || 0), bg: 'var(--ds-sucesso-fundo)', cor: 'var(--ds-sucesso-texto)', bd: 'var(--ds-sucesso-borda)' },
-      { val: 'Enviada por WhatsApp', rot: 'Enviados', n: cont['Enviada por WhatsApp'], bg: 'var(--ds-marca-50)', cor: 'var(--ds-marca-700)', bd: 'var(--ds-marca-200)' },
       { val: 'Não atende', rot: 'Não atende', n: cont['Não atende'], bg: 'var(--ds-atencao-fundo)', cor: 'var(--ds-atencao-texto)', bd: 'var(--ds-atencao-borda)' }
     ];
     el.innerHTML = defs.map(d =>
@@ -410,7 +409,7 @@ const estadoGuia = {
     const resetSel = function () { const s = document.getElementById('gTransferirSel'); if (s) s.value = ''; };
     guiaModalConfirmar(
       'Transferir paciente',
-      `Mover <b>${escGuia(guiaNomePax(c.p))}</b> do carro <b>${escGuia(c.v.placa)}</b> para <b>${destTxt}</b>?<br><br>O paciente volta para <b>Pendente</b> (carro/horário mudaram) e gera uma tarefa na Lista de Tarefas.`,
+      `Mover <b>${escGuia(guiaNomePax(c.p))}</b> do carro <b>${escGuia(c.v.placa)}</b> para <b>${destTxt}</b>?<br><br>O paciente volta para <b>Pendente</b> (carro/horário mudaram).`,
       'Confirmar transferência', 'primario',
       function () {
         guiaModalLoading('Transferindo...');
@@ -456,7 +455,7 @@ const estadoGuia = {
           ${criarCard(pOutro, c.v)}
         </div>
       </div>
-      <div class="gm-aviso-final">Os dois voltam para Pendente e geram tarefa na Lista de Tarefas.</div>`;
+      <div class="gm-aviso-final">Os dois voltam para Pendente.</div>`;
     guiaModalConfirmar('Trocar pacientes de carro', msg, 'Confirmar Troca', 'primario',
       function () {
         guiaModalLoading('Trocando pacientes...');
@@ -881,7 +880,7 @@ const estadoGuia = {
   // trás. Se o servidor recusar, a tela volta ao que era e avisa. Os dados do servidor só redesenham a lista quando a
   // ÚLTIMA gravação em andamento termina: com cliques seguidos, a resposta do primeiro não desfaz o segundo na tela.
   // ⚠️ Só aqui (status do contato), que é gravação pequena e independente. Cancelar continua esperando o servidor:
-  // mexe no carro e na Lista de Tarefas.
+  // tira o passageiro do carro.
   let guiaGravacoesContato = 0;
   function guiaGravarStatusContato(c, status, quem, obs, msgOk) {
     const p = c.p;
@@ -1174,7 +1173,7 @@ const estadoGuia = {
     if (!v) return;
     if (!n && guiaDoisMotoristas(v)) { guiaJanelaDoisMotoristas(placa, 'texto'); return; }
     const m = guiaMotoristaN(v, n || 1);
-    if (!m.zap) { toast('Motorista sem WhatsApp cadastrado (bd_motoristas, coluna E).', 'aviso'); return; }
+    if (!m.zap) { toast('Motorista sem WhatsApp cadastrado. O gestor preenche o número em Configurações > Motoristas.', 'aviso'); return; }
     const dataOp = document.getElementById('gFiltroData').value;
     const msg = gerarMensagemWhatsapp(v, dataOp, m.nome);
     // ⚠️ Aspas simples, nunca crase, em endereço com https (05/10/2026): ver enviarWhatsappPaciente.
@@ -1326,7 +1325,7 @@ const estadoGuia = {
         +   linha('Contato', p.telefones ? guiaFoneImagem(p.telefones) : '—')
         +   linha('Acompanhante', acomp)
         + '</div>'
-        + (p.pedidoCancelado ? '<div class="gimg-faixa gimg-faixa-canc">PEDIDO CANCELADO NO POSTO · confira antes de sair</div>' : '')
+        + (p.pedidoCancelado ? '<div class="gimg-faixa gimg-faixa-canc">PEDIDO CANCELADO NA UBSF · confira antes de sair</div>' : '')
         + (temRestricaoReal(p.observacao) ? '<div class="gimg-faixa gimg-faixa-obs">' + e(p.observacao) + '</div>' : '')
         + '</div>';
     });
@@ -1398,7 +1397,7 @@ const estadoGuia = {
       link.click();
       if (!guiaTemZap(v)) {
         destravar();
-        toast('Imagem baixada. Motorista sem WhatsApp cadastrado (bd_motoristas, coluna E).', 'aviso');
+        toast('Imagem baixada. Motorista sem WhatsApp cadastrado. O gestor preenche o número em Configurações > Motoristas.', 'aviso');
         return;
       }
       // Dois motoristas (11/11/2026): a janela oferece uma conversa para cada um.
