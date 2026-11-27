@@ -1,8 +1,8 @@
 # 0012. Método de trabalho com IA: Maestro enxuto
 
-- **Situação:** aceita em 08/11/2026, por decisão do Hélio.
-- **Redação:** proposta pela IA em 08/11/2026, a partir do registro de trabalho e dos planos da pasta TCC. O Hélio
-  revisa o texto e o ajusta com as palavras dele.
+- **Situação:** aceita em 08/11/2026.
+- **Redação:** proposta pela IA em 08/11/2026, a partir do registro de trabalho e dos planos da pasta TCC.
+  O autor do projeto revisa o texto e o ajusta com as próprias palavras.
 - **Fontes:** quadro do ambiente de IA (08/11/2026, seções 0 a 9) e avaliação das ferramentas externas (08/11/2026),
   ambos na pasta TCC.
 
@@ -21,18 +21,19 @@ conjunto pesa demais para um prazo de três semanas.
 - **Idioma:** as skills de terceiros ficam como vieram. As nossas skills e tudo o que uma pessoa lê ficam em
   português.
 - **Ordem de precedência:** os `CLAUDE.md`, depois as nossas skills e subagentes, depois as de terceiros.
-- **Ferramentas externas:** o Hélio as aprovou depois da avaliação de 24 IAs do GitHub e de três repositórios
-  indicados por ele. São elas: três skills do Superpowers, Context7, os modelos do Spec Kit, `security-audit`
+- **Ferramentas externas:** aprovadas depois da avaliação de 24 IAs do GitHub e de três repositórios indicados
+  pelo autor do projeto. São elas: três skills do Superpowers, Context7, os modelos do Spec Kit, `security-audit`
   (Cloudflare), `no-ai-slop` e `playwright-cli` (Microsoft).
 
 ## Alternativas consideradas
 
 - **Maestro completo:** tem problemas de peso e de idioma, e acrescenta mais uma coisa a explicar na prova.
-- **"Enxuto mínimo" com dois subagentes:** proposto e descartado pelo Hélio, porque tirava o revisor de segurança e
+- **"Enxuto mínimo" com dois subagentes:** proposto e descartado, porque tirava o revisor de segurança e
   baixava a régua.
 - **Plugins inteiros (Superpowers, BMAD Method):** trazem um segundo método ao lado do Maestro.
-- **Outros agentes de programação, geradores de aplicação e "empresas de agentes" autônomas:** o Hélio descartou
-  essas ferramentas depois da avaliação. Elas repetem o Claude Code, geram a aplicação sem planejamento ou tiram o Hélio do processo.
+- **Outros agentes de programação, geradores de aplicação e "empresas de agentes" autônomas:** essas ferramentas
+  foram descartadas depois da avaliação. Elas repetem o Claude Code, geram a aplicação sem planejamento ou tiram o
+  autor do processo.
 
 ## Consequências
 

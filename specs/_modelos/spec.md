@@ -1,7 +1,7 @@
 # Especificação: [NOME DO FLUXO]
 
 - **Pasta:** `specs/NNN-nome-do-fluxo/`
-- **Situação:** proposta | aprovada pelo Hélio em DD/MM/AAAA
+- **Situação:** proposta | aprovada em DD/MM/AAAA
 - **Fontes:** [documentos do sistema atual, triagens, issues, reuniões com o setor]
 
 ## 1. Objetivo

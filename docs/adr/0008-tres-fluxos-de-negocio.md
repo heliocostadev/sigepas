@@ -1,13 +1,13 @@
 # 0008. Três fluxos de negócio
 
-- **Situação:** aceita em 08/11/2026, por decisão do Hélio.
-- **Redação:** proposta pela IA em 08/11/2026, a partir do registro de trabalho e dos planos da pasta TCC. O Hélio
-  revisa o texto e o ajusta com as palavras dele.
+- **Situação:** aceita em 08/11/2026.
+- **Redação:** proposta pela IA em 08/11/2026, a partir do registro de trabalho e dos planos da pasta TCC.
+  O autor do projeto revisa o texto e o ajusta com as próprias palavras.
 - **Fontes:** registro de trabalho de 08/11/2026 e plano de construção (seção 5).
 
 ## Contexto
 
-A linha exige três fluxos de negócio completos. Nas palavras do Hélio, o dia do setor tem cinco partes. São elas:
+A linha exige três fluxos de negócio completos. O dia do setor tem cinco partes. São elas:
 importação do CSV, montagem dos carros para as viagens fora de Joinville (com as edições), escala dos motoristas,
 remoção interna e ligações.
 

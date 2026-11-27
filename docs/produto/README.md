@@ -5,7 +5,7 @@
 O setor de transportes da Secretaria de Saúde de Joinville recebe todos os dias do OLOSTECH a lista de pedidos de
 transporte de pacientes. Os pedidos são para consultas, exames e tratamentos em outras cidades. O setor precisa
 transformar essa lista em carros: quem vai em qual veículo, com qual motorista, saindo a que horas. O SIGEPAS em Apps
-Script, construído pelo Hélio no estágio, já faz isso numa planilha e é usado no setor. Este repositório constrói o
+Script já faz isso numa planilha e é usado no setor. Este repositório constrói o
 mesmo sistema em arquitetura de servidor, para fim acadêmico. Os dois não se substituem.
 
 ## Papéis (decisão de 08/11/2026)

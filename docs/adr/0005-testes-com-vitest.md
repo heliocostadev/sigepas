@@ -1,8 +1,8 @@
 # 0005. Testes com Vitest nos dois lados
 
-- **Situação:** aceita em 16/11/2026, por decisão do Hélio, depois de uma prova de conceito.
-- **Redação:** proposta pela IA em 08/11/2026 e atualizada em 16/11/2026 com o resultado da prova de conceito. O Hélio
-  revisa o texto e o ajusta com as palavras dele.
+- **Situação:** aceita em 16/11/2026, depois de uma prova de conceito.
+- **Redação:** proposta pela IA em 08/11/2026 e atualizada em 16/11/2026 com o resultado da prova de conceito.
+  O autor do projeto revisa o texto e o ajusta com as próprias palavras.
 - **Fontes:** plano de construção de 08/11/2026 (seção 1) e entrada R-0007 do
   [`RASTREABILIDADE.md`](../RASTREABILIDADE.md).
 
@@ -12,7 +12,7 @@ A linha exige 75% de cobertura no back-end e 25% no front-end, medidas separadam
 Vitest, com 7 testes na `main` e os testes dos parsers nos PRs 1 a 3.
 
 O NestJS cria o projeto com o Jest por padrão. A injeção de dependência do NestJS depende dos metadados dos
-decoradores. Por isso, o Hélio pediu um teste antes de decidir.
+decoradores. Por isso, um teste foi pedido antes da decisão.
 
 ## Decisão
 
@@ -33,7 +33,7 @@ falha se os metadados deixarem de ser gerados.
 
 ## Alternativas consideradas
 
-- **Vitest sem o plugin SWC:** funciona na versão testada e tem duas dependências a menos. O Hélio não a escolheu,
+- **Vitest sem o plugin SWC:** funciona na versão testada e tem duas dependências a menos. Ela não foi escolhida,
   porque o comportamento não está documentado e pode mudar numa atualização.
 - **Jest no back-end:** é o padrão do NestJS e funciona com os decoradores sem configuração extra. O projeto não o
   escolheu porque exige uma segunda ferramenta, já que o front-end usa Vite. Também exige converter os testes que já
@@ -41,7 +41,7 @@ falha se os metadados deixarem de ser gerados.
 
 ## Consequências
 
-- O Hélio aprende e explica uma ferramenta só, nos dois lados.
+- Só uma ferramenta precisa ser aprendida e explicada, nos dois lados.
 - O relatório `lcov` alimenta o SonarCloud.
 - O plugin SWC acrescenta duas dependências de desenvolvimento (`unplugin-swc` e `@swc/core`) e cerca de 0,2 segundo
   por execução.

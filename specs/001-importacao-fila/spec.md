@@ -1,11 +1,11 @@
 # Especificação: fluxo 1, do arquivo à fila do dia
 
 - **Pasta:** `specs/001-importacao-fila/`
-- **Situação:** proposta em 08/11/2026 e **aprovada pelo Hélio em 16/11/2026**. A aprovação inclui os pontos que a
+- **Situação:** proposta em 08/11/2026 e **aprovada em 16/11/2026**. A aprovação inclui os pontos que a
   spec propôs e as regras da triagem da Importação que ainda estavam sem decisão, conforme a recomendação.
 - **Fontes:**
   - Triagem das 21 regras da Importação, de 08/11/2026 (pasta TCC, `SIGEPAS/PLANOS_DE_TRABALHO/`). A triagem traz
-    as duas decisões do Hélio (chave natural e dicionário inicial) e a recomendação para as demais regras.
+    as duas decisões tomadas (chave natural e dicionário inicial) e a recomendação para as demais regras.
   - Documentação da aba Importação do sistema atual (pasta TCC, `SIGEPAS/02-DOCUMENTACAO/01_IMPORTACAO.md`): dados,
     casos-limite, histórias US-IMP-01 a 06, requisitos RF-IMP e RNF-IMP.
   - Medição na exportação real de 15/09/2026 (380 linhas). A data veio sempre no formato "12 de set. de 2026", e a
@@ -178,13 +178,13 @@ por dentro e devolve uma sugestão. O fluxo 1 ignora essa sugestão e não a gra
 | RF-007 | Padronizar cidade e local pelo dicionário antes de gravar. A grafia da cidade pode ser corrigida, mas nunca trocada por outra cidade | RN-006, RF-IMP-04, issue 7 | Entra |
 | RF-008 | Marcar como "local a revisar" o pedido cuja cidade e local não estão no dicionário, sem impedir a importação. Pedido cancelado não conta como local a revisar | RN-007, RN-016, RN-017, RF-IMP-05 | Entra |
 | RF-009 | Registrar cada envio como um lote de importação: arquivo, data e hora, quem enviou e as contagens (novos, atualizados, cancelados, rejeitados, locais a revisar, ausentes) | RN-001, RF-IMP-11 | Adaptada |
-| RF-010 | Identificar o pedido pela chave natural de oito colunas com contador de ocorrência, de modo que reimportar atualize o pedido e não o duplique | RN-001, RN-020, RF-IMP-17, RF-IMP-19, ADR 0010 | Adaptada, decidida pelo Hélio |
+| RF-010 | Identificar o pedido pela chave natural de oito colunas com contador de ocorrência, de modo que reimportar atualize o pedido e não o duplique | RN-001, RN-020, RF-IMP-17, RF-IMP-19, ADR 0010 | Adaptada, decidida em 08/11/2026 |
 | RF-011 | Se o pedido tem data no período do arquivo novo e não veio nele, marcar o pedido como "não veio na última importação", sem apagá-lo | RN-001 adaptada | Proposta desta spec |
 | RF-012 | Mostrar as linhas rejeitadas de cada lote, com o número da linha no arquivo e o motivo | RN-003, RF-IMP-16 | Adaptada |
 | RF-013 | Mostrar a fila de uma data escolhida, ordenada por cidade e hora, com cancelados escondidos por padrão e a opção de mostrá-los | RN-011, RN-021, RF-IMP-18, RN-025 | Entra |
 | RF-014 | Importar arquivo de qualquer data, sem recusa e sem confirmação | RN-019, RF-IMP-14 | Entra |
 | RF-015 | Gravar cada importação inteira numa transação: ou entra tudo o que é válido, ou nada | RN-012, RF-IMP-13 | Adaptada |
-| RF-016 | Carregar o dicionário inicial de cidades e locais a partir do sistema atual, só com cidade, local e grafia | ADR 0011 | Decidida pelo Hélio |
+| RF-016 | Carregar o dicionário inicial de cidades e locais a partir do sistema atual, só com cidade, local e grafia | ADR 0011 | Decidida em 08/11/2026 |
 | RF-017 | Guardar o acompanhante como registro próprio ligado ao pedido | Documentação, seção 6 | Entra |
 
 ### 4.2 Não funcionais
