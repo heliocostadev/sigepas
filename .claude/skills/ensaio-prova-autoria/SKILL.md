@@ -10,7 +10,7 @@ description: Ensaia com o autor a prova de autoria do Portfólio, fazendo as per
 A prova é um encontro individual, até 30/11/2026. Nele, o professor pergunta sobre o projeto, pede para mostrar o
 código e pode pedir uma alteração ao vivo. A prova é eliminatória. A segunda tentativa vai até 03/12/2026.
 
-O guia oficial é `documentation/guia-prova-de-autoria.md` do playbook do professor. No computador do autor, o playbook
+O guia oficial é `documentation/guia-prova-de-autoria.md` do playbook do professor. A cópia local do playbook
 fica em `TCC/SIGEPAS/03-REFERENCIAS/playbook-professor/`. Antes de ensaiar, confira se o guia mudou: rode `git fetch`
 e leia `origin/main`.
 

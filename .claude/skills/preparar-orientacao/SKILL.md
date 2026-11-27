@@ -12,7 +12,7 @@ O `Portfolio.md` exige **cinco orientações**, presenciais ou remotas. **Ao men
 registro equivalente**, entregue ao professor. Sem as cinco evidenciadas, o aluno não se habilita ao Poster + Demo Day.
 Antes de usar datas, confira o playbook atualizado (`git fetch` e leitura de `origin/main`).
 
-No computador do autor, as evidências ficam em `TCC/ENTREGAS/PORTFOLIO/orientacoes/`, uma pasta por orientação com a data
+As evidências ficam em `TCC/ENTREGAS/PORTFOLIO/orientacoes/`, uma pasta por orientação com a data
 no nome (`AAAA-MM-DD_orientacao-N/`).
 
 ## Antes: a pauta

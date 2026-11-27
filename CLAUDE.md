@@ -22,7 +22,7 @@ coisa está e quais regras valem. O sistema está descrito em [`docs/`](docs/REA
 
 ## Ordem de precedência (quando duas instruções discordarem)
 
-1. **Os `CLAUDE.md`:** este e, no computador do autor, o da pasta `TCC`, que o Claude Code carrega por ser pasta-mãe.
+1. **Os `CLAUDE.md`:** este e o da pasta `TCC`, que o Claude Code carrega por ser pasta-mãe.
 2. **As nossas skills e subagentes**, em português: `.claude/agents/` e as skills marcadas como "nossa" em
    [`.claude/skills/README.md`](.claude/skills/README.md).
 3. **As skills de terceiros**, que são técnica de ofício e ficam no idioma em que vieram.
@@ -149,4 +149,4 @@ npm run test:cov       # cobertura
 ## Ao fechar uma conversa
 
 Use a skill `registrar-sessao`. Ela cuida da entrada do dia no registro de trabalho, da página de onde parei e do
-checklist do professor. No computador do autor, esses arquivos ficam na pasta `TCC`, fora deste repositório.
+checklist do professor. Esses arquivos ficam na pasta `TCC`, fora deste repositório.
