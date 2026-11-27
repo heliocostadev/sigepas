@@ -24,7 +24,7 @@ Use a skill `security-audit` (Cloudflare, MIT):
   - `CLOUD-AND-DEPLOYMENT.md` (Terraform, AWS, contêineres).
   - `SUPPLY-CHAIN-AND-RELEASE.md` (dependências e GitHub Actions).
   - `DATA-ISOLATION-AND-LIFECYCLE.md` (cópia de segurança, retenção e exclusão).
-- **Auditoria completa:** faça só quando o Hélio pedir, com perfil `quick` e limite de agentes combinado antes. Grave o
+- **Auditoria completa:** faça só quando o autor pedir, com perfil `quick` e limite de agentes combinado antes. Grave o
   relatório fora do repositório (padrão da skill). O `sigepas` é público, e achado não se publica antes da correção.
 
 O `/security-review` do Claude Code é segunda opinião, não substituto.

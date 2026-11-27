@@ -5,7 +5,7 @@ coisa está e quais regras valem. O sistema está descrito em [`docs/`](docs/REA
 
 ## O que é este repositório
 
-- **SIGEPAS** (Sistema de Gestão de Transportes de Pacientes e Servidores). Hélio Costa constrói o sistema como
+- **SIGEPAS** (Sistema de Gestão de Transportes de Pacientes e Servidores). O sistema é construído como
   trabalho de conclusão do curso de Engenharia de Software do Centro Universitário Católica SC (Joinville). O trabalho
   segue a linha Web Apps do Portfólio e também é o projeto do PAC Extensionista VIII.
 - **Dois sistemas com o mesmo nome, que não se substituem.** O "SIGEPAS em Apps Script" é o que o setor de transportes
@@ -22,7 +22,7 @@ coisa está e quais regras valem. O sistema está descrito em [`docs/`](docs/REA
 
 ## Ordem de precedência (quando duas instruções discordarem)
 
-1. **Os `CLAUDE.md`:** este e, na máquina do Hélio, o da pasta `TCC`, que o Claude Code carrega por ser pasta-mãe.
+1. **Os `CLAUDE.md`:** este e, no computador do autor, o da pasta `TCC`, que o Claude Code carrega por ser pasta-mãe.
 2. **As nossas skills e subagentes**, em português: `.claude/agents/` e as skills marcadas como "nossa" em
    [`.claude/skills/README.md`](.claude/skills/README.md).
 3. **As skills de terceiros**, que são técnica de ofício e ficam no idioma em que vieram.
@@ -32,7 +32,7 @@ conhecidos estão resolvidos no fim do [`.claude/skills/README.md`](.claude/skil
 
 ## Idioma
 
-- **Tudo o que uma pessoa lê é em português do Brasil.** A regra vale para respostas ao Hélio, documentos, telas,
+- **Tudo o que uma pessoa lê é em português do Brasil.** A regra vale para respostas ao autor, documentos, telas,
   mensagens de erro, descrições de PR, mensagens de commit, issues e comentários.
 - **Nomes do domínio no código ficam em português**, como já estão (`normalizarTexto`, `interpretarStatus`).
 - **Ficam em inglês só** os termos técnicos consagrados (lint, commit, deploy) e as palavras fixas de padrões externos.
@@ -44,7 +44,7 @@ conhecidos estão resolvidos no fim do [`.claude/skills/README.md`](.claude/skil
 O método é adaptado do [Maestro](https://github.com/GHDaru/maestro) (MIT) e usa cinco subagentes. **Quem escreve não
 é quem confere.**
 
-1. **Não escreva código sem `spec.md` aprovado pelo Hélio.** Cada fluxo tem uma pasta em [`specs/`](specs/) com
+1. **Não escreva código sem `spec.md` aprovado pelo autor.** Cada fluxo tem uma pasta em [`specs/`](specs/) com
    `spec.md`, `plan.md` e `tasks.md`. O `spec.md` traz o quê e o porquê, os critérios testáveis e a matriz
    requisito → teste. Os modelos estão em [`specs/_modelos/`](specs/_modelos/).
 2. **Antes de codar, liste os casos-limite.** Se a regra vier do sistema atual, confira os casos nos dados medidos.
@@ -61,7 +61,7 @@ O método é adaptado do [Maestro](https://github.com/GHDaru/maestro) (MIT) e us
    | `verificador` | Depois de cada tarefa e antes de todo PR, em contexto novo. Dá o veredito com a prova |
    | `revisor-de-seguranca` | Todo PR que toque dado pessoal, login, permissão, configuração ou deploy. Também faz a auditoria completa antes da orientação 5 e do release |
    | `redator-tecnico` | ADR, `docs/`, Wiki e instruções de deploy, no mesmo PR da mudança |
-   | `explicador` | Ao fim de cada tarefa: explica ao Hélio o que foi feito e por quê, com perguntas no estilo da prova de autoria |
+   | `explicador` | Ao fim de cada tarefa: explica ao autor o que foi feito e por quê, com perguntas no estilo da prova de autoria |
 
 5. **Correção de defeito** vai direto para PR, com um teste que reproduz o defeito antes da correção
    (`diagnose-before-fix`).
@@ -77,12 +77,12 @@ O método é adaptado do [Maestro](https://github.com/GHDaru/maestro) (MIT) e us
 - **Caixa de ferramentas completa:** não monte nada só para cobrir o mínimo. Ao propor algo, mostre também as
   ferramentas de apoio que evitam problemas previsíveis.
 - **Toda restrição tem fonte.** Ao propor uma regra ou proibição, diga de onde ela vem (playbook, norma, boa prática
-  citada, decisão do Hélio). Sem fonte, a regra é uma proposta.
+  citada, decisão do autor). Sem fonte, a regra é uma proposta.
 - **Não invente** datas, nomes, resultados ou alterações. Se faltar um dado, marque a falta e pergunte.
 - **Checar antes e rechecar depois.** Antes de push, issue ou comentário, confira branch, repositório e número.
   Depois, confirme no GitHub que o envio chegou e que o texto saiu certo. Confirme também que os links abrem e que o
   CI passou. Use links completos em vez de `#N`.
-- **Faça commit, push, PR, issue e comentário só quando o Hélio pedir e só depois de ele ler o texto.** O
+- **Faça commit, push, PR, issue e comentário só quando o autor pedir e só depois de ele ler o texto.** O
   `.claude/settings.json` pede confirmação antes desses comandos, no Bash e no PowerShell, e proíbe `git push --force`.
 - **Nomes que se explicam sozinhos** (*Código Limpo*, cap. 2): arquivo, pasta, função, constante e script dizem o que
   a coisa é ou faz. Não use sigla interna nem nome genérico. Renomeações pendentes do código atual: `HORA_COLADA` →
@@ -91,10 +91,10 @@ O método é adaptado do [Maestro](https://github.com/GHDaru/maestro) (MIT) e us
 - **Use registro universitário, sem marca de IA**, em tudo que outra pessoa lê: português correto, sem gírias, sem
   travessões e sem frases de efeito. A skill `no-ai-slop` ajuda a conferir. As expressões a evitar em português estão
   em [`docs/git/escrita-dos-textos-publicados.md`](docs/git/escrita-dos-textos-publicados.md). **Não reescreva texto
-  aprovado pelo Hélio.** Nele, aponte só os problemas.
+  aprovado pelo autor.** Nele, aponte só os problemas.
 - **Reaproveitar boa prática é permitido. Plagiar o produto não é.** Skills, testes, estruturas, configurações e
-  scripts de outros repositórios e de colegas podem vir, com autor e licença registrados. O Hélio deve entender o que
-  entrou. O que não se faz é copiar o produto de outra pessoa e disfarçar.
+  scripts de outros repositórios e de colegas podem vir, com autor e licença registrados. O autor do projeto deve
+  entender o que entrou. O que não se faz é copiar o produto de outra pessoa e disfarçar.
 
 ## Dados e segurança
 
@@ -149,4 +149,4 @@ npm run test:cov       # cobertura
 ## Ao fechar uma conversa
 
 Use a skill `registrar-sessao`. Ela cuida da entrada do dia no registro de trabalho, da página de onde parei e do
-checklist do professor. Na máquina do Hélio, esses arquivos ficam na pasta `TCC`, fora deste repositório.
+checklist do professor. No computador do autor, esses arquivos ficam na pasta `TCC`, fora deste repositório.

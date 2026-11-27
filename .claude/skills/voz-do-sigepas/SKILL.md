@@ -1,13 +1,13 @@
 ---
 name: voz-do-sigepas
-description: O jeito de falar do SIGEPAS em arquitetura de servidor. Como escrever qualquer texto que o operador ou o gestor do setor de transportes vão ler na tela, em mensagem de erro, relatório de importação, guia do motorista ou e-mail do sistema. Use sempre que for escrever ou revisar texto de interface, mesmo um rótulo de botão, e sempre que o Hélio corrigir uma frase (a correção vira regra aqui). Manda sobre a better-writing e a impeccable quando discordarem.
+description: O jeito de falar do SIGEPAS em arquitetura de servidor. Como escrever qualquer texto que o operador ou o gestor do setor de transportes vão ler na tela, em mensagem de erro, relatório de importação, guia do motorista ou e-mail do sistema. Use sempre que for escrever ou revisar texto de interface, mesmo um rótulo de botão, e sempre que o autor corrigir uma frase (a correção vira regra aqui). Manda sobre a better-writing e a impeccable quando discordarem.
 ---
 
 # Voz do SIGEPAS
 
-Esta skill é uma adaptação, de 08/11/2026, da skill `voz-do-servidor`, do projeto de estágio do Hélio. Aquele projeto
+Esta skill é uma adaptação, de 08/11/2026, da skill `voz-do-servidor`, do projeto de estágio do autor. Aquele projeto
 é o sistema de retirada e devolução de veículos da Saúde de Joinville. A adaptação manteve os princípios gerais e as
-correções do Hélio que valem para qualquer tela. O leitor e o vocabulário mudaram. A skill aguarda a revisão do Hélio.
+correções do autor que valem para qualquer tela. O leitor e o vocabulário mudaram. A skill aguarda a revisão do autor.
 
 ## Quem lê
 
@@ -75,9 +75,9 @@ Esta skill dá a nossa voz. Quando as duas discordarem, vale esta.
 - O botão diz o que acontece? O erro diz o que fazer agora?
 - Tem alguma palavra da coluna "Em vez de"?
 
-## Correções do Hélio
+## Correções do autor
 
-Quando o Hélio corrigir um texto deste sistema, registre aqui a regra que a correção ensina. Use o formato data ·
+Quando o autor corrigir um texto deste sistema, registre aqui a regra que a correção ensina. Use o formato data ·
 antes → depois · por quê. Aplique a regra dali em diante.
 
 - 08/11/2026 · hora vazia exibida como `00:00` → **"sem hora"** · defeito apontado na review do PR 1 (issue 8): hora
