@@ -35,7 +35,7 @@ no `README.md` e no `CLAUDE.md` do repositório.
   **onde você quer a opinião de quem revisa**. Perguntas na descrição renderam as melhores reviews da N1.
 - Correção de defeito apontado por colega cita o link completo da issue e responde a ela com o commit.
 - O merge só acontece com o "CI aprovado" verde e pelo menos uma revisão.
-- Nada é publicado (PR, comentário, issue) sem o autor do projeto ler o texto antes.
+- Nada é publicado (PR, comentário, issue) sem que o texto seja lido antes.
 
 ## Textos publicados
 

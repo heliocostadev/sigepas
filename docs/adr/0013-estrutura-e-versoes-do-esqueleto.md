@@ -1,6 +1,6 @@
 # 0013. Estrutura do repositório e versões do esqueleto
 
-- **Situação:** proposta em 16/11/2026. Aguarda a aprovação do autor do projeto.
+- **Situação:** proposta em 16/11/2026. Aguarda aprovação.
 - **Redação:** IA, em 16/11/2026, durante a montagem do esqueleto.
 - **Fontes:** plano de construção de 08/11/2026 (seção 1) e ADRs 0002 a 0006. Também a consulta ao npm e os testes
   locais, ambos em 16/11/2026.

@@ -1,6 +1,6 @@
 # Especificações por fluxo
 
-Cada fluxo de negócio tem uma pasta. Ninguém escreve código do fluxo antes de o autor do projeto aprovar o `spec.md`. Os
+Cada fluxo de negócio tem uma pasta. Ninguém escreve código do fluxo antes de o `spec.md` ser aprovado. Os
 modelos estão em [`_modelos/`](_modelos/README.md).
 
 | Fluxo | Spec | Situação |

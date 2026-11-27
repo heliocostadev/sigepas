@@ -2,7 +2,7 @@
 
 - **Situação:** aceita em 08/11/2026.
 - **Redação:** proposta pela IA em 08/11/2026, a partir do registro de trabalho e dos planos da pasta TCC.
-  O autor do projeto revisa o texto e o ajusta com as próprias palavras.
+  O texto passa por revisão e ajuste de redação.
 - **Fontes:** registro de trabalho de 08/11/2026 e plano de construção (seção 1).
 
 ## Contexto
@@ -16,8 +16,8 @@ O front-end usa **React com Vite**, em TypeScript, servido por Nginx no Docker C
 
 ## Alternativas consideradas
 
-As alternativas abaixo não foram discutidas em 08/11/2026. A IA as acrescentou na redação desta ADR, e o autor do
-projeto confirma ou retira cada uma na revisão:
+As alternativas abaixo não foram discutidas em 08/11/2026. A IA as acrescentou na redação desta ADR, e cada
+uma deve ser confirmada ou retirada na revisão:
 
 - **Páginas montadas no servidor:** são mais simples, mas não usam o framework moderno que a linha valoriza.
 - **Next.js:** traz renderização no servidor e rotas de API de que o projeto não precisa, já que a API é o NestJS.
