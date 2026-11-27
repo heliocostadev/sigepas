@@ -285,3 +285,16 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
   números.
 - Prova no ambiente local: entrada, importação do CSV fictício, padronização de locais, montagem de carro,
   confirmação, e um cancelamento feito por fora apareceu na tela aberta sem recarregar a página.
+
+## R-0020 · 26/11/2026 · Publicação, conferência no site, diagramas C4 e Wiki
+
+- Publicação: PR https://github.com/heliocostadev/sigepas/pull/38 na `dev` e PR
+  https://github.com/heliocostadev/sigepas/pull/39 na `main`, com todas as verificações aprovadas. O workflow Deploy
+  publicou o commit `2b92aef`. Depois de o segredo do gestor inicial ser gravado, o Deploy rodou de novo e criou a
+  conta.
+- Prova no site, com dados fictícios: importação do CSV (128 viagens) e decisão dos locais novos. Depois, montagem de
+  um carro, escala com motorista, confirmação do paciente e tempo real entre duas abas. O log do Deploy mostra os contêineres
+  do Prometheus e do Grafana rodando.
+- Diagramas C4 em `docs/arquitetura/`: contexto, contêineres, componentes da API e implantação na AWS, em Mermaid.
+- Wiki: `scripts/montar-paginas-da-wiki.mjs` dá um nome único a cada página de `docs/` e acerta os links, porque a Wiki
+  do GitHub não tem pastas. A montagem local gerou 36 páginas e o menu lateral.
