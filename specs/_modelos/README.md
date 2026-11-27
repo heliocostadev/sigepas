@@ -20,7 +20,7 @@ O projeto não trouxe o modelo de "constituição" do Spec Kit, porque o `CLAUDE
 
 1. Copie a pasta para `specs/NNN-nome-do-fluxo/`.
 2. Preencha o `spec.md`.
-3. Peça ao autor do projeto a aprovação do `spec.md`.
+3. Peça a aprovação do `spec.md`.
 4. Só depois da aprovação, escreva o `plan.md` e o `tasks.md`.
 5. Acione o `implementador`, que segue o `tasks.md` uma tarefa por vez.
 6. Acione o `verificador`, que confere o resultado pela matriz requisito → teste.

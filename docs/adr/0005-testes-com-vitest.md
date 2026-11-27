@@ -2,7 +2,7 @@
 
 - **Situação:** aceita em 16/11/2026, depois de uma prova de conceito.
 - **Redação:** proposta pela IA em 08/11/2026 e atualizada em 16/11/2026 com o resultado da prova de conceito.
-  O autor do projeto revisa o texto e o ajusta com as próprias palavras.
+  O texto passa por revisão e ajuste de redação.
 - **Fontes:** plano de construção de 08/11/2026 (seção 1) e entrada R-0007 do
   [`RASTREABILIDADE.md`](../RASTREABILIDADE.md).
 

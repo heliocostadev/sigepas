@@ -12,8 +12,8 @@ o tamanho da máquina nem o programa do HTTPS.
 
 Em 24/11/2026, a consulta `ec2:DescribeInstanceTypes` em `sa-east-1` (São Paulo) foi negada. A negação veio de uma
 política de controle de serviço (SCP) da organização da AWS da qual a conta faz parte. A mesma consulta funcionou em
-`us-east-2` (Ohio). O login do AWS CLI também só é aceito em `us-east-2`. A política não é controlada pelo autor do
-projeto.
+`us-east-2` (Ohio). O login do AWS CLI também só é aceito em `us-east-2`. A política vem da
+organização, e a conta do projeto não pode alterá-la.
 
 O plano gratuito cobre, em `us-east-2`, máquinas de 1 GB e de 2 GB das famílias `t3`, `t4g`, `t8i` e `t9g`. Ele cobre
 também a `c7i-flex.large`, de 4 GB, e a `m7i-flex.large`, de 8 GB. O crédito da conta é de 100 dólares, até
@@ -57,10 +57,10 @@ O sistema roda seis contêineres: banco, API, Nginx, Caddy, Prometheus e Grafana
   "My Zero-Spend Budget" pode mandar alerta quando o crédito começar a ser usado.
 - O estado do Terraform fica só no computador de quem roda o Terraform, fora do git. Se o arquivo se perder, o
   Terraform não reconhece mais os recursos. Guardar o estado num bucket S3 fica como melhoria.
-- Antes do primeiro deploy, o autor do projeto cria no GitHub o ambiente `producao`, só para a `main`, e a proteção da
-  `main`. Ele cria também as variáveis `DEPLOY_HABILITADO`, `DOMINIO`, `AWS_ID_DA_MAQUINA` e `AWS_PAPEL_DE_DEPLOY`.
-  Depois do primeiro deploy, ele torna públicas as duas imagens do GitHub Container Registry, para a máquina baixá-las
-  sem senha.
-- O desligamento não é automático. Perto do Demo Day e quando o crédito ficar baixo, a IA avisa o autor do
-  projeto com o custo acumulado. O autor decide se mantém o sistema no ar ou se roda `terraform destroy` (pedido de
+- Antes do primeiro deploy, é preciso criar no GitHub o ambiente `producao`, só para a `main`, e a proteção da
+  `main`. Também é preciso criar as variáveis `DEPLOY_HABILITADO`, `DOMINIO`, `AWS_ID_DA_MAQUINA` e
+  `AWS_PAPEL_DE_DEPLOY`. Depois do primeiro deploy, as duas imagens do GitHub Container Registry precisam ficar
+  públicas, para a máquina baixá-las sem senha.
+- O desligamento não é automático. Perto do Demo Day e quando o crédito ficar baixo, a IA avisa o custo
+  acumulado. A decisão de manter o sistema no ar ou rodar `terraform destroy` vem depois desse aviso (pedido de
   24/11/2026).

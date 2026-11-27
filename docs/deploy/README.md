@@ -4,8 +4,8 @@ As decisões estão na [ADR 0006](../adr/0006-hospedagem-na-aws-com-terraform.md
 OIDC) e na [ADR 0014](../adr/0014-regiao-maquina-e-https-do-deploy.md) (região `us-east-2`, máquina `t3.small` e
 HTTPS pelo Caddy). **Situação em 27/11/2026:** os 12 recursos da AWS foram criados com `terraform apply` em 24/11/2026,
 e o deploy automático está ligado desde então. Antes do primeiro `apply`, o Terraform, o Compose e o workflow passaram
-por revisão de segurança. Toda mudança na infraestrutura passa primeiro por `terraform plan` e só é aplicada depois da
-aprovação do autor do projeto.
+por revisão de segurança. Toda mudança na infraestrutura passa primeiro por `terraform plan` e só é aplicada depois de
+aprovada.
 
 ## Como funciona
 
@@ -73,7 +73,7 @@ aws login --profile sigepas --region us-east-2
    ```bash
    terraform plan -out=plano.tfplan
    ```
-4. Depois da aprovação do autor do projeto, aplique o plano:
+4. Com o plano aprovado, aplique as mudanças:
    ```bash
    terraform apply plano.tfplan
    ```
@@ -123,7 +123,7 @@ aws login --profile sigepas --region us-east-2
   `sigepas-api:<sha>-migracao` e termina. A API só sobe depois que ele termina bem. Uma migração que falha deixa a
   versão anterior da API no ar, e o workflow `Deploy` reprova.
 - **Gestor inicial (conta para entrar no site):** nenhuma senha fica no repositório. O script
-  `SIGEPAS/criar-gestor-do-sigepas-no-ar.ps1` fica na pasta de trabalho do autor, fora do repositório. Ele gera a senha
+  `SIGEPAS/criar-gestor-do-sigepas-no-ar.ps1` fica na pasta de trabalho local, fora do repositório. Ele gera a senha
   e calcula o hash scrypt no contêiner da API local. Depois, grava só o hash no segredo
   `HASH_DA_SENHA_DO_GESTOR_INICIAL` do GitHub, com o e-mail na variável `EMAIL_DO_GESTOR_INICIAL`. O deploy leva os dois
   para o `/opt/sigepas/.env`, e a API cria a conta na subida se ela ainda não existir. A senha fica em
@@ -138,8 +138,8 @@ aws login --profile sigepas --region us-east-2
   própria tela Importar CSV.
 - **Trocar o domínio:** mude a variável `DOMINIO` no GitHub e aponte o DNS do domínio novo para o `ip_publico`.
   Depois, rode o workflow `Deploy`. O Caddy pede o certificado novo sozinho.
-- **Desligar tudo:** só com a decisão do autor do projeto. Perto do Demo Day, a IA avisa com o custo acumulado, e o
-  autor decide se mantém ou desliga. Para desligar, rode `terraform destroy` na pasta do Terraform. O volume do banco é
+- **Desligar tudo:** não é automático. Perto do Demo Day, a IA avisa com o custo acumulado, e a decisão de manter ou
+  desligar vem depois desse aviso. Para desligar, rode `terraform destroy` na pasta do Terraform. O volume do banco é
   apagado junto com a máquina.
 - **Cópia do estado do Terraform:** depois de cada `apply` ou `destroy`, copie o `terraform.tfstate` para a pasta
   `ESTADO_DO_TERRAFORM`. Essa pasta fica fora do repositório. Sem esse arquivo, o Terraform não

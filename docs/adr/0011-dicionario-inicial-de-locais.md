@@ -2,7 +2,7 @@
 
 - **Situação:** aceita em 08/11/2026.
 - **Redação:** proposta pela IA em 08/11/2026, a partir do registro de trabalho e dos planos da pasta TCC.
-  O autor do projeto revisa o texto e o ajusta com as próprias palavras.
+  O texto passa por revisão e ajuste de redação.
 - **Fontes:** triagem das regras da Importação (08/11/2026).
 
 ## Contexto

@@ -6,12 +6,12 @@ Estas regras valem para todo texto que uma pessoa lê:
 - Issues, descrições de PR, comentários e mensagens de commit.
 - Instruções escritas para os subagentes e para as skills nossas.
 
-O professor e os colegas devem perceber que o autor participa do processo. A IA não faz tudo sozinha (pedido de
+O professor e os colegas devem perceber que uma pessoa conduz o processo. A IA não faz tudo sozinha (pedido de
 08/11/2026).
 
 ## 1. Português Técnico Simplificado
 
-Regras do padrão ASD-STE100, adaptadas ao português. Elas vêm do gem de POPs do autor e foram adotadas no TCC em
+Regras do padrão ASD-STE100, adaptadas ao português. Elas vêm de um gem de POPs e foram adotadas no TCC em
 16/11/2026.
 
 | Regra | Como aplicar | Exemplo |
@@ -45,8 +45,8 @@ e nomes de produtos. Nomes de teste copiados do código também ficam como estã
 - Use português correto, sem gírias.
 - Use fatos concretos no lugar de adjetivos: datas, números medidos, nomes de arquivo, links completos.
 - Use links completos para issue e PR (`https://github.com/heliocostadev/sigepas/issues/8`). Nunca use `#8`.
-- Escreva a saudação sem vírgula, como o autor escreve: "Obrigado Vinicius."
-- Não reescreva texto aprovado pelo autor. Nele, aponte só os problemas.
+- Escreva a saudação sem vírgula: "Obrigado Vinicius."
+- Não reescreva texto já aprovado. Nele, aponte só os problemas.
 
 ## 3. Padrões que denunciam texto gerado
 

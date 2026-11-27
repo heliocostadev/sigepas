@@ -1,7 +1,7 @@
 # Modelo de ameaça
 
-**Situação: primeira versão, escrita em 08/11/2026 antes de qualquer código do servidor. O autor do projeto deve revisar
-o modelo antes do fluxo 1 e a cada fluxo novo.** A ideia é do Leonardo (repositório
+**Situação: primeira versão, escrita em 08/11/2026 antes de qualquer código do servidor. O modelo deve ser
+revisado antes do fluxo 1 e a cada fluxo novo.** A ideia é do Leonardo (repositório
 [code-lab-project](https://github.com/leonsnw/code-lab-project)): escrever as ameaças primeiro e ligar cada defesa à
 ameaça que ela combate.
 
