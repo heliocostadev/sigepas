@@ -670,7 +670,7 @@
         'Dar baixa em <b>' + escAba3(key) + '</b>?'
       + '<div class="ds-faixa ds-faixa--info" style="margin-top:12px;"><span>'
       + '<b>O que acontece:</b> ' + oQue + ' sai da operação e das listas a partir de agora.<br>'
-      + '<b>O que NÃO acontece:</b> nada é apagado — a linha continua na planilha e as viagens '
+      + '<b>O que NÃO acontece:</b> nada é apagado. O cadastro continua guardado e as viagens '
       + 'já feitas seguem mostrando ' + (tipo === 'veiculos' ? 'a placa' : 'o nome') + ' normalmente.</span>'
       + '</div>'
       + '<div class="ds-ajuda" style="margin-top:10px;">Dá para reverter depois.</div>';

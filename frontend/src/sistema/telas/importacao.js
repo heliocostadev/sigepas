@@ -88,7 +88,7 @@
           var cancel = (res && res.canceladas) ? res.canceladas : 0;
           // Desde 28/08 eles não são mais ignorados: entram marcados, para o sistema poder
           // avisar quando o cancelamento atinge alguém que já está num carro.
-          var sufixoCancel = cancel > 0 ? (' (' + cancel + ' cancelado(s) pelo posto)') : '';
+          var sufixoCancel = cancel > 0 ? (' (' + cancel + ' cancelado(s) pela UBSF)') : '';
           if (pend.length > 0) {
             toast('Viagens importadas' + sufixoCancel + '. ' + pend.length + ' local(is) novo(s) para revisar.', 'aviso');
             abrirModalLocais(pend);
@@ -262,18 +262,13 @@
     } else {
       area = '<div class="ds-texto-3">— sem sugestão automática</div>';
     }
-    // Aviso do Google: informação, nunca botão. Aparece sempre que a cidade encontrada é outra,
-    // com ou sem sugestão do dicionário (📌 25/09/2026: antes só aparecia junto da sugestão).
-    var extraGoogle = '';
-    if (!p.carregando && p.cidadeGoogle && p.cidadeGoogle.trim().toUpperCase() !== (p.cidade || '').trim().toUpperCase()) {
-      extraGoogle = '<div class="ds-faixa ds-faixa--sucesso"><i class="ti ti-world"></i><span>O Google indica que este local fica em <b>'
-        + escaparHtmlLocais(p.cidadeGoogle) + '</b>. Se for o caso, use <b>Editar</b> para trocar a cidade.</span></div>';
-    }
+    // O aviso "O Google indica que este local fica em..." do Apps Script saiu (27/11/2026): a consulta ao Google Maps
+    // não foi trazida para o servidor (importacao.service.ts), e o aviso nunca apareceria no ar.
     var btnAceitar = '';
     if (!p.carregando && p.fonte !== 'nenhuma') {
       btnAceitar = '<button class="ds-btn ds-btn--sucesso ds-btn--sm" onclick="decidirLocal(' + i + ',\'aceitar\')"><i class="ti ti-check"></i>Aceitar sugestão</button>';
     }
-    return area + extraGoogle
+    return area
       + '<div class="imp-pend-acoes">' + btnAceitar
       + '<button class="ds-btn ds-btn--secundario ds-btn--sm" onclick="decidirLocal(' + i + ',\'manter\')">Manter como está</button>'
       + '<button class="ds-btn ds-btn--secundario ds-btn--sm" onclick="decidirLocal(' + i + ',\'manual\')"><i class="ti ti-pencil"></i>Editar</button>'

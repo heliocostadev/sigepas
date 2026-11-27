@@ -4,6 +4,8 @@
 - **Redação:** proposta pela IA em 08/11/2026, a partir do registro de trabalho e dos planos da pasta TCC.
   O texto passa por revisão e ajuste de redação.
 - **Fontes:** registro de trabalho de 08/11/2026 e plano de construção (seção 5).
+- **Substituída em parte** pela [ADR 0020](0020-o-que-as-adrs-aceitas-previam-e-ainda-nao-esta-no-ar.md), proposta em
+  27/11/2026.
 
 ## Contexto
 

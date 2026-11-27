@@ -292,6 +292,8 @@ describe('Confirmação e Guias: cancelar passageiro', () => {
     clicar('#guiaSlideDrawer .guia-btn-qcb.canc');
     expect(janelaAberta()).toBe(true);
     expect(textoDaJanela()).toContain(`Cancelar o paciente ${ELISA}?`);
+    expect(textoDaJanela()).toContain('Ele sai do carro e libera a vaga. O motivo fica registrado na confirmação.');
+    expect(textoDaJanela()).not.toContain('Lista de Tarefas');
     clicar(botaoDaJanela('Confirmar cancelamento'));
     expect(avisos()).toContain('Descreva a justificativa do cancelamento.');
     expect(janelaAberta()).toBe(true);
@@ -485,6 +487,8 @@ describe('Confirmação e Guias: mover e trocar passageiro de carro', () => {
     expect(janelaAberta()).toBe(false);
     // Desistir na janela não grava.
     tela.transferirPaciente('VIAGEM-02');
+    expect(textoDaJanela()).toContain('O paciente volta para Pendente (carro/horário mudaram).');
+    expect(textoDaJanela()).not.toContain('Lista de Tarefas');
     clicar(botaoDaJanela('Cancelar'));
     expect(chamadasA(ROTA_MOVER)).toHaveLength(0);
     tela.transferirPaciente('VIAGEM-02');
@@ -526,6 +530,8 @@ describe('Confirmação e Guias: mover e trocar passageiro de carro', () => {
     expect(busca.value).toBe('IARA EXEMPLO DA SILVA 011');
     expect(elemento('#gTpaxSug').classList.contains('on')).toBe(false);
     expect(textoDaJanela()).toContain('Trocar pacientes de carro');
+    expect(textoDaJanela()).toContain('Os dois voltam para Pendente.');
+    expect(textoDaJanela()).not.toContain('Lista de Tarefas');
     expect(textos('#guiaModalBox .gm-card-nome')).toEqual([ELISA, 'IARA EXEMPLO DA SILVA 011', ELISA, 'IARA EXEMPLO DA SILVA 011']);
     expect(textos('#guiaModalBox .gm-avatar')).toEqual(['E', 'I', 'E', 'I']);
     clicar(botaoDaJanela('Confirmar Troca'));

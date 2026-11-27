@@ -322,7 +322,7 @@ describe('Viagens Externas: montar carro, confirmação e gravação', () => {
     clicar(elemento('#dmMoCorpo .stepper button[aria-label="Mais"]'));
     clicar('#dmMoNext');
     expect(texto('#dmMoNext')).toBe('Gravando...');
-    expect(texto('#dmMoDica')).toBe('Gravando na planilha...');
+    expect(texto('#dmMoDica')).toBe('Gravando no sistema...');
     await esperar();
     const [payload] = chamadasA('/api/operacao/montar-carros')[0] as [Registro & { alocacoes: Registro[] }];
     expect(payload.data).toBe(DATA_DO_TESTE);
@@ -584,7 +584,7 @@ describe('Viagens Externas: incluir e corrigir paciente digitado à mão', () =>
     expect(avisos()).toContain('Paciente incluído na fila com sucesso.');
   });
 
-  it('destino Joinville avisa que a demanda foi para a Remoção Interna', async () => {
+  it('destino Joinville avisa que a demanda não entra na fila desta entrega', async () => {
     await abrirNovo();
     const campoDaRemocao = document.createElement('input');
     campoDaRemocao.id = 'riData';
@@ -597,7 +597,7 @@ describe('Viagens Externas: incluir e corrigir paciente digitado à mão', () =>
     preencher('#dmNovoHora', '14:00');
     clicar('#dmNovoSalvarBtn');
     await esperar();
-    expect(avisos()).toContain('Destino Joinville: esta demanda está na Remoção Interna');
+    expect(avisos()).toContain('Destino Joinville é remoção interna, que fica fora desta entrega. Esta demanda não entra na fila de viagens externas.');
     expect(campoDaRemocao.value).toBe(DATA_DO_TESTE);
     campoDaRemocao.remove();
   });

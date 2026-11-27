@@ -55,7 +55,9 @@ describe('Confirmação e Guias: lista dos carros do dia', () => {
     expect(textos('#guiaCorpo .gc-nome')).toEqual(['BLUMENAU', 'CURITIBA', 'FLORIANÓPOLIS']);
     expect(textos('#guiaCorpo .gc-meta')).toEqual(['1 veículo · 1 passageiro', '1 veículo · 1 passageiro', '1 veículo · 3 passageiros']);
     expect(texto('#guiaResumo')).toBe('3 veículo(s) · 5 passageiro(s)');
-    expect(textos('#guiaContadores .gcont-chip')).toEqual(['Todos 4', 'Ligar 3', 'Confirmados 1', 'Enviados 0', 'Não atende 0']);
+    // Sem WhatsApp no ar: nem chip nem filtro de "Enviada", que o servidor nunca grava.
+    expect(textos('#guiaContadores .gcont-chip')).toEqual(['Todos 4', 'Ligar 3', 'Confirmados 1', 'Não atende 0']);
+    expect(Array.from(elemento<HTMLSelectElement>('#gFiltroStatusConf').options).map((o) => o.textContent)).toEqual(['Todas', 'Pendentes', 'Confirmado', 'Não atende']);
     expect(elemento('#guiaContadores .gcont-chip').classList.contains('gcont-ativo')).toBe(true);
     // Uma cidade, uma opção: a chave sem acento é o valor e a grafia com acento é o rótulo.
     const cidades = Array.from(elemento<HTMLSelectElement>('#gFiltroCidade').options).map((o) => [o.value, o.textContent]);
@@ -182,11 +184,10 @@ describe('Confirmação e Guias: lista dos carros do dia', () => {
   it('filtra pela confirmação pelos contadores, e só mostra no card quem casa com o filtro', async () => {
     const dados = dia();
     item(carroDoDia(dados, VIAGEM_CURITIBA).passageiros, 0).statusConfirmacao = 'Confirmado por WhatsApp';
-    item(carroDoDia(dados, VIAGEM_BLUMENAU).passageiros, 0).statusConfirmacao = 'Enviada por WhatsApp';
     item(carroDoDia(dados, VIAGEM_FLORIANOPOLIS).passageiros, 1).statusConfirmacao = 'Status antigo';
     await abrirGuia(dados);
     // "Confirmados" soma os dois jeitos de confirmar. Um status fora da lista conta no total.
-    expect(textos('#guiaContadores .gcont-chip')).toEqual(['Todos 4', 'Ligar 0', 'Confirmados 2', 'Enviados 1', 'Não atende 0']);
+    expect(textos('#guiaContadores .gcont-chip')).toEqual(['Todos 4', 'Ligar 1', 'Confirmados 2', 'Não atende 0']);
     const chips = Array.from(document.querySelectorAll<HTMLElement>('#guiaContadores .gcont-chip'));
     clicar(item(chips, 2));
     expect(elemento<HTMLSelectElement>('#gFiltroStatusConf').value).toBe('Confirmado');
@@ -195,9 +196,9 @@ describe('Confirmação e Guias: lista dos carros do dia', () => {
     expect(textos('.gp-nome', cardDe('TST1A01'))).toHaveLength(1);
     expect(cardDe('TST1A03').querySelector('.gp-status')?.textContent).toBe('Confirmado');
     expect(elemento('#guiaContadores .gcont-chip.gcont-ativo').textContent).toBe('Confirmados 2');
-    tela.filtrarStatusGuia('Enviada por WhatsApp');
+    tela.filtrarStatusGuia('Pendente');
     expect(placasNaTela()).toEqual(['TST2B01']);
-    expect(cardDe('TST2B01').querySelector('.gp-status')?.textContent).toBe('Enviado');
+    expect(cardDe('TST2B01').querySelector('.gp-status')?.textContent).toBe('Ligar');
     tela.filtrarStatusGuia('Não atende');
     expect(texto('#guiaCorpo')).toContain('Nenhum veículo salvo');
     // O status desconhecido aparece como "Ligar".
@@ -248,7 +249,8 @@ describe('Confirmação e Guias: lista dos carros do dia', () => {
     expect(karina.textContent).toContain('Local de atendimento: —');
     expect(karina.textContent).toContain('Telefone: —');
     expect(karina.textContent).toContain('Acompanhante: Sem acompanhante');
-    expect(karina.textContent).toContain('PEDIDO CANCELADO NO POSTO');
+    expect(karina.textContent).toContain('🚫 PEDIDO CANCELADO NA UBSF · confira antes de sair');
+    expect(karina.textContent).not.toContain('POSTO');
     expect(karina.querySelector('.gp-obs:not([style])')?.textContent).toBe('⚠️ Cadeirante');
     expect(karina.querySelector('.gp-obs-lig')?.textContent).toBe('☎️ Horário do carro mudou');
     expect(karina.querySelector('.gp-hora')?.textContent).toBe('--:--');

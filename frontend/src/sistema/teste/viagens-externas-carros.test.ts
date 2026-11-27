@@ -143,6 +143,7 @@ describe('Viagens Externas: carros do dia', () => {
     expect(excedido.querySelector('.vagas-badge')?.textContent).toBe('Excedido por 2');
     expect(excedido.querySelector('.cv-rota')?.textContent).toBe('Joinville › CURITIBA');
     expect(excedido.textContent).toContain('PEDIDO CANCELADO');
+    expect(excedido.querySelector('.alerta-pill.a-perigo')?.getAttribute('title')).toBe('A UBSF cancelou este pedido depois que o carro foi montado. Confira antes de sair.');
     expect(excedido.textContent).toContain('Idoso (acompanhante OK)');
     expect(excedido.textContent).toMatch(/\d+ anos • AMÉRICA/);
     expect(excedido.textContent).toContain('Embarque: Terminal Central');
@@ -187,6 +188,7 @@ describe('Viagens Externas: editar carro gravado', () => {
     preencher('#dmMoAviso', 'Levar a cadeira de rodas e o oxigênio');
     clicar('#dmMoNext');
     expect(texto('#dmMoNext')).toBe('Salvando...');
+    expect(texto('#dmMoDica')).toBe('Gravando no sistema...');
     await esperar();
     const chamada = chamadasA('/api/operacao/editar-carro')[0] as unknown[];
     expect(chamada[0]).toBe(DATA_DO_TESTE);

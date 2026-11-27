@@ -111,7 +111,7 @@ describe('Confirmação e Guias: imagem da guia e WhatsApp do motorista', () => 
     expect(opcoes).toMatchObject({ scale: 3, backgroundColor: '#ffffff' });
     expect(elemento('#guiaImgPalco').getAttribute('aria-hidden')).toBe('true');
     expect(downloads).toEqual([{ nome: '27-11 - SEM MOTORISTA - 05h30 - TST1A03 ARGO - CURITIBA.png', endereco: 'data:image/png;base64,AAAA' }]);
-    expect(avisos()).toContain('Imagem baixada. Motorista sem WhatsApp cadastrado (bd_motoristas, coluna E).');
+    expect(avisos()).toContain('Imagem baixada. Motorista sem WhatsApp cadastrado. O gestor preenche o número em Configurações > Motoristas.');
     expect(botao.disabled).toBe(false);
     expect(botao.innerHTML).toBe(desenhoAntes);
     // Baixar a imagem sem mandar ao motorista não marca o aviso como enviado.
@@ -241,7 +241,7 @@ describe('Confirmação e Guias: imagem da guia e WhatsApp do motorista', () => 
     clicar(Array.from(document.querySelectorAll<HTMLButtonElement>('#guiaModalBox button')).find((b) => b.textContent === 'Enviar') as HTMLButtonElement);
     expect(decodeURIComponent(item(item(abrirJanela.mock.calls, 0), 0) as string)).toContain(`phone=55${ZAP_ANTONIO}`);
     tela.abrirWhatsappGuia(VIAGEM_FLORIANOPOLIS, 2);
-    expect(avisos()).toContain('Motorista sem WhatsApp cadastrado (bd_motoristas, coluna E).');
+    expect(avisos()).toContain('Motorista sem WhatsApp cadastrado. O gestor preenche o número em Configurações > Motoristas.');
     expect(abrirJanela).toHaveBeenCalledTimes(1);
     tela.abrirWhatsappGuia('VIAGEM-QUE-NAO-EXISTE');
     tela.guiaJanelaDoisMotoristas('VIAGEM-QUE-NAO-EXISTE', 'texto');
@@ -449,7 +449,7 @@ describe('Confirmação e Guias: desenho da guia', () => {
     expect(bebe.textContent).toContain('EmbarqueRUA FICTÍCIA 50, 150');
     expect(bebe.textContent).toContain('Contato00 0000-1050');
     expect(textos('.gimg-nw', bebe)).toEqual(['00 0000-1050', '00 00000-5050', '123']);
-    expect(textos('.gimg-faixa', bebe)).toEqual(['PEDIDO CANCELADO NO POSTO · confira antes de sair', 'Levar o carrinho']);
+    expect(textos('.gimg-faixa', bebe)).toEqual(['PEDIDO CANCELADO NA UBSF · confira antes de sair', 'Levar o carrinho']);
     const servidor = item(cartoes, 2);
     expect(textos('.gimg-nome', servidor)).toEqual(['SERVIDORLUCAS SERVIDOR']);
     expect(textos('.gimg-meta', servidor)).toEqual(['mat. 7777']);
