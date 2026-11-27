@@ -2,7 +2,7 @@
 
 Este índice é de 08/11/2026 e parte de duas fontes:
 
-- o quadro do ambiente de IA aprovado pelo Hélio (pasta `TCC`,
+- o quadro do ambiente de IA aprovado pelo autor (pasta `TCC`,
   `SIGEPAS/PLANOS_DE_TRABALHO/2026-11-08_ambiente-ia-skills.md`).
 - a avaliação das ferramentas externas (`SIGEPAS/03-REFERENCIAS/AVALIACAO_24_IAS_DO_GITHUB_MAPA_103.md`).
 
@@ -17,7 +17,7 @@ skills e subagentes, depois as de terceiros.
 | `registrar-sessao` | Registro de trabalho, página de onde parei e checklist do professor | Ao fechar cada conversa |
 | `ensaio-prova-autoria` | Perguntas do guia do professor sobre o próprio código, sem dar a resposta | Antes de cada orientação e na semana de 23/11 |
 | `preparar-orientacao` | Pauta antes e evidência depois de cada orientação | Antes e depois de cada orientação |
-| `voz-do-sigepas` | Como o sistema fala com o operador e o gestor (adaptada da `voz-do-servidor`, do projeto de estágio do Hélio) | Todo texto de tela |
+| `voz-do-sigepas` | Como o sistema fala com o operador e o gestor (adaptada da `voz-do-servidor`, do projeto de estágio do autor) | Todo texto de tela |
 | `relatorio-abnt` | Relatórios do PAC VIII com formatação acadêmica (regra do report da N1, sem alteração do texto) | Quando houver relatório |
 
 ## As de terceiros
@@ -65,7 +65,7 @@ O lançador da pasta `scripts/` baixa e executa um programa. Sem ele, a skill us
 |---|---|---|
 | `no-ai-slop` | Aceita "um ou dois travessões" em textos longos | Nenhum travessão |
 | `no-ai-slop` | Preserva gírias e palavrões do autor | Registro universitário |
-| `no-ai-slop` | Modo editar reescreve o rascunho | Em texto aprovado pelo Hélio, só o modo detectar |
+| `no-ai-slop` | Modo editar reescreve o rascunho | Em texto aprovado pelo autor, só o modo detectar |
 | `no-ai-slop` | Lista de palavras proibidas em inglês | Lista em português em `docs/git/escrita-dos-textos-publicados.md` |
 | `playwright-cli` | O guia `test-generation.md` grava o teste a partir da tela pronta | O teste de ponta a ponta nasce da spec e roda vermelho. Depois disso, a ferramenta é livre, inclusive o gravador |
 | `playwright-cli` | O guia propõe consertar teste quebrado | O agente pode consertar só o localizador. Asserção que falha é defeito até a `diagnose-before-fix` provar o contrário |
