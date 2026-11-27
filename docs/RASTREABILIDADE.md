@@ -298,3 +298,13 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 - Diagramas C4 em `docs/arquitetura/`: contexto, contêineres, componentes da API e implantação na AWS, em Mermaid.
 - Wiki: `scripts/montar-paginas-da-wiki.mjs` dá um nome único a cada página de `docs/` e acerta os links, porque a Wiki
   do GitHub não tem pastas. A montagem local gerou 36 páginas e o menu lateral.
+
+## R-0021 · 27/11/2026 · Base do porte fica na versão 18 do SIGEPAS em Apps Script
+
+- Decisão: o SIGEPAS em arquitetura de servidor fica com as regras da versão 18 do SIGEPAS em Apps Script
+  (`a221c04`, de 13/11/2026), a mesma usada no porte dos três fluxos.
+- As versões mais novas que tocam os três fluxos (34, 41 e a do pedido repetido) são melhorias em teste no setor. Elas
+  entram neste sistema aos poucos, só depois de validadas pelo uso no setor.
+- Medição feita em 27/11/2026 no repositório do SIGEPAS em Apps Script, só com leitura. Da versão 18 à 42, as mudanças
+  que tocam os três fluxos somam cerca de 4.800 linhas. As versões 38, 39 e 42 tratam de WhatsApp e da Remoção
+  Interna, que estão fora desta entrega.
