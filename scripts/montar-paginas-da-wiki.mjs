@@ -3,18 +3,16 @@
 // várias README.md das subpastas colidirem e quebraria os links relativos. Este script dá um nome único a cada página,
 // reescreve os links entre páginas e aponta os links para fora de docs/ ao arquivo no GitHub.
 //
-// Uso: node scripts/montar-paginas-da-wiki.mjs <pasta de destino>
+// Uso: node scripts/montar-paginas-da-wiki.mjs
+// As páginas saem sempre na pasta paginas-da-wiki/, na raiz do repositório. O destino é fixo para o script não gravar
+// em caminho recebido de fora.
 import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync, existsSync } from 'node:fs';
 import { join, posix, sep } from 'node:path';
 
 const REPOSITORIO = 'https://github.com/heliocostadev/sigepas';
 const PASTA_DOS_DOCUMENTOS = 'docs';
 
-const destino = process.argv[2];
-if (!destino) {
-  console.error('Informe a pasta de destino. Exemplo: node scripts/montar-paginas-da-wiki.mjs wiki');
-  process.exit(1);
-}
+const destino = 'paginas-da-wiki';
 
 function listarDocumentos(pasta) {
   return readdirSync(pasta).flatMap((nome) => {
