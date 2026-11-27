@@ -13,7 +13,7 @@
 
 | Documento | Situação |
 |---|---|
-| [`modelo-de-ameaca.md`](modelo-de-ameaca.md) | Primeira versão em 08/11/2026, a revisar pelo autor do projeto antes do fluxo 1 e a cada fluxo |
+| [`modelo-de-ameaca.md`](modelo-de-ameaca.md) | Primeira versão em 08/11/2026, a revisar antes do fluxo 1 e a cada fluxo |
 | Registro de tratamento de dados pessoais (base legal, dados mínimos, retenção, quem acessa) | Antes do release |
 
 ## Como a segurança é conferida

@@ -47,7 +47,7 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 
 - Decisão: Maestro enxuto, cinco subagentes, skills dentro do repositório, regra de idioma e ordem de
   precedência. Também foram aprovadas seis ferramentas externas depois da avaliação de 24 IAs do GitHub e de
-  três repositórios indicados pelo autor do projeto.
+  três repositórios indicados.
 - O ambiente foi montado na branch `claude/ambiente-de-trabalho-da-ia-a1cf0a`, sem código de aplicação. Entraram o
   `CLAUDE.md`, os cinco subagentes e 23 skills (5 nossas e 18 de terceiros, com autor e licença). Entraram também
   dois hooks, modelos de issue e de PR, CI com verificação única, gitleaks, CodeQL e Dependabot. Entraram ainda a
@@ -106,8 +106,8 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
   back-end ficou em 96,8%. Os 2 testes do banco passaram com o PostgreSQL real no Docker.
 - O ambiente completo foi testado localmente. A rota `/saude` respondeu 200 com o banco disponível. O Nginx
   devolveu 404 em `/api/metrics`. O Prometheus leu a API (situação "up"), e o Grafana respondeu.
-- Prova: ADR [0013](adr/0013-estrutura-e-versoes-do-esqueleto.md), proposta e aguardando a aprovação do autor do
-  projeto.
+- Prova: ADR [0013](adr/0013-estrutura-e-versoes-do-esqueleto.md), proposta e aguardando
+  aprovação.
 
 ## R-0010 · 17/11/2026 · Correções do esqueleto depois das conferências
 
@@ -250,9 +250,9 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
   a verificação "CI aprovado", também para o administrador, e bloqueia push forçado e exclusão.
 - O `terraform apply` criou os 12 recursos em `us-east-2`, sem erro. A máquina ficou com o IP fixo e com o IMDSv2
   obrigatório.
-- O estado do Terraform tem cópia fora do repositório, na pasta de trabalho do autor. A cópia não tem senha: as únicas
+- O estado do Terraform tem cópia fora do repositório, na pasta de trabalho local. A cópia não tem senha: as únicas
   ocorrências de "password" e "senha" são campos vazios e o texto do script de preparação.
-- O desligamento não é automático. O autor do projeto decide se mantém ou desliga, depois de um aviso perto do Demo Day.
+- O desligamento não é automático. A decisão de manter ou desligar vem depois de um aviso perto do Demo Day.
 - O deploy continua desligado até o IP entrar no DuckDNS e as variáveis do repositório existirem.
 
 ## R-0018 · 24/11/2026 · Portão do SonarQube Cloud na primeira publicação
