@@ -1,8 +1,8 @@
 # 0007. Dois papéis: gestor e operador
 
-- **Situação:** aceita em 08/11/2026, por decisão do Hélio.
-- **Redação:** proposta pela IA em 08/11/2026, a partir do registro de trabalho e dos planos da pasta TCC. O Hélio
-  revisa o texto e o ajusta com as palavras dele.
+- **Situação:** aceita em 08/11/2026.
+- **Redação:** proposta pela IA em 08/11/2026, a partir do registro de trabalho e dos planos da pasta TCC.
+  O autor do projeto revisa o texto e o ajusta com as próprias palavras.
 - **Fontes:** registro de trabalho de 08/11/2026.
 
 ## Contexto
