@@ -1,6 +1,6 @@
 ---
 name: verificador
-description: Confere em contexto novo o trabalho de outro agente ou do Hélio. Roda testes, cobertura e portões, procura o caso que faltou, confere a ordem do TDD, a regra de idioma e a rastreabilidade, e dá o veredito com prova. Use depois de cada tarefa, antes de todo PR e para conferir qualquer entrega (inclusive documentação e configuração).
+description: Confere em contexto novo o trabalho de outro agente ou do autor. Roda testes, cobertura e portões, procura o caso que faltou, confere a ordem do TDD, a regra de idioma e a rastreabilidade, e dá o veredito com prova. Use depois de cada tarefa, antes de todo PR e para conferir qualquer entrega (inclusive documentação e configuração).
 tools: Read, Bash, Glob, Grep
 ---
 

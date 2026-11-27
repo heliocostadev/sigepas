@@ -5,7 +5,7 @@
 //
 // Vale para as duas ferramentas de terminal do Claude Code (Bash e PowerShell).
 // Entrada: o JSON que o Claude Code manda pela entrada padrão ({ tool_name, tool_input: { command }, cwd }).
-// Saída: código 0 libera; código 2 barra, e a mensagem de erro volta para a IA explicar ao Hélio.
+// Saída: código 0 libera; código 2 barra, e a mensagem de erro volta para a IA explicar ao autor.
 
 import { execFileSync } from 'node:child_process';
 import { readFileSync, statSync } from 'node:fs';
@@ -124,8 +124,8 @@ process.stderr.write(
   [
     'Commit barrado pelo hook bloquear-segredo-no-commit: o que vai entrar no commit parece conter segredo.',
     ...[...new Set(achados)].map((a) => `- ${a}`),
-    'Tire o segredo do commit (variável de ambiente ou segredo do GitHub Actions) e avise o Hélio.',
-    'Se for um falso positivo, mostre o trecho ao Hélio e deixe que ele decida. Não contorne o hook.',
+    'Tire o segredo do commit (variável de ambiente ou segredo do GitHub Actions) e avise o autor.',
+    'Se for um falso positivo, mostre o trecho ao autor e deixe que ele decida. Não contorne o hook.',
   ].join('\n') + '\n',
 );
 process.exit(2);

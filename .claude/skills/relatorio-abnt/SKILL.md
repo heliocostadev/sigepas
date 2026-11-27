@@ -1,13 +1,13 @@
 ---
 name: relatorio-abnt
-description: Monta os relatórios do PAC Extensionista VIII do Hélio (N1, N2 e N3) com a formatação acadêmica de um documento feito no Word, a partir de links, prints, PRs, reviews e evidências de reunião com o setor. Use quando o Hélio pedir um relatório, report ou entrega escrita do PAC VIII.
+description: Monta os relatórios do PAC Extensionista VIII do autor (N1, N2 e N3) com a formatação acadêmica de um documento feito no Word, a partir de links, prints, PRs, reviews e evidências de reunião com o setor. Use quando o autor pedir um relatório, report ou entrega escrita do PAC VIII.
 ---
 
 > **Origem e uso:** regra de formatação usada no report da N1 (arquivo de 20/09/2026), guardada em
 > `TCC/ENTREGAS/PAC-VIII/skill-relatorio-abnt/` e trazida para cá sem alteração do texto. Para a N2 e a N3, troque
 > apenas o campo **Entrega** dos dados fixos (por exemplo, "REPORT DA N2") e siga o enunciado da entrega no playbook
 > (`PAC Extensionista VIII.md`). O relatório pronto é gravado em `TCC/ENTREGAS/PAC-VIII/<entrega-AAAA-MM-DD>/`, fora
-> deste repositório. Antes de usar, confira com o Hélio se a regra mudou.
+> deste repositório. Antes de usar, confira com o autor se a regra mudou.
 
 # Skill — PAC Extensionista VIII — Report da N1
 
