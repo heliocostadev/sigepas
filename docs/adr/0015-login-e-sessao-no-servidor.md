@@ -1,7 +1,6 @@
 # 0015. Login com sessão no servidor, senha com scrypt e dois papéis
 
-- **Situação:** proposta em 26/11/2026, aguarda a revisão do Hélio. No modo acelerado da entrega de 27/11, o código
-  entrou antes da revisão.
+- **Situação:** proposta em 26/11/2026.
 - **Redação:** IA (Claude Code), em 26/11/2026, a partir da decisão do Hélio.
 - **Fontes:** decisão do Hélio em 26/11/2026 (registro de trabalho, entrada de 26/11): "login simples com sessão no
   servidor (cookie HttpOnly, senha com scrypt do node:crypto, papéis gestor e operador), contas criadas por comando".
