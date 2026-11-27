@@ -270,13 +270,12 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 ## R-0019 · 26/11/2026 · Porte dos três fluxos do SIGEPAS em Apps Script
 
 - Decisões: ADR 0015 (login com sessão no servidor) e ADR 0016 (abas viram tabelas, telas com a mesma aparência e
-  tempo real por Server-Sent Events). Modo acelerado da entrega de 27/11: commit, PR e merge sem a leitura prévia do
-  Hélio, com os testes automáticos mantidos.
+  tempo real por Server-Sent Events).
 - Banco: uma migração versionada com as tabelas dos três fluxos. Em produção, o serviço `migracao` a aplica antes da
   API subir.
 - Testes: 117 no back-end, com PostgreSQL real, e 95% das linhas; 232 no front-end, com as telas no jsdom, e 98,9%
-  das linhas. Seis testes do projeto do estágio foram convertidos para o Vitest. No modo acelerado, teste e
-  implementação entraram no mesmo commit.
+  das linhas. Seis testes do projeto do estágio foram convertidos para o Vitest. Teste e implementação
+  entraram no mesmo commit.
 - Defeitos herdados do Apps Script achados pelos testes e corrigidos: o trecho da demanda digitada voltava para
   Completo; Salvar anotações desfazia a confirmação do paciente; a imagem da escala dependia de um site de fora.
 - Análise: SonarQube Cloud aprovado no PR https://github.com/heliocostadev/sigepas/pull/38, com cobertura do código

@@ -1,7 +1,6 @@
 # 0016. Porte do SIGEPAS em Apps Script: abas viram tabelas, telas mantêm a aparência e o tempo real usa SSE
 
-- **Situação:** proposta em 26/11/2026, aguarda a revisão do Hélio. No modo acelerado da entrega de 27/11, o código
-  entrou antes da revisão.
+- **Situação:** proposta em 26/11/2026.
 - **Redação:** IA (Claude Code), em 26/11/2026, a partir da decisão do Hélio.
 - **Fontes:** decisão do Hélio em 26/11/2026 (registro de trabalho, entrada de 26/11): portar o sistema sem adaptador que
   imite o SpreadsheetApp, com tempo real entre as telas e reaproveitando o HTML, o CSS e o JavaScript das telas.
