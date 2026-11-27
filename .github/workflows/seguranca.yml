@@ -17,7 +17,7 @@ jobs:
     name: segredos no histórico (gitleaks)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -33,7 +33,7 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Barrar dependência com falha conhecida ou licença incompatível
         uses: actions/dependency-review-action@v4
@@ -46,7 +46,7 @@ jobs:
     name: falhas conhecidas nas dependências (npm audit)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v4
         with:

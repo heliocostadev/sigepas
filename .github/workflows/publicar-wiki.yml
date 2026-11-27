@@ -20,7 +20,7 @@ jobs:
     if: vars.WIKI_HABILITADA == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Montar as páginas e copiar para o repositório da Wiki
         env:
