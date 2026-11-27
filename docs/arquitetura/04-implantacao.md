@@ -29,7 +29,8 @@ C4Deployment
                 Container(api, "API", "Node 24, NestJS 12", "Porta interna 3000 e métricas na 9464.")
                 ContainerDb(banco, "Banco de dados", "PostgreSQL 16", "Volume persistente.")
                 Container(prometheus, "Coletor de métricas", "Prometheus 3.7", "127.0.0.1:9090.")
-                Container(grafana, "Painéis", "Grafana 12.3", "127.0.0.1:3001.")
+                Container(migracao, "Migração do banco", "Prisma 7", "Roda a cada atualização e termina.")
+                Container(grafana, "Consulta de métricas", "Grafana 12.3", "127.0.0.1:3001.")
             }
         }
         Container(ssm, "Systems Manager", "AWS SSM", "Executa o script de atualização na máquina.")
@@ -39,6 +40,7 @@ C4Deployment
     Rel(caddy, web, "Repassa para", "HTTP 8080")
     Rel(web, api, "Repassa /api/ para", "HTTP 3000")
     Rel(api, banco, "Lê e grava em", "SQL 5432")
+    Rel(migracao, banco, "Aplica as migrações em", "SQL 5432")
     Rel(prometheus, api, "Lê as métricas de", "HTTP 9464")
     Rel(grafana, prometheus, "Consulta", "PromQL 9090")
     Rel(actions, ghcr, "Publica as imagens em", "HTTPS")
@@ -83,8 +85,8 @@ SHA (identificador do commit).
 
 - **Uma máquina só.** O volume de uso do setor cabe numa `t3.small`. O custo fica no crédito da AWS
   ([ADR 0006](../adr/0006-hospedagem-na-aws-com-terraform.md) e [ADR 0014](../adr/0014-regiao-maquina-e-https-do-deploy.md)).
-- **Versão pelo SHA do commit.** Cada imagem leva o SHA do commit. Voltar uma versão é rodar o Deploy com o SHA
-  anterior ([instruções de deploy](../deploy/README.md)).
+- **Versão pelo SHA do commit.** Cada imagem leva o SHA do commit. Voltar uma versão é repetir a execução do Deploy
+  da versão anterior, que leva o SHA daquele commit ([instruções de deploy](../deploy/README.md)).
 - **Portas mínimas.** O grupo de segurança abre só 80 e 443. O PostgreSQL, o Prometheus e o Grafana não saem da
   máquina.
 

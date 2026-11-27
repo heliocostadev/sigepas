@@ -4,8 +4,8 @@
 
 O SIGEPAS roda em sete contêineres do Docker Compose, numa única máquina. O navegador fala só com o Caddy, que recebe
 o HTTPS. Atrás dele, o Nginx entrega as telas e repassa as chamadas `/api/` para a API em NestJS. A API grava no
-PostgreSQL e avisa as telas abertas pelo canal de tempo real. O Prometheus lê as métricas da API, e o Grafana mostra
-essas métricas em painéis.
+PostgreSQL e avisa as telas abertas pelo canal de tempo real. O Prometheus lê as métricas da API, e o Grafana consulta
+essas métricas. O repositório não versiona nenhum painel do Grafana.
 
 ## Diagrama
 
@@ -23,7 +23,7 @@ C4Container
         Container(migracao, "Migração do banco", "Prisma 7", "Aplica as migrações versionadas antes de a API subir e termina.")
         ContainerDb(banco, "Banco de dados", "PostgreSQL 16", "Pedidos, viagens, passageiros, cadastros, escala, contas e sessões.")
         Container(prometheus, "Coletor de métricas", "Prometheus 3.7", "Lê as métricas da API a cada 15 segundos e guarda a série histórica.")
-        Container(grafana, "Painéis", "Grafana 12.3", "Mostra as métricas do Prometheus. Acesso só pela própria máquina.")
+        Container(grafana, "Consulta de métricas", "Grafana 12.3", "Sobe ligado ao Prometheus e consulta as métricas pelo Explore. Painel do SIGEPAS ainda pendente. Acesso só pela própria máquina.")
     }
 
     Rel(usuario, caddy, "Abre o sistema e envia as ações por", "HTTPS")
@@ -62,7 +62,7 @@ Siglas: HTTPS (HTTP com criptografia), SQL (linguagem do banco), PromQL (linguag
 | Migração do banco | Contêiner | Prisma 7 | `prisma migrate deploy` a cada atualização |
 | Banco de dados | Contêiner de dados | PostgreSQL 16 | Persistência |
 | Coletor de métricas | Contêiner | Prometheus 3.7 | Coleta das métricas da API |
-| Painéis | Contêiner | Grafana 12.3 | Visualização das métricas |
+| Consulta de métricas | Contêiner | Grafana 12.3 | Consulta das métricas pelo Explore, sem painel versionado |
 
 ## Relações principais
 
@@ -93,7 +93,11 @@ Siglas: HTTPS (HTTP com criptografia), SQL (linguagem do banco), PromQL (linguag
 ## Premissas
 
 - O Grafana é aberto por um túnel do Systems Manager até a porta 3001 da máquina. Não há acesso pela internet.
-- A cópia de segurança do banco para o S3 ainda não existe.
+- O Grafana sobe só com a fonte de dados do Prometheus
+  (`observabilidade/grafana/provisionamento/fontes-de-dados/prometheus.yml`). Um painel versionado do SIGEPAS e os
+  alertas são melhoria futura.
+- A cópia de segurança do banco para o S3 ainda não existe
+  ([ADR 0020](../adr/0020-o-que-as-adrs-aceitas-previam-e-ainda-nao-esta-no-ar.md)).
 
 ## Outros níveis
 

@@ -85,12 +85,18 @@ Siglas: SSE (Server-Sent Events), CSV (arquivo de valores separados).
 
 ## Decisões que aparecem neste nível
 
-- **Uma rota por ação.** Cada função do `codigo.gs` virou uma rota `POST /<assunto>/<ação>`, com os mesmos argumentos.
-  As telas trazidas não precisaram mudar a forma das chamadas.
+- **Uma rota por ação.** Cada função do `codigo.gs` que as telas desta entrega usam virou uma rota
+  `POST /<assunto>/<ação>`, com os mesmos argumentos. As telas trazidas não precisaram mudar a forma das chamadas. A
+  importação do calendário pelo site da Prefeitura não tem rota. A tela mostra um aviso no lugar dela
+  (`FORA_DESTA_ENTREGA`, em `frontend/src/sistema/servidor.js`).
+- **Papel declarado só nas rotas de Configurações.** As seis rotas que alteram cadastros e configurações levam
+  `@SoGestor`, e a guarda recusa o operador com 403. As demais rotas aceitam o operador e o gestor
+  ([ADR 0019](../adr/0019-toda-a-logistica-e-de-quem-trabalha-no-setor.md)).
 - **Trava por dia no banco.** Duas pessoas montando carros no mesmo dia não se atropelam: o serviço pede ao PostgreSQL
   uma trava do dia (`pg_advisory_xact_lock`) dentro da transação. Ela substitui o `LockService` do Apps Script.
-- **Regras puras separadas.** O módulo de regras não importa NestJS nem Prisma. Por isso, os testes dele rodam sem
-  banco e cobrem os casos-limite medidos nos dados do setor.
+- **Regras puras separadas.** O módulo de regras não importa NestJS nem Prisma. Por isso, os testes dele
+  (`regras-do-setor.test.ts`) rodam sem banco. A pasta `src/dominio/`, na raiz do repositório, guarda uma versão
+  anterior das regras, com testes. A API não usa essa pasta.
 - **Proteção contra CSRF pela exigência de JSON.** As rotas que gravam só aceitam `Content-Type: application/json`, que
   um formulário de outro site não consegue enviar sem a permissão do navegador. O cookie também é `SameSite=Strict`.
 

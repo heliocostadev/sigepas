@@ -5,6 +5,8 @@
   O texto passa por revisão e ajuste de redação.
 - **Fontes:** registro de trabalho de 08/11/2026, plano de construção (seção 2) e quadro do ambiente de IA
   (seção 8.4).
+- **Substituída em parte** pela [ADR 0020](0020-o-que-as-adrs-aceitas-previam-e-ainda-nao-esta-no-ar.md), proposta em
+  27/11/2026.
 
 ## Contexto
 

@@ -5,6 +5,8 @@
   O texto passa por revisão e ajuste de redação.
 - **Fontes:** plano de construção de 08/11/2026 (seção 1) e entrada R-0007 do
   [`RASTREABILIDADE.md`](../RASTREABILIDADE.md).
+- **Substituída em parte** pela [ADR 0020](0020-o-que-as-adrs-aceitas-previam-e-ainda-nao-esta-no-ar.md), proposta em
+  27/11/2026.
 
 ## Contexto
 

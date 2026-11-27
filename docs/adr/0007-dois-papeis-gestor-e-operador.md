@@ -4,6 +4,8 @@
 - **Redação:** proposta pela IA em 08/11/2026, a partir do registro de trabalho e dos planos da pasta TCC.
   O texto passa por revisão e ajuste de redação.
 - **Fontes:** registro de trabalho de 08/11/2026.
+- **Substituída em parte** pela [ADR 0019](0019-toda-a-logistica-e-de-quem-trabalha-no-setor.md), proposta em
+  27/11/2026.
 
 ## Contexto
 
