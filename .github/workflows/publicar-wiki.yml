@@ -1,13 +1,14 @@
 name: Publicar a documentação na Wiki
 
-# Copia a pasta docs/ para a Wiki do GitHub a cada merge na main, para a Wiki ser sempre igual ao repositório.
+# Publica a pasta docs/ na Wiki do GitHub a cada merge na main, para a Wiki ser sempre igual ao repositório.
+# A Wiki não tem pastas, então scripts/montar-paginas-da-wiki.mjs dá um nome único a cada página e acerta os links.
 # Fica desligado até a Wiki existir. Para ligar: criar a primeira página da Wiki pelo site do GitHub e a variável
 # WIKI_HABILITADA=true em Settings > Secrets and variables > Actions.
 
 on:
   push:
     branches: [main]
-    paths: ['docs/**']
+    paths: ['docs/**', 'scripts/montar-paginas-da-wiki.mjs']
   workflow_dispatch:
 
 permissions:
@@ -21,13 +22,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Copiar docs/ para o repositório da Wiki
+      - name: Montar as páginas e copiar para o repositório da Wiki
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.wiki.git" wiki
-          rsync -a --delete --exclude '.git' docs/ wiki/
-          cp docs/README.md wiki/Home.md
+          node scripts/montar-paginas-da-wiki.mjs paginas-da-wiki
+          rsync -a --delete --exclude '.git' paginas-da-wiki/ wiki/
           cd wiki
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
