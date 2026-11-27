@@ -5,7 +5,7 @@ description: Ritual de fechamento de uma conversa de trabalho no TCC do autor. A
 
 # Registrar a sessão
 
-A memória do TCC fica em três arquivos da pasta `TCC`, e não na conversa. A pasta fica no computador do autor, fora
+A memória do TCC fica em três arquivos da pasta `TCC`, e não na conversa. A pasta fica fora
 deste repositório. Uma conversa nova começa pela leitura desses arquivos. Se a conversa que termina não atualizar esses
 arquivos, o trabalho dela se perde para a próxima.
 

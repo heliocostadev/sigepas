@@ -104,7 +104,7 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
   `{/*splat}`. O middleware de métricas foi corrigido.
 - Resultado: `npm run verificar` passou com 7 testes do domínio, 19 do back-end e 3 do front-end. A cobertura do
   back-end ficou em 96,8%. Os 2 testes do banco passaram com o PostgreSQL real no Docker.
-- O ambiente completo foi testado no computador do autor. A rota `/saude` respondeu 200 com o banco disponível. O Nginx
+- O ambiente completo foi testado localmente. A rota `/saude` respondeu 200 com o banco disponível. O Nginx
   devolveu 404 em `/api/metrics`. O Prometheus leu a API (situação "up"), e o Grafana respondeu.
 - Prova: ADR [0013](adr/0013-estrutura-e-versoes-do-esqueleto.md), proposta e aguardando a aprovação do autor do
   projeto.

@@ -55,8 +55,8 @@ O sistema roda seis contêineres: banco, API, Nginx, Caddy, Prometheus e Grafana
 
 - O custo estimado é de cerca de 20 dólares por mês (máquina, disco e IP fixo), descontados do crédito. O orçamento
   "My Zero-Spend Budget" pode mandar alerta quando o crédito começar a ser usado.
-- O estado do Terraform fica no computador do autor, fora do git. Se o arquivo se perder, o Terraform não reconhece mais
-  os recursos. Guardar o estado num bucket S3 fica como melhoria.
+- O estado do Terraform fica só no computador de quem roda o Terraform, fora do git. Se o arquivo se perder, o
+  Terraform não reconhece mais os recursos. Guardar o estado num bucket S3 fica como melhoria.
 - Antes do primeiro deploy, o autor do projeto cria no GitHub o ambiente `producao`, só para a `main`, e a proteção da
   `main`. Ele cria também as variáveis `DEPLOY_HABILITADO`, `DOMINIO`, `AWS_ID_DA_MAQUINA` e `AWS_PAPEL_DE_DEPLOY`.
   Depois do primeiro deploy, ele torna públicas as duas imagens do GitHub Container Registry, para a máquina baixá-las
