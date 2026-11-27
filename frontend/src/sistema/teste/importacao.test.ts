@@ -89,8 +89,10 @@ describe('Importar CSV', () => {
     expect(resumo).toContain('3locais novos para revisar');
     expect(texto('#impLocTit')).toContain('3 combinações novas');
     expect(texto('#conteudoModalLocais')).toContain('HOSPITAL REGIONAL DE EXEMPLO');
-    expect(texto('#conteudoModalLocais')).toContain('O Google indica que este local fica em São José');
+    // O sistema no ar não consulta o Google Maps: mesmo que a resposta traga a cidade, o aviso não aparece.
+    expect(texto('#conteudoModalLocais')).not.toContain('Google');
     expect(texto('#toastArea')).toContain('Cabeçalho fora do padrão.');
+    expect(texto('#toastArea')).toContain('Viagens importadas (12 cancelado(s) pela UBSF).');
   });
 
   it('importação sem pendências avisa o sucesso; erro da API aparece na tela', async () => {
