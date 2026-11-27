@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Hook SessionStart do Claude Code: no começo de cada conversa, procura a página
-// ONDE_PAREI_E_PROXIMOS_PASSOS.md subindo as pastas a partir do repositório (no computador do autor ela fica na pasta
+// ONDE_PAREI_E_PROXIMOS_PASSOS.md subindo as pastas a partir do repositório (ela fica na pasta
 // TCC, pasta-mãe do repositório) e entrega o conteúdo à IA. Em outra máquina, onde a página não existe, não faz nada.
 
 import { existsSync, readFileSync } from 'node:fs';

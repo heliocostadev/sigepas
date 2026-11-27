@@ -55,7 +55,7 @@ segurança de 24/11/2026.
 
 ## Primeira publicação, passo a passo
 
-No computador do autor, faça o login do AWS CLI:
+No computador, faça o login do AWS CLI:
 
 ```bash
 aws login --profile sigepas --region us-east-2
@@ -100,7 +100,7 @@ aws login --profile sigepas --region us-east-2
 - **Voltar uma versão:** na aba Actions, abra a execução do `Deploy` da versão anterior e clique em "Re-run all
   jobs". O GitHub repete o deploy com o commit daquela execução. O GitHub só aceita repetir uma execução até 30 dias
   depois dela. Para uma volta definitiva, faça um `git revert` por PR.
-- **Comandos do Systems Manager no computador do autor:** eles exigem o plugin do Session Manager instalado.
+- **Comandos do Systems Manager:** eles exigem o plugin do Session Manager instalado no computador.
   ```bash
   winget install Amazon.SessionManagerPlugin
   ```
@@ -142,13 +142,13 @@ aws login --profile sigepas --region us-east-2
   autor decide se mantém ou desliga. Para desligar, rode `terraform destroy` na pasta do Terraform. O volume do banco é
   apagado junto com a máquina.
 - **Cópia do estado do Terraform:** depois de cada `apply` ou `destroy`, copie o `terraform.tfstate` para a pasta
-  `ESTADO_DO_TERRAFORM`. Essa pasta fica no computador do autor, fora do repositório. Sem esse arquivo, o Terraform não
+  `ESTADO_DO_TERRAFORM`. Essa pasta fica fora do repositório. Sem esse arquivo, o Terraform não
   reconhece os recursos.
 
 ## O que ainda falta
 
 - **Cópia de segurança do banco** para o S3, com teste de restauração (ADR 0006). Entra antes do release.
-- **Estado do Terraform num bucket S3.** Hoje, o arquivo `terraform.tfstate` fica só no computador do autor, fora do
-  git. Se ele se perder, o Terraform não reconhece mais os recursos.
+- **Estado do Terraform num bucket S3.** Hoje, o arquivo `terraform.tfstate` fica só no
+  computador de quem roda o Terraform, fora do git. Se ele se perder, o Terraform não reconhece mais os recursos.
 - **Monitor externo de disponibilidade**, com alerta quando `/api/saude` parar de responder.
 - **Documento próprio do Systems Manager**, que aceite só um SHA da `main`, no lugar do `AWS-RunShellScript`.
