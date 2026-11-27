@@ -9,7 +9,7 @@ const CARRO = {
   roteiro: ['itajaí', 'florianópolis'],
   horaEmbarque: '04:30',
   localEmbarque: 'Secretaria da Saúde',
-  aviso: 'Levar a cadeira de rodas\nPassar no posto antes',
+  aviso: 'Levar a cadeira de rodas\nPassar na UBSF antes',
   passageiros: [
     { hora: '09:00', nome: 'MARIA FICTÍCIA', matricula: '900001', local: 'hospital regional', cidade: 'florianópolis', nascimento: '1950-01-01', acompanhante: 'JOSÉ ACOMPANHANTE', telefones: '(00) 0000-0001', telefonesAcomp: '(00) 0000-0002', enderecoEmbarque: 'Endereço do paciente', enderecoResidencia: 'Rua Fictícia, 10', observacao: 'Cadeirante', quantidade: 2 },
     { hora: '07:00', nome: 'BEBÊ FICTÍCIO', matricula: '900002', local: 'clínica', cidade: 'itajaí', nascimento: new Date(Date.now() - 200 * 86_400_000).toISOString().slice(0, 10), acompanhante: '', telefones: '', enderecoEmbarque: '', observacao: 'nenhuma', quantidade: 1 },
@@ -68,13 +68,18 @@ describe('mensagens e utilidades comuns das telas', () => {
     area.innerHTML = tela.cancelamentoCamposHTML('teste', 'MARIA <FICTÍCIA>', '');
     document.body.appendChild(area);
     expect(area.textContent).toContain('MARIA <FICTÍCIA>');
-    expect(area.textContent).toContain('Libera a vaga');
+    // Sem Lista de Tarefas nem envio ao sistema da prefeitura no ar: o texto diz só o que o servidor faz.
+    expect(area.textContent).toContain('Ele sai do carro e libera a vaga. O motivo fica registrado na confirmação.');
+    // Os campos servem também à demanda digitada à mão, que o servidor apaga sem guardar a justificativa.
+    expect(area.textContent).toContain('Justificativa (obrigatória)');
+    expect(area.textContent).not.toContain('fica registrada no cancelamento');
+    expect(area.textContent).not.toContain('Lista de Tarefas');
     expect(tela.cancelamentoLer('teste')).toBeNull();
     expect(document.getElementById('toastArea')?.textContent).toContain('Descreva a justificativa do cancelamento.');
     (document.getElementById('testeJustif') as HTMLTextAreaElement).value = 'Internada';
     expect(tela.cancelamentoLer('teste')).toEqual({ motivo: 'Paciente cancelou', justificativa: 'Internada', texto: 'Paciente cancelou: Internada' });
     expect(tela.cancelamentoLer('sem-campos')).toBeNull();
-    expect(tela.cancelamentoMarca('posto')).toBe('cancelado pelo posto');
+    expect(tela.cancelamentoMarca('posto')).toBe('cancelado pela UBSF');
     expect(tela.cancelamentoMarca('qualquer')).toBe('cancelado');
     area.remove();
   });
@@ -83,7 +88,7 @@ describe('mensagens e utilidades comuns das telas', () => {
     const msg = tela.gerarMensagemWhatsapp(structuredClone(CARRO), '2026-11-27', 'BEATRIZ EXEMPLO');
     expect(msg.startsWith('Olá, BEATRIZ EXEMPLO! Tudo bem?')).toBe(true);
     expect(msg).toContain('para o dia 27/11');
-    expect(msg).toContain('🚨 *AVISO URGENTE:*\n*Levar a cadeira de rodas*\n*Passar no posto antes*');
+    expect(msg).toContain('🚨 *AVISO URGENTE:*\n*Levar a cadeira de rodas*\n*Passar na UBSF antes*');
     expect(msg).toContain('*MOTORISTAS:* ANTÔNIO FICTÍCIO (ida) e BEATRIZ EXEMPLO (volta)');
     expect(msg).toContain('*ROTA:* Joinville -> Itajaí -> Florianópolis');
     expect(msg.indexOf('BEBÊ FICTÍCIO')).toBeLessThan(msg.indexOf('MARIA FICTÍCIA'));

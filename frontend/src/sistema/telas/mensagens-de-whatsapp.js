@@ -141,12 +141,12 @@
   const CANCEL_MOTIVOS = ['Paciente cancelou', 'Cancelado pelo setor', 'Outro'];
   function cancelamentoCamposHTML(prefixo, nome, textoExtra) {
     return '<p style="margin:0; font-size:14px; color:#475569;">Cancelar o paciente <b>' + cvAvisoEsc(nome || 'este paciente') + '</b>? '
-      + cvAvisoEsc(textoExtra || 'Libera a vaga e cria uma tarefa na Lista de Tarefas.') + '</p>'
+      + cvAvisoEsc(textoExtra || 'Ele sai do carro e libera a vaga. O motivo fica registrado na confirmação.') + '</p>'
       + '<label class="gm-form-lbl" for="' + prefixo + 'Motivo">Motivo</label>'
       + '<select id="' + prefixo + 'Motivo" class="gm-form-sel">'
       +   CANCEL_MOTIVOS.map(function (o) { return '<option>' + o + '</option>'; }).join('')
       + '</select>'
-      + '<label class="gm-form-lbl" for="' + prefixo + 'Justif">Justificativa (obrigatória — vai para a Lista de Tarefas / sistema da prefeitura)</label>'
+      + '<label class="gm-form-lbl" for="' + prefixo + 'Justif">Justificativa (obrigatória)</label>'
       + '<textarea id="' + prefixo + 'Justif" class="gm-form-txt" placeholder="Descreva o motivo do cancelamento"></textarea>';
   }
   // Lê e confere. Sem justificativa avisa e devolve null: quem chama NÃO fecha a janela.
@@ -164,7 +164,7 @@
   }
   // A marca do pedido cancelado na fila: quem cancelou. "posto" é o que veio cancelado do Olostech.
   function cancelamentoMarca(quem) {
-    return ({ posto: 'cancelado pelo posto', paciente: 'cancelado pelo paciente', setor: 'cancelado pelo setor',
+    return ({ posto: 'cancelado pela UBSF', paciente: 'cancelado pelo paciente', setor: 'cancelado pelo setor',
               outro: 'cancelado · outro motivo' })[quem] || 'cancelado';
   }
 

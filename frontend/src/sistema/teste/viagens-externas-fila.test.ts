@@ -159,15 +159,16 @@ describe('Viagens Externas: fila do dia, filtros e busca', () => {
     expect(textosDe('#dmCorpo .dm-cidade-row')).toEqual([expect.stringContaining('CURITIBA'), expect.stringContaining('ITAJAÍ')]);
   });
 
-  it('o botão de cancelados mostra e esconde os pedidos cancelados pelo posto', async () => {
+  it('o botão de cancelados mostra e esconde os pedidos cancelados pela UBSF', async () => {
     await abrirDia();
+    expect(elemento('#dmBtnCancel').getAttribute('title')).toBe('Pedidos cancelados pela UBSF');
     clicar('#dmBtnCancel');
     expect(elemento('#dmBtnCancel').classList.contains('on')).toBe(true);
     const linha = linhaDe('P1');
     expect(linha.classList.contains('cancelada')).toBe(true);
     expect(linha.querySelector('input')).toBeNull();
     expect(linha.querySelector('.dm-cancelar-linha')).toBeNull();
-    expect(linha.textContent).toContain('cancelado pelo posto');
+    expect(linha.textContent).toContain('cancelado pela UBSF');
     // O cancelado aparece, mas não conta como trabalho do dia.
     expect(texto('#dmResumo')).toContain('2 pac · 3 pass');
     clicar('#dmBtnCancel');
@@ -331,6 +332,14 @@ describe('Viagens Externas: painel do paciente, restrição e quantidade', () =>
     expect(aberto('dmDrawer')).toBe(false);
   });
 
+  it('a ficha de quem tem restrição diz que ela é gravada no pedido', async () => {
+    const dados = dia();
+    dados.pacientes[0] = { ...dados.pacientes[0], observacao: 'Cadeirante' };
+    await abrirDia(dados);
+    clicar(linhaDe('P8'));
+    expect(texto('#dmDrObsDica')).toBe('Grava no pedido.');
+  });
+
   it('salvar a restrição grava os três campos e mostra o aviso na linha', async () => {
     await abrirDia();
     clicar(linhaDe('P8'));
@@ -446,7 +455,10 @@ describe('Viagens Externas: cancelar, desfazer e apagar pedido da fila', () => {
     expect(aberto('dmCfm')).toBe(true);
     expect(texto('#dmCfmTit')).toBe('Cancelar paciente');
     expect(texto('#dmCfmCorpo')).toContain('HEITOR TESTE DA SILVA 007');
-    expect(texto('#dmCfmCorpo')).toContain('nasce uma tarefa na Lista de Tarefas');
+    // Não existe Lista de Tarefas no ar: a janela só lembra a baixa no OLOSTECH.
+    expect(texto('#dmCfmCorpo')).toContain('Ele sai da fila. Lembre-se de dar baixa no OLOSTECH.');
+    expect(texto('#dmCfmCorpo')).toContain('Justificativa (obrigatória)');
+    expect(texto('#dmCfmCorpo')).not.toContain('Lista de Tarefas');
     clicar('#dmCfmOk');
     expect(avisos()).toContain('Descreva a justificativa do cancelamento.');
     expect(chamadasA('/api/operacao/cancelar-pedido')).toEqual([]);
@@ -463,7 +475,7 @@ describe('Viagens Externas: cancelar, desfazer e apagar pedido da fila', () => {
     ]);
     expect(aberto('dmCfm')).toBe(false);
     expect(estado().selecionados).toEqual({ P4: true });
-    expect(avisos()).toContain('Paciente cancelado. A tarefa foi para a Lista de Tarefas.');
+    expect(avisos()).toContain('Paciente cancelado. Lembre-se de dar baixa no OLOSTECH.');
   });
 
   it('cancelar a demanda digitada à mão apaga a linha e zera a seleção', async () => {
@@ -472,7 +484,9 @@ describe('Viagens Externas: cancelar, desfazer e apagar pedido da fila', () => {
     await abrirDia(dados);
     marcar(caixaDe('P4'));
     tela.dmCancelarPedido('P8');
-    expect(texto('#dmCfmCorpo')).toContain('digitada à mão');
+    expect(texto('#dmCfmCorpo')).toContain('Esta demanda foi digitada à mão. Ela é apagada da fila, porque não existe no OLOSTECH.');
+    // O servidor apaga a demanda e não guarda a justificativa: a janela não pode dizer que ela fica registrada.
+    expect(texto('#dmCfmCorpo')).not.toContain('fica registrada');
     apiFalsa('/api/operacao/cancelar-pedido', () => ({ ...dia(), acaoCancelamento: 'apagada' }));
     preencher('#dmCancJustif', 'Lançada por engano');
     clicar('#dmCfmOk');
@@ -520,6 +534,7 @@ describe('Viagens Externas: cancelar, desfazer e apagar pedido da fila', () => {
     expect(texto('#dmDrCorpo .dm-dr-cancelar')).toContain('Paciente internado');
     clicar(botaoComTexto('#dmDrCorpo', 'Desfazer cancelamento'));
     expect(texto('#dmCfmTit')).toBe('Desfazer o cancelamento?');
+    expect(texto('#dmCfmCorpo')).not.toContain('Lista de Tarefas');
     clicar('#dmCfmOk');
     expect(texto('#dmCfmOk')).toBe('Desfazendo...');
     await esperar();
@@ -552,6 +567,7 @@ describe('Viagens Externas: cancelar, desfazer e apagar pedido da fila', () => {
     expect(texto('#dmDrCorpo')).not.toContain('Cancelar pedido');
     clicar('#dmDrBtnApagar');
     expect(texto('#dmCfmTit')).toBe('Apagar esta demanda?');
+    expect(texto('#dmCfmCorpo')).toContain('Isto não avisa o paciente nem a UBSF.');
     clicar('#dmCfmOk');
     await esperar();
     expect(chamadasA('/api/operacao/excluir-pedido-digitado')).toEqual([['D-A7895223', '27/11/2026']]);

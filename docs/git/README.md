@@ -3,7 +3,7 @@
 ## Branches
 
 - **`main`:** o que está estável e publicado. Ninguém escreve direto.
-- **`dev`:** integração. Todo PR aponta para cá.
+- **`dev`:** integração. Todo PR de trabalho aponta para cá. A publicação é um PR da `dev` para a `main`.
 - **`feat/...`, `fix/...`, `docs/...`, `chore/...`:** uma branch por assunto, curta, saída da `dev`.
 
 É o fluxo que o SIGEPAS usa desde a N1 do PAC VIII e o mesmo descrito pelo colega Bruno.
@@ -34,7 +34,9 @@ no `README.md` e no `CLAUDE.md` do repositório.
 - O modelo em `.github/pull_request_template.md` pede a regra de negócio, a spec, como foi verificado, a segurança e
   **onde você quer a opinião de quem revisa**. Perguntas na descrição renderam as melhores reviews da N1.
 - Correção de defeito apontado por colega cita o link completo da issue e responde a ela com o commit.
-- O merge só acontece com o "CI aprovado" verde e pelo menos uma revisão.
+- O merge só acontece com a verificação "CI aprovado" verde. A proteção da `main` exige PR e essa verificação, sem
+  aprovação obrigatória. A proteção da `dev` exige a mesma verificação. Nenhuma das duas exige revisão de outra
+  pessoa.
 - Nada é publicado (PR, comentário, issue) sem que o texto seja lido antes.
 
 ## Textos publicados

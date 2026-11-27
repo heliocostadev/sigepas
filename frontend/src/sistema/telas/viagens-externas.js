@@ -313,7 +313,7 @@
     // Vem PRIMEIRO, antes dos avisos de idade: e o unico que muda se a viagem deve
     // acontecer. Reusa a `.alerta-pill`, que ja e o lugar dos avisos dentro do chip.
     if (p.pedidoCancelado) {
-      pills = '<span class="alerta-pill a-perigo" title="O posto cancelou este pedido '
+      pills = '<span class="alerta-pill a-perigo" title="A UBSF cancelou este pedido '
             + 'depois que o carro foi montado. Confira antes de sair.">'
             + '🚫 PEDIDO CANCELADO</span>' + pills;
     }
@@ -651,7 +651,7 @@
 
     const btn = document.getElementById('dmMoNext');
     if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
-    document.getElementById('dmMoDica').textContent = 'Gravando na planilha...';
+    document.getElementById('dmMoDica').textContent = 'Gravando no sistema...';
 
     const placa = m.editando;
     chamarServidor('atualizarCarroAlocado', [estadoDm.data, placa, {
@@ -1159,7 +1159,7 @@
       + '<div class="dm-dr-obs-acoes">'
       +   '<button class="dm-dr-salvar" id="dmDrBtnObs" onclick="dmSalvarRestricao(\'' + dmAspas(p.id) + '\')">Salvar</button>'
       +   '<span class="dm-dr-obs-dica" id="dmDrObsDica">'
-      +     (restr ? 'Grava na planilha do dia.' : 'Nada que conte como restrição.')
+      +     (restr ? 'Grava no pedido.' : 'Nada que conte como restrição.')
       +   '</span>'
       + '</div></div>';
 
@@ -1218,13 +1218,14 @@
   // ---- Cancelar pedido na fila (05/10/2026) ----------------------------------------
   // A MESMA janela do Cancelar da Guia: os campos vêm do cancelamentoCamposHTML (WhatsappFormatter) e aparecem
   // na janela DESTA tela (dmConfirmar), porque a da Guia mora dentro da aba dela e fica escondida aqui.
-  // Sem otimismo: a fila só muda depois que o servidor confirmar (grava na planilha e cria a tarefa).
-  // A digitada à mão sai da fila sem tarefa (não existe no Olostech): quem decide é o servidor.
+  // Sem otimismo: a fila só muda depois que o servidor confirmar o cancelamento.
+  // A digitada à mão é apagada da fila (não existe no OLOSTECH): quem decide é o servidor.
+  // A Lista de Tarefas do Apps Script não faz parte desta entrega: a janela só lembra a baixa no OLOSTECH.
 
   // A marca do cancelado: quem cancelou. Sem o campo (servidor antigo colado), é o do posto, como sempre foi.
   function dmMarcaCancelado(p) {
     const quem = p.canceladoPor || 'posto';
-    return (typeof cancelamentoMarca === 'function') ? cancelamentoMarca(quem) : 'cancelado pelo posto';
+    return (typeof cancelamentoMarca === 'function') ? cancelamentoMarca(quem) : 'cancelado pela UBSF';
   }
 
   // Na ficha: "Cancelar pedido" para quem está na fila; "Desfazer cancelamento" para o cancelado AQUI (o do
@@ -1249,8 +1250,8 @@
     if (!p.chaveDemanda) { toast('Pedido sem identificação. Recarregue a tela.', 'erro'); return; }
     if (typeof cancelamentoCamposHTML !== 'function') { toast('Recarregue o sistema (Ctrl+Shift+R) e tente de novo.', 'erro'); return; }
     const extra = p.origemManual
-      ? 'Esta demanda foi digitada à mão: ela sai da fila e não gera tarefa, porque não existe no Olostech.'
-      : 'Ele sai da fila e nasce uma tarefa na Lista de Tarefas para dar baixa no Olostech.';
+      ? 'Esta demanda foi digitada à mão. Ela é apagada da fila, porque não existe no OLOSTECH.'
+      : 'Ele sai da fila. Lembre-se de dar baixa no OLOSTECH.';
     dmConfirmar('Cancelar paciente', cancelamentoCamposHTML('dmCanc', dmNomeExib(p), extra), 'Confirmar cancelamento', 'perigo', function () {
       const c = cancelamentoLer('dmCanc');
       if (!c) return;   // sem justificativa: a janela fica aberta e o botão continua armado
@@ -1264,7 +1265,7 @@
           // "Apagar da fila". Cancelar não apaga linha: sai da seleção só quem foi cancelado.
           if (apagada) estadoDm.selecionados = {}; else delete estadoDm.selecionados[id];
           dmCarregar(res);
-          toast(apagada ? 'Demanda apagada da fila.' : 'Paciente cancelado. A tarefa foi para a Lista de Tarefas.', 'ok');
+          toast(apagada ? 'Demanda apagada da fila.' : 'Paciente cancelado. Lembre-se de dar baixa no OLOSTECH.', 'ok');
           if (!apagada && typeof atualizarBadgeKanban === 'function') atualizarBadgeKanban();
         }, function (err) {
           dmConfirmaOcupado('');
@@ -1279,9 +1280,7 @@
     if (!p || !p.canceladoNaFila) return;
     dmConfirmar(
       'Desfazer o cancelamento?',
-      '<p><b>' + dmEsc(dmNomeExib(p) || 'O paciente') + '</b> volta para a fila, pronto para entrar num carro.</p>'
-      + '<p>Se a tarefa de baixa ainda estiver pendente na Lista de Tarefas, ela sai. Se já foi registrada, nasce uma '
-      + 'tarefa avisando que o pedido voltou.</p>',
+      '<p><b>' + dmEsc(dmNomeExib(p) || 'O paciente') + '</b> volta para a fila, pronto para entrar num carro.</p>',
       'Desfazer cancelamento',
       '',
       function () {
@@ -1313,7 +1312,7 @@
     dmConfirmar(
       'Apagar esta demanda?',
       '<p>A demanda de <b>' + dmEsc(dmNomeExib(p) || 'sem nome') + '</b> sai da fila e não volta.</p>'
-      + '<p>Isto não avisa o paciente nem o posto.</p>',
+      + '<p>Isto não avisa o paciente nem a UBSF.</p>',
       'Apagar',
       'perigo',
       function () {
@@ -2721,7 +2720,7 @@
     const placa = m.placa, n = pac.length;
     const btn = document.getElementById('dmMoNext');
     if (btn) { btn.disabled = true; btn.textContent = 'Gravando...'; }
-    document.getElementById('dmMoDica').textContent = 'Gravando na planilha...';
+    document.getElementById('dmMoDica').textContent = 'Gravando no sistema...';
 
     chamarServidor('salvarViagensAlocadas', [payload], function () {
         dmFecharModal();
@@ -3795,7 +3794,7 @@
         // 📌 Vale na edição também: trocar o destino para Joinville TIRA a demanda desta
         // fila e a manda para a outra tela — mudança grande demais para acontecer calada.
         if (dmNorm(cid) === 'JOINVILLE') {
-          toast('Destino Joinville: esta demanda está na Remoção Interna, não nesta fila.', 'aviso');
+          toast('Destino Joinville é remoção interna, que fica fora desta entrega. Esta demanda não entra na fila de viagens externas.', 'aviso');
           dmAvisarRemocaoInterna();
         } else {
           toast(editando ? 'Demanda atualizada.' : 'Paciente incluído na fila com sucesso.', 'ok');

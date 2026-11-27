@@ -113,7 +113,9 @@ aws login --profile sigepas --region us-east-2
   sudo docker compose -f /opt/sigepas/infraestrutura/producao/docker-compose.yml --env-file /opt/sigepas/.env ps
   ```
 - **Abrir o Grafana:** crie um túnel até a porta 3001 da máquina e acesse `http://localhost:3001`. O usuário é
-  `admin`. A senha está em `/opt/sigepas/.env` (`SENHA_DO_GRAFANA`), legível só pelo root.
+  `admin`. A senha está em `/opt/sigepas/.env` (`SENHA_DO_GRAFANA`), legível só pelo root. O Grafana sobe só com a
+  fonte de dados do Prometheus. Como o repositório não tem painel do SIGEPAS, consulte as métricas pelo Explore, por
+  exemplo `sigepas_requisicoes_http_total`.
   ```bash
   aws ssm start-session --profile sigepas --region us-east-2 --target <id_da_maquina> --document-name AWS-StartPortForwardingSession --parameters portNumber=3001,localPortNumber=3001
   ```
@@ -147,8 +149,10 @@ aws login --profile sigepas --region us-east-2
 
 ## O que ainda falta
 
-- **Cópia de segurança do banco** para o S3, com teste de restauração (ADR 0006). Entra antes do release.
+- **Cópia de segurança do banco** para o S3, com teste de restauração (ADR 0006). Ficou pendente depois do release
+  v1.0.0. Hoje o volume do banco fica só no disco da máquina.
 - **Estado do Terraform num bucket S3.** Hoje, o arquivo `terraform.tfstate` fica só no
   computador de quem roda o Terraform, fora do git. Se ele se perder, o Terraform não reconhece mais os recursos.
 - **Monitor externo de disponibilidade**, com alerta quando `/api/saude` parar de responder.
 - **Documento próprio do Systems Manager**, que aceite só um SHA da `main`, no lugar do `AWS-RunShellScript`.
+- **Painel do SIGEPAS no Grafana**, guardado no repositório e carregado na subida, e **alertas** das métricas.

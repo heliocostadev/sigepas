@@ -308,3 +308,36 @@ Formato de cada entrada: número, data, o que aconteceu, a prova (commit, PR, is
 - Medição feita em 27/11/2026 no repositório do SIGEPAS em Apps Script, só com leitura. Da versão 18 à 42, as mudanças
   que tocam os três fluxos somam cerca de 4.800 linhas. As versões 38, 39 e 42 tratam de WhatsApp e da Remoção
   Interna, que estão fora desta entrega.
+
+## R-0022 · 27/11/2026 · Documentação alinhada ao sistema no ar
+
+- Esta entrada corrige o fluxo 3 da R-0003. Decisão de 26/11/2026: a entrega tem três fluxos. O fluxo 1 vai do
+  arquivo CSV do OLOSTECH à fila do dia. O fluxo 2 vai do pedido ao carro escalado, com motoristas, carros e escala.
+  O fluxo 3 é a confirmação do paciente, só com a marcação de confirmado ou não confirmado e sem WhatsApp. A remoção
+  interna e os transportes dentro de Joinville ficaram fora e são melhoria futura. A entrega usa só dados fictícios.
+- Decisão sobre os papéis, registrada em 27/11/2026 com estas palavras: "Quem trabalha no setor manipula tudo o que
+  tem no sistema. É premissa que no setor de transportes todos estejam hábeis e capazes de fazer a logística dos que
+  solicitam a viagem."
+- Consequência da decisão: toda a logística é de todos do setor, operador e gestor. Isso inclui importação, fila,
+  carros, escala, confirmação e guias. No sistema no ar, só as seis rotas que alteram os cadastros e as configurações
+  exigem o papel de gestor, com a marca `@SoGestor`. As contas nascem pelo comando `criar-conta`. Nenhuma permissão
+  foi mudada no código.
+- O release v1.0.0 foi publicado em 27/11/2026, a partir do commit `d7c1eef`. Nenhuma entrada anterior o registrava.
+- O que mudou: a documentação pública foi conferida contra o código da `main` no commit `3dbc261`, que é o que está
+  no ar. O texto que descrevia função inexistente passou a dizer que ela é planejada ou melhoria futura, sem prazo.
+  O modelo de ameaça passou a citar o hash scrypt e o escape de HTML feito à mão nas telas dos fluxos. Ele também
+  descreve os papéis decididos acima. A verificação com axe e o teste de ponta a ponta passaram a constar como
+  planejados. Os itens de segurança com prazo "antes do release" que não foram feitos passaram a constar como pendentes depois da v1.0.0.
+  O guia de instalação passou a apontar `backend/src/regras/` como o lugar das regras que rodam. Ele também diz que
+  só a tela de entrada é React. As regras de Git passaram a dizer que a proteção da `main` exige o "CI aprovado" e não
+  exige revisão.
+- As telas também mudaram, porque prometiam função que não existe no ar. Saíram o filtro e o contador "Enviada" da
+  Confirmação e Guias, a opção "Google" e o aviso do Google na padronização de locais e o botão "Importar do site" do
+  calendário. Os avisos deixaram de citar a Lista de Tarefas, a aba Remoção Interna, a planilha e a `bd_motoristas`,
+  e "posto" virou UBSF. Nenhuma regra de negócio nem permissão mudou. Os testes das telas foram ajustados antes de
+  cada mudança.
+- Ficaram para depois: o código do WhatsApp do paciente em `confirmacao-e-guias.js`, que a tela esconde, e o pedido
+  digitado à mão com destino Joinville, que é gravado e não aparece em nenhuma tela.
+- Prova: leitura do código em 27/11/2026. `gh api repos/heliocostadev/sigepas/branches/main/protection` mostrou a
+  verificação "CI aprovado" e zero aprovações obrigatórias. `gh release view v1.0.0` mostrou a publicação às 00h13 de
+  27/11/2026 (horário de Brasília) no commit `d7c1eef`.

@@ -223,6 +223,9 @@ describe('Configurações', () => {
   it('dar baixa passa pela confirmação, e reverter a baixa vai direto', async () => {
     tela.aba3Baixa('motoristas', 'ANA SERVIDORA', true);
     expect(texto('#modalBaixaTexto')).toContain('Dar baixa em ANA SERVIDORA?');
+    // O cadastro fica no banco do sistema, não numa planilha.
+    expect(texto('#modalBaixaTexto')).toContain('nada é apagado. O cadastro continua guardado e as viagens já feitas seguem mostrando o nome normalmente.');
+    expect(texto('#modalBaixaTexto')).not.toContain('planilha');
     clicar('#btnConfirmarBaixa');
     await esperar();
     expect(chamadasA('/api/cadastros/salvar')[0]?.[2]).toMatchObject({ motivo: 'Baixado' });
@@ -337,6 +340,12 @@ describe('Configurações', () => {
     expect(tela.aba3DiaSemana('x')).toBe('');
   });
 
+  it('o calendário não oferece importar do site, que não existe nesta versão', () => {
+    const botoes = Array.from(document.querySelectorAll('#sec-calendario button')).map((b) => (b.textContent ?? '').trim());
+    expect(botoes).toContain('Novo dia');
+    expect(botoes).not.toContain('Importar do site');
+  });
+
   it('importar o calendário do site da Prefeitura avisa que não existe nesta versão', async () => {
     tela.abrirModalImportar();
     valor('cal_imp_ano', '');
@@ -367,6 +376,7 @@ describe('Configurações', () => {
     tela.aba3PadCarregar(false);
     await esperar();
     expect(texto('#padN')).toBe('3 nomes');
+    expect(document.body.textContent).toContain('Como cada cidade e local chega no CSV do OLOSTECH');
     expect(texto('#padInfo')).toContain('1 mantidos como vieram');
     expect(linhas('padronizacao').join(' ')).toContain('Sugestão');
     tela.aba3PadCarregar(false);
@@ -379,6 +389,8 @@ describe('Configurações', () => {
     expect(linhas('padronizacao')[0]).toContain('Nenhum nome com esses filtros.');
     tela.aba3PadLimpar();
     valor('padCidade', 'BLUMENAU');
+    // O sistema no ar não consulta o Google: o filtro não oferece essa origem.
+    expect(Array.from((document.getElementById('padOrigem') as HTMLSelectElement).options).map((o) => o.textContent)).toEqual(['Todos', 'Sugestão', 'Digitado', 'Mantido como veio']);
     valor('padOrigem', 'outra');
     tela.aba3PadFiltrar();
     expect(texto('#padInfo')).toBe('Mostrando 1 de 1');
