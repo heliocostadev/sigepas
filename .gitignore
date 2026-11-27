@@ -31,3 +31,6 @@ crash.log
 
 # Cliente do Prisma, gerado a partir de backend/prisma/schema.prisma pelo comando prisma generate
 backend/src/gerado/
+
+# Páginas da Wiki montadas por scripts/montar-paginas-da-wiki.mjs
+paginas-da-wiki/
